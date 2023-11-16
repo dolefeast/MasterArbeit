@@ -5,7 +5,7 @@ electric field and the scalar field.
 
 from __init__ import *
 from dataclasses import dataclass
-
+import matplotlib.pyplot as plt
 
 @dataclass
 class Scalar_Field(object):
@@ -21,27 +21,28 @@ class Scalar_Field(object):
         deriv: the derivative wrt z of the field
     """
     #Implement here Robin boundary conditions? 
-    value: np.ndarray
+    value: None=None
     mass: float=1
     charge: float=1
     n_points: int=50
 
     def __post_init__(self):
-        try: 
-            iter(value)
-            self.value = np.array(value) #If value is an array, leave as is.
-                                    #Change into numpy array just in 
-                                    #case.
-        except TypeError:
-            self.value = value * np.array(self.n_points) #If value is scalar, it
-                                               #was expected to be constant
-                                               #value, thus create new array
-        except NameError:
+        if self.value is None:
             self.value = np.zeros(self.n_points)         #If value is not given, create
                                                #empty sequence.
+        else:
+            try: 
+                iter(self.value)
+                self.value = np.array(self.value) #If value is an array, leave as is.
+                                        #Change into numpy array just in 
+                                        #case.
+                self.n_points = len(self.value)
+            except TypeError:
+                self.value = self.value * np.ones(self.n_points) #If value is scalar, it
+                                                   #was expected to be constant
+                                                   #value, thus create new array
+        self.z = np.linspace(0, 1, self.n_points)
 
-    z: np.ndarray = np.linspace(0, 1, n_points)
-    
     def __add__(self, other_field):
         assert self.mass == other_field.mass
         assert self.charge == other_field.charge
@@ -55,21 +56,34 @@ class Scalar_Field(object):
     def __getitem__(self, index):
         return self.value[index]
 
+    def __call__(self, z):
+        raise Exception("This is not working yet, sorry!")
+        return self[0] #Do I need this?
+
     def __mul__(self, k):
-        if isinstance(k, float) or isinstance(k, complex):
+        try:
+            iter(k)
+            assert np.shape(k) == np.shape(self.value)
+            is_iterable = True
+        except TypeError:
+            is_iterable = False
+        except AssertionError: 
+            raise AssertionError("The shapes of the scalar and the field do not match")
+        if isinstance(k, (float, int)) or isinstance(k, complex) or is_iterable:
             return Scalar_Field(mass=self.mass,
                     charge=self.charge,
                     n_points=self.n_points,
                     value = k * self.value)
         else:
-            raise TypeError("k must be a real or complex scalar!")
+            raise TypeError("k must be a real or complex scalar (function)!")
         pass
 
+    def __rmul__(self, k):
+        return self*k
 
-phi1 = Scalar_Field(value=1)
-print(phi1)
-
-phi2 = Scalar_Field()
+    def plot(self):
+        #plot method??
+        return 
 
 
 @dataclass
@@ -81,4 +95,18 @@ class Ambient:
     #electric field MUST be continuous and thus equal to 
     #some fixed value on the boundaries.
     pass
+
+
+if __name__ == "__main__":
+    values = 5
+    phi1 = Scalar_Field(value=values, n_points=500)
+
+    phi2 = Scalar_Field(value=1)
+
+    f = lambda z, sigma, z0: 1/np.sqrt(2*np.pi*sigma**2) * np.exp(-(z-z0)**2/2/sigma**2)
+    k = f(np.linspace(0,1,phi1.n_points) , 0.025, 0.5)
+
+    print(phi1*k)
+    plt.plot(phi1.value*k)
+    plt.show()
 
