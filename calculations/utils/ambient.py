@@ -6,6 +6,8 @@ electric field and the scalar field.
 from __init__ import *
 from dataclasses import dataclass
 import matplotlib.pyplot as plt
+import scipy as sp
+import sys
 
 @dataclass
 class Scalar_Field(object):
@@ -25,6 +27,8 @@ class Scalar_Field(object):
     mass: float=1
     charge: float=1
     n_points: int=50
+    _field_derivative: np.ndarray = None
+    _field_integral: np.ndarray = None
 
     def __post_init__(self):
         if self.value is None:
@@ -42,6 +46,10 @@ class Scalar_Field(object):
                                                    #was expected to be constant
                                                    #value, thus create new array
         self.z = np.linspace(0, 1, self.n_points)
+
+    
+    def __repr__(self):
+        return f'Scalar_Field(mass={self.mass}, charge={self.charge})'
 
     def __add__(self, other_field):
         assert self.mass == other_field.mass
@@ -81,10 +89,46 @@ class Scalar_Field(object):
     def __rmul__(self, k):
         return self*k
 
-    def plot(self):
-        #plot method??
-        return 
+    def __call__(self, z):
+        return self[int(self.n_points * z)]
 
+    @property
+    def field_integral(self):
+        if self._field_integral is None:
+            self._field_integral = self.calculate_field_integral()
+
+        return self._field_integral
+    
+    def calculate_field_integral(self, method='quad'):
+        self.methods={'quad': sp.integrate.quad,
+                'fixed_quad': sp.integrate.fixed_quad,
+                'gaussian': sp.integrate.fixed_quad,
+                'quadrature': sp.integrate.quadrature}
+
+        z0 = min(self.z) #Should be 0
+        z1 = max(self.z) #Should be 1
+        if method not in self.methods.keys():
+            raise TypeError(f"The supplied method of integration {method} is not a valid one!\n\t Please input one of the following: {self.methods.keys()}")
+
+
+
+        return self.methods[method](self.value, z0, z1) #Watch out! This is total integral of the field, not F(x) s.t. F'(x) = phi(x)
+
+    
+    @property
+    def field_derivative(self): #To calculate the derivative each time
+                                #the object is generated is costly 
+                                #and absurd. This way it will only 
+                                #generate it if called.
+        if self._field_derivative is None:
+            self._field_derivative = self.calculate_field_derivative()
+
+        return self._field_derivative
+
+    def calculate_field_derivative(self, order=1):
+        diff_phi = np.diff(self.value, order)
+        diff_phi = np.append(diff_phi, diff_phi[-1])
+        return  diff_phi * self.n_points
 
 @dataclass
 class Ambient:
@@ -98,15 +142,16 @@ class Ambient:
 
 
 if __name__ == "__main__":
-    values = 5
-    phi1 = Scalar_Field(value=values, n_points=500)
 
-    phi2 = Scalar_Field(value=1)
+    n_points = 500
 
-    f = lambda z, sigma, z0: 1/np.sqrt(2*np.pi*sigma**2) * np.exp(-(z-z0)**2/2/sigma**2)
-    k = f(np.linspace(0,1,phi1.n_points) , 0.025, 0.5)
+    #f = lambda z, sigma, z0: 1/np.sqrt(2*np.pi*sigma**2) * np.exp(-(z-z0)**2/2/sigma**2)
+    f = lambda z, sigma, z0: z**2
+    value = f(np.linspace(0,1,n_points) , 0.025, 0.5)
+    phi1 = Scalar_Field(value=value)
 
-    print(phi1*k)
-    plt.plot(phi1.value*k)
+    plt.plot(phi1.z, phi1.value)
+    plt.plot(phi1.z, phi1.field_derivative)
+    print(phi1.field_integral('gauss'))
     plt.show()
 
