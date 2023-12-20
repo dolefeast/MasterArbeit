@@ -1,6 +1,12 @@
 import numpy as np
 
 class Klein_Gordon:
+    def  __init__(self):
+        self.boundary_conditions ={
+                'dirichlet': self.dirichlet_boundary_conditions,
+                'neumann': self.neumann_boundary_conditions}
+        print('holi estoy iniciando la clase kleinordob')
+
     def differential_equation(self, z, f, p):
         """The differential equation ruling the system, after assuming 
         phi_n(z, t) = exp(-i omega_n t) phi(z)
@@ -16,7 +22,7 @@ class Klein_Gordon:
             #field = -self.field_strengh*(z -1/2) #Means I am not trying to vary 
                                                 #the field (yet)
 
-        klein_gordon = np.array((f[1], (omega_n**2 - 2*e*omega_n * field -  field**2*e**2 - self.phi.mass**2)*f[0]))
+        klein_gordon = np.array((f[1], -(omega_n**2 - 2*e*omega_n * field -  field**2*e**2 - self.phi.mass**2)*f[0]))
         #klein_gordon = np.array((f[1], -omega_n ** 2 * f[0]))
         return klein_gordon
 
@@ -26,6 +32,6 @@ class Klein_Gordon:
 
     def dirichlet_boundary_conditions(self, ya, yb, p):
         omega_n, = p
-        bcs = np.array((ya[0], yb[0], ya[1] - omega_n))
+        bcs = np.array((ya[0], yb[0], yb[1]-1))
         return bcs
 

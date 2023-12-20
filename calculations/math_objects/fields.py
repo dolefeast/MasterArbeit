@@ -107,7 +107,17 @@ class Field(object):
         return self.methods[method](self, z0, z1)[0] #Watch out! This is total integral of the field, not F(x) s.t. F'(x) = phi(x)
 
     def norm_squared(self, method='quad'):
+        """Calculates the square of the L2 norm of the field
+        Parameters:
+            method: str. The method used for the integration in scipy.integrate
+        Returns:
+            norm_squared: float. The norm squared of the field. The integral from 0 to 1 of the wave function times itself, complex conjugated
+        """
         return sp.integrate.quad(self.value*np.conjugate(self.value))
+
+    def normalize(self, method='quad'):
+        norm = np.sqrt(self.norm_squared)
+        self.value /= norm
 
     def conjugate(self):
         return np.conjugate(self.value)

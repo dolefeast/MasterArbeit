@@ -1,6 +1,10 @@
-from ambient import Field, Vector_Potential
+from math_objects.fields import Field, Vector_Potential
+from math_objects.value_generator import value_generator
+from math_objects.unique_floats import unique_floats, float_in_array
+from math_objects.Klein_Gordon import Klein_Gordon
+
+import matplotlib.pyplot as plt
 import numpy as np
-from Klein_Gordon import Klein_Gordon
 import scipy as sp
 
 class System(Klein_Gordon):
@@ -60,7 +64,96 @@ class System(Klein_Gordon):
                     mass=self.scalar_mass, 
                     n_points=self.n_points,
                     name=scalar_name)
-            A_field = -field_strengh * (self.z - 1/2)
-            self.A0 = Vector_Potential(value=A_field,
+            self.A_field_base = - field_strengh * (self.z - 1/2)
+            self.A0 = Vector_Potential(value=self.A_field_base,
                     n_points=self.n_points)
 
+    def first_n_eigenstates(self, 
+                            n,
+                            omega_0_guess=0,
+                            omega_ratio=1e-2,
+                            method='linear',
+                            tol=1e-2,
+                            boundary_conditions='dirichlet'):
+        """
+        Calculates the first n eigenstates of the system and its energies
+        Parameters:
+            n: number of desired eigenstates
+            omega_0_guess: guess for the frequency of the 
+            boundary_conditions: dirichlet or neumann 
+            tol: 
+        Returns:
+            eigenstates: [sol1, ...] a 1xn array of scipy.integrate.solve_bvp solution objects
+        """
+
+        #bcs = self.boundary_conditions[boundary_conditions]
+        omega_array = []
+        eigenstates = []
+        for i, omega_guess in enumerate(value_generator(omega_0_guess, omega_ratio, method=method)):
+            #print('Estoy en el intento n', i, 'Omega_guess =', omega_guess)
+            solution = sp.integrate.solve_bvp(self.differential_equation,
+                    self.dirichlet_boundary_conditions,
+                    #self.dirichlet_boundary_conditions,
+                    self.z, 
+                    (self.phi.value, self.phi.gradient.value),
+                    p=(omega_guess, ),
+                    tol=tol)
+
+            omega_solution = solution.p[0]
+            if float_in_array(omega_solution, omega_array, tol=tol):
+                continue
+            else:
+                omega_array.append(omega_solution)
+                eigenstates.append(solution)
+
+            if len(omega_array) >= n:
+                break
+        return eigenstates
+
+    def calculate_charge_density(self, z, eigenstates):
+        """
+        Calculates the charge density in the system given a certain family of solutions
+        Parameters:
+            z: float the z value at which the charge density is being calculated
+            eigenstates: [scipy.integrate.solve_bvp]
+        Returns: 
+            charge_density: float, the charge density at z
+        """
+
+        charge_density = 0
+        for solution in eigenstates:
+            omega_n = solution.p[0]
+            phi = solution.sol(z)[0]
+            factor = omega_n - self.phi.charge * self.A0(z)
+            charge_density += factor * np.linalg.norm(phi)**2
+
+        return charge_density 
+
+    def new_electric_field(self, z, eigenstates):
+        """
+        Calculates the corresponding electric field to a certain charge density
+        Parameters:
+            z: float. The z value at which the electric field is to be calculated
+            eigenstates: SolutionArray. A given solution array to calculate_charge_density
+        Returns:
+            electric_field: float, the electric field at z
+            """
+     
+        charge_density_at_z = lambda z, eigenstates: self.calculate_charge_density(z, eigenstates)     
+        modified_electric = sp.integrate.quad(charge_density, 0, z, args=eigenstates) 
+         
+        return modified_electric 
+
+    def new_vector_field(self, z, eigenstates):
+        """
+        Calculates the new vector field A0 corresponding to a family of solutions to the previous one
+        Parameters:
+            z: float. The z value at which A0 field is to be calculated
+            eigenstates: SolutionArray. A given solution array to calculate_charge_density
+        Returns:
+            new_vector_field: float, the electromagnetic field at z
+        """
+        electric_field_at_z = lambda z, eigenstates: self.new_electric_field(z, eigenstates)
+        modified_vector_field = -sp.integrate.quad(electric_field_at_z, 0, z, args=eigenstates) - self.field_strength * (z-1/2)
+
+        return modified_vector_field
