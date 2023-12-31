@@ -21,7 +21,7 @@ class System(Klein_Gordon):
         scalar_name: str = 'phi'    #The name of the field, for plotting reasons
         scalar_value: np.ndarray = 1#Initial guess for the value of the scalar field
                                     #If scalar, then it is just a repetition of that scalar.
-        field_strengh: float = 1    #The (external) electric field strength to which our system
+        field_strength: float = 1    #The (external) electric field strength to which our system
                                     #is subject to. 
     """
     #Since the integro differential equations are coupled,
@@ -43,19 +43,18 @@ class System(Klein_Gordon):
     #   => Choose C such that A(0) is ALWAYS the same
     #Always = after each iteration to calculate the 'true' resultant field
     def __init__(self, 
-        scalar_mass: float=1,
-        scalar_charge: float=1,
+        field_strength: function,
+        scalar_mass: float,
+        scalar_charge: float,
         n_points = 100,
         scalar_name: str='phi1',
-        scalar_value: np.ndarray=1,
-        field_strengh: float = 1):
+        scalar_value: np.ndarray=1):
 
             self.scalar_mass = scalar_mass
             self.scalar_charge = scalar_charge
             self.n_points = n_points
             self.scalar_name = scalar_name
             self.scalar_value = scalar_value
-            self.field_strengh = field_strengh
 
             self.z = np.linspace(0, 1, n_points)
 
@@ -64,7 +63,14 @@ class System(Klein_Gordon):
                     mass=self.scalar_mass, 
                     n_points=self.n_points,
                     name=scalar_name)
-            self.A_field_base = - field_strengh * (self.z - 1/2)
+
+            try:
+                field_strength(0)
+                self.A_field_base = field_strength #field_strength is already the field
+            except TypeError:
+                #field_strength is only the lambda factor. we are in the first iteration
+                self.A_field_base = - field_strength * (self.z - 1/2)
+
             self.A0 = Vector_Potential(value=self.A_field_base,
                     n_points=self.n_points)
 

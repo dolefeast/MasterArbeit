@@ -12,7 +12,7 @@ N_POINTS = 300
 scalar_value = 1
 scalar_mass = 1
 
-fig, ax = plt.subplots(figsize=(16, 9))
+fig, (ax_fields, ax_omegas) = plt.subplots(1, 2, figsize=(16, 9))
 
 systesm = system.System(scalar_name = 'phi', 
         n_points = N_POINTS,
@@ -28,7 +28,7 @@ total_charge_density = 0
 
 omega_limit = 50
 
-for i, omega_guess in enumerate(np.linspace(-omega_limit, omega_limit, 200)):
+for i, omega_guess in enumerate(np.linspace(-omega_limit, omega_limit, 500)):
     solution = sp.integrate.solve_bvp(systesm.differential_equation,
             systesm.dirichlet_boundary_conditions,
             systesm.z, 
@@ -48,27 +48,27 @@ for i, omega_guess in enumerate(np.linspace(-omega_limit, omega_limit, 200)):
     solution_norm_squared = sp.integrate.quad(solution_squared, 0, 1)[0]
 
     #print(f'Guessing for omega = {omega_n}\n\tomega_n = {solution.p[0]} \n\tsolution_norm_squared={solution_norm_squared}')
-
+    ax_omegas.scatter(i,  omega_guess, color='b')
     omega_solution = solution.p[0]
     if float_in_array(omega_solution, omega_solution_array):
         continue
     else:
-        #field_factor = np.sign(omega_n)*(omega_solution- systesm.phi.charge*systesm.A0(x))
-        #charge_density_n = field_factor*np.real(solution.sol(x)[0])**2/scalar_mass/lambda_value/solution_norm_squared
-        #total_charge_density += charge_density_n
+        field_factor = np.sign(omega_solution)*(omega_solution- systesm.phi.charge*systesm.A0(x))
+        charge_density_n = field_factor*np.real(solution.sol(x)[0])**2/scalar_mass/lambda_value/solution_norm_squared
+        total_charge_density += charge_density_n
 
-        #ax.plot(x,  charge_density_n, fmt, alpha=0.6, linewidth=0.8)
-        ax.scatter(i,  omega_solution, color=fmt)
-        ax.set_title(f'$\lambda={lambda_value}, m={scalar_mass}$')
+        ax_fields.plot(x,  charge_density_n, fmt, alpha=0.5, linewidth=0.6)
+        ax_omegas.scatter(i,  omega_solution, color=fmt)
+        ax_omegas.set_title(f'$\lambda={lambda_value}, m={scalar_mass}$')
         eigenstates.append(solution) #Watch out there are repeating eigenstates.
         omega_solution_array.append(omega_solution)
 
-    ax.scatter(i,  omega_guess, color='b')
+    
 
 
 #plt.plot(x, systesm.calculate_charge_density(x, eigenstates))
 
 
-#ax.plot(x,  total_charge_density, '-', linewidth=2)
+ax_fields.plot(x,  total_charge_density, '-', linewidth=2)
 plt.tight_layout()
 plt.show()
