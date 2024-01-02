@@ -23,6 +23,8 @@ class System(Klein_Gordon):
                                     #If scalar, then it is just a repetition of that scalar.
         field_strength: float = 1    #The (external) electric field strength to which our system
                                     #is subject to. 
+    Properties:
+        eigenstates: The eigenstates to a certain electric potential
     """
     #Since the integro differential equations are coupled,
     #I want a System in which the properties of the fields
@@ -43,7 +45,7 @@ class System(Klein_Gordon):
     #   => Choose C such that A(0) is ALWAYS the same
     #Always = after each iteration to calculate the 'true' resultant field
     def __init__(self, 
-        field_strength: function,
+        field_strength,
         scalar_mass: float,
         scalar_charge: float,
         n_points = 100,
@@ -64,9 +66,11 @@ class System(Klein_Gordon):
                     n_points=self.n_points,
                     name=scalar_name)
 
+            self._eigenstates = None
+
             try:
-                field_strength(0)
-                self.A_field_base = field_strength #field_strength is already the field
+                field_strength(0) #field_strength is callable, therefoere
+                self.A_field_base = field_strength #it is already the electromagnetic potential
             except TypeError:
                 #field_strength is only the lambda factor. we are in the first iteration
                 self.A_field_base = - field_strength * (self.z - 1/2)
@@ -74,7 +78,61 @@ class System(Klein_Gordon):
             self.A0 = Vector_Potential(value=self.A_field_base,
                     n_points=self.n_points)
 
-    def first_n_eigenstates(self, 
+
+    def calculate_N_eigenstates(self, 
+                              N: int,
+                              omega_in: float,
+                              omega_end: float,
+                              boundary_conditions = None,
+                              tolerance: float=1e-2, 
+                              n_points: int=300, 
+                              max_nodes: int=3000):
+        """Calculates N  KG eigenstates associated to a certain external classical field
+        Parameters
+            N: int,
+                Amount of desired eigenstates. 
+            omega_in: float,
+                initial omega for the sweep of eigenvalue
+            omega_end: float,
+                final omega for the sweep of eigenvalue
+            boundary_conditions: float=None,
+                boundary conditions tos solve the differential equation. 
+                If not given (None), they are assumed to be dirichlet (y(0) = y(1) = 0)
+            tolerance: float=1e-2, 
+                The tolerance to check wether the solution converged
+            n_points: int=300, 
+                Number of nodes in the solution
+            scalar_name: str='phi'
+                Name of the scalar field. For representation purposes
+            max_nodes: int=3000
+                Maximum number of nodes for a given solution 
+        Returns:
+            [scipy.integrate.solve_bvp.solution] of len() = N
+        
+        """
+        if omega_in > 0:
+            print("Warning: The starting value for the omega guesses is positive, and the solution needs negative frequency solutions")
+
+        if boundary_conditions is None:
+            boundary_conditions = self.dirichlet_boundary_conditions
+
+        solution_array = []
+
+        for i, omega_guess in enumerate(np.linspace(omega_in, omega_end, N)):
+            solution = sp.integrate.solve_bvp(self.differential_equation,
+                    boundary_conditions, 
+                    self.z, 
+                    (self.phi.value, self.phi.gradient.value),
+                    p=(omega_guess, ),
+                    verbose=0,
+                    max_nodes=max_nodes,
+                    tol=tolerance)
+
+            solution_array.append(solution)
+
+        return solution_array
+
+    def first_N_eigenstates(self, 
                             n,
                             omega_0_guess=0,
                             omega_ratio=1e-2,
@@ -116,24 +174,29 @@ class System(Klein_Gordon):
                 break
         return eigenstates
 
-    def calculate_charge_density(self, z, eigenstates):
+    def calculate_total_charge_density(self, eigenstates):
         """
         Calculates the charge density in the system given a certain family of solutions
         Parameters:
             z: float the z value at which the charge density is being calculated
-            eigenstates: [scipy.integrate.solve_bvp]
+            eigenstates: [scipy.integrate.solve_bvp solution objects]
         Returns: 
             charge_density: float, the charge density at z
         """
 
-        charge_density = 0
-        for solution in eigenstates:
-            omega_n = solution.p[0]
-            phi = solution.sol(z)[0]
-            factor = omega_n - self.phi.charge * self.A0(z)
-            charge_density += factor * np.linalg.norm(phi)**2
+        total_charge_density = 0.
 
-        return charge_density 
+        for i, solution in enumerate(eigenstates):
+            omega_n = solution.p[0]
+            phi = solution.sol(self.z)[0]
+            field_factor = (omega_n - self.phi.charge * self.A0(self.z))*np.sign(omega_n)
+            solution_squared = lambda z: (solution.p[0] - self.phi.charge * self.A0(z))*np.real(solution.sol(z)[0]**2)
+            solution_norm_squared = sp.integrate.quad(solution_squared, 0, 1)[0]
+            charge_density_n = field_factor*np.real(solution.sol(self.z)[0])**2/self.phi.mass/solution_norm_squared
+
+            total_charge_density += charge_density_n
+
+        return total_charge_density 
 
     def new_electric_field(self, z, eigenstates):
         """
