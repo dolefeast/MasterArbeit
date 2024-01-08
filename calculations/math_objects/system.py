@@ -1,5 +1,6 @@
 from math_objects.fields import Field, Vector_Potential
 from math_objects.value_generator import value_generator
+from math_objects.iterable_output import iterable_output 
 from math_objects.unique_floats import unique_floats, float_in_array
 from math_objects.Klein_Gordon import Klein_Gordon
 
@@ -87,7 +88,7 @@ class System(Klein_Gordon):
                               tolerance: float=1e-2, 
                               n_points: int=300, 
                               max_nodes: int=3000):
-        """Calculates N  KG eigenstates associated to a certain external classical field
+        """Calculates N (not necessarily normalized) KG eigenstates associated to a certain external classical field
         Parameters
             N: int,
                 Amount of desired eigenstates. 
@@ -119,110 +120,101 @@ class System(Klein_Gordon):
         solution_array = []
 
         for i, omega_guess in enumerate(np.linspace(omega_in, omega_end, N)):
+
+            guess = np.sin(omega_guess*self.z)
+            guess_derivative = np.diff(guess)
+            guess_derivative = np.append(guess_derivative, guess_derivative[-1])
+
             solution = sp.integrate.solve_bvp(self.differential_equation,
                     boundary_conditions, 
                     self.z, 
-                    (self.phi.value, self.phi.gradient.value),
+                    (guess, guess_derivative),
                     p=(omega_guess, ),
                     verbose=0,
                     max_nodes=max_nodes,
                     tol=tolerance)
 
-            solution_array.append(solution)
+            if solution.success:
+                solution_array.append(solution)
 
         return solution_array
 
-    def first_N_eigenstates(self, 
-                            n,
-                            omega_0_guess=0,
-                            omega_ratio=1e-2,
-                            method='linear',
-                            tol=1e-2,
-                            boundary_conditions='dirichlet'):
+    def calculate_charge_density(self, solution):
         """
-        Calculates the first n eigenstates of the system and its energies
+        Calculates the charge density associated to certain eigenstate
         Parameters:
-            n: number of desired eigenstates
-            omega_0_guess: guess for the frequency of the 
-            boundary_conditions: dirichlet or neumann 
-            tol: 
-        Returns:
-            eigenstates: [sol1, ...] a 1xn array of scipy.integrate.solve_bvp solution objects
+            eigenstates: scipy.integrate.solve_bvp solution object
+        Returns: 
+            charge_density: callable, the charge density corresponding to the input eigenstate
         """
 
-        #bcs = self.boundary_conditions[boundary_conditions]
-        omega_array = []
-        eigenstates = []
-        for i, omega_guess in enumerate(value_generator(omega_0_guess, omega_ratio, method=method)):
-            #print('Estoy en el intento n', i, 'Omega_guess =', omega_guess)
-            solution = sp.integrate.solve_bvp(self.differential_equation,
-                    self.dirichlet_boundary_conditions,
-                    #self.dirichlet_boundary_conditions,
-                    self.z, 
-                    (self.phi.value, self.phi.gradient.value),
-                    p=(omega_guess, ),
-                    tol=tol)
+        eigenvalue = solution.p[0]
+        charge_density_no_normalization = lambda z: (eigenvalue - self.phi.charge * self.A0(z))*np.real(solution.sol(z)[0]**2)
+        charge_density_norm_squared = sp.integrate.quad(charge_density_no_normalization, 0, 1)[0]
+        charge_density_normalized = lambda z: np.sign(eigenvalue)*charge_density_no_normalization(z)/charge_density_norm_squared
 
-            omega_solution = solution.p[0]
-            if float_in_array(omega_solution, omega_array, tol=tol):
-                continue
-            else:
-                omega_array.append(omega_solution)
-                eigenstates.append(solution)
+        return charge_density_normalized
 
-            if len(omega_array) >= n:
-                break
-        return eigenstates
-
-    def calculate_total_charge_density(self, eigenstates):
+    def calculate_total_charge_density(self, eigenstate_array):
         """
         Calculates the charge density in the system given a certain family of solutions
         Parameters:
-            z: float the z value at which the charge density is being calculated
-            eigenstates: [scipy.integrate.solve_bvp solution objects]
+            eigenstate_array: [scipy.integrate.solve_bvp solution objects]
         Returns: 
-            charge_density: float, the charge density at z
+            charge_density: np.array([float]) The total charge density at every node
         """
 
-        total_charge_density = 0.
+        def total_charge_density(z):
+            total_charge_density = 0
 
-        for i, solution in enumerate(eigenstates):
-            omega_n = solution.p[0]
-            phi = solution.sol(self.z)[0]
-            field_factor = (omega_n - self.phi.charge * self.A0(self.z))*np.sign(omega_n)
-            solution_squared = lambda z: (solution.p[0] - self.phi.charge * self.A0(z))*np.real(solution.sol(z)[0]**2)
-            solution_norm_squared = sp.integrate.quad(solution_squared, 0, 1)[0]
-            charge_density_n = field_factor*np.real(solution.sol(self.z)[0])**2/self.phi.mass/solution_norm_squared
+            for i, solution in enumerate(eigenstate_array):
+                total_charge_density = total_charge_density + self.calculate_charge_density(solution)(z)
 
-            total_charge_density += charge_density_n
+            return total_charge_density 
 
-        return total_charge_density 
+        return total_charge_density
 
-    def new_electric_field(self, z, eigenstates):
+
+    def new_electric_field(self, eigenstate_array):
         """
         Calculates the corresponding electric field to a certain charge density
         Parameters:
             z: float. The z value at which the electric field is to be calculated
-            eigenstates: SolutionArray. A given solution array to calculate_charge_density
+            eigenstate_array: SolutionArray. A given solution array to calculate_charge_density
         Returns:
             electric_field: float, the electric field at z
             """
      
-        charge_density_at_z = lambda z, eigenstates: self.calculate_charge_density(z, eigenstates)     
-        modified_electric = sp.integrate.quad(charge_density, 0, z, args=eigenstates) 
-         
+        #Calculate this solving an ODE, not integration
+        print('I am again here, hello!')
+        charge_density_at_z = self.calculate_total_charge_density(eigenstate_array)
+        
+        modified_electric = sp.integrate.solve_ivp(lambda z, y: charge_density_at_z(z),
+                y0 = [0],
+                t_span=(self.z[0], self.z[-1]),
+                t_eval=self.z)
+        print('The ODE was completed!')
+
         return modified_electric 
 
-    def new_vector_field(self, z, eigenstates):
+    def new_vector_field(self, eigenstate_array):
         """
         Calculates the new vector field A0 corresponding to a family of solutions to the previous one
         Parameters:
             z: float. The z value at which A0 field is to be calculated
-            eigenstates: SolutionArray. A given solution array to calculate_charge_density
+            eigenstate_array: SolutionArray. A given solution array to calculate_charge_density
         Returns:
             new_vector_field: float, the electromagnetic field at z
         """
-        electric_field_at_z = lambda z, eigenstates: self.new_electric_field(z, eigenstates)
-        modified_vector_field = -sp.integrate.quad(electric_field_at_z, 0, z, args=eigenstates) - self.field_strength * (z-1/2)
+        #Calculate this solving an ODE, not integrating
+        charge_density_at_z = self.calculate_total_charge_density(eigenstate_array)
 
-        return modified_vector_field
+        def dAdz(z, A):
+            return np.array(A[1], -charge_density_at_z(z))
+
+        modified_electric = sp.integrate.solve_ivp(dAdz, 
+                y0 = [0,1],
+                t_span=(self.z[0], self.z[-1]),
+                t_eval=self.z )
+
+        return modified_electric

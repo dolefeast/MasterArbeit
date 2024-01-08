@@ -47,15 +47,19 @@ class Field(object):
                                                    #was expected to be constant
                                                    #value, thus create new array
         self.z = np.linspace(0, 1, self.n_points)
+        self.callable = None
 
     
     def __repr__(self):
         return f'{self.name}(mass={self.mass}, charge={self.charge})'
 
+    def assertion(self, other_field):
+        assert self.mass == other_field.mass, "The masses of the fields do not match"
+        assert self.charge == other_field.charge, "The masses of the fields do not match"
+        assert self.n_points == other_field.n_points, "n_points of the fields do not match"
+
     def __add__(self, other_field):
-        assert self.mass == other_field.mass
-        assert self.charge == other_field.charge
-        assert self.n_points == other_field.n_points
+        self.assertion(other_field)
 
         return Field(mass=self.mass,
                 charge=self.charge,
@@ -65,7 +69,6 @@ class Field(object):
     def __mul__(self, k):
         try:
             iter(k)
-            assert np.shape(k) == np.shape(self.value)
             is_iterable = True
         except TypeError:
             is_iterable = False
@@ -80,17 +83,27 @@ class Field(object):
             raise TypeError("k must be a real or complex scalar (function)!")
         pass
 
-
     def __rmul__(self, k):
-        return self*k
+        return self*k #Multiplication is in this case commutative
 
     def __call__(self, z):
-        """returns field(z) with z between 0 and 1"""
+        """returns field(z) with z between 0 and 1 by interpolation."""
         try:
-            return np.array([self.value[int(self.n_points*z_value)-1] for z_value in z]) #z was an array.
+            z_min, z_max = min(z), max(z) #means z was an iterable
+            assert z_min >= 0, f"z_min={z_min}. Every item in z must be greater than 0."
+            assert z_max <= 1, f"z_max={z_max}. Every item in z must be smaller than 1."
         except TypeError:
-            return self.value[int(self.n_points * z)]
+            assert z >= 0 and z <= 1, f"z={z}. z must be greater than 0 and smaller than 1."
+                
+        if self.callable is None: 
+            self.callable = self.calculate_interpolation()
+        return self.callable(z) #callable accepting arrays is already built in the PPoly object
             
+    def calculate_interpolation(self):
+        """Calculates interpoltion of the field value property"""
+        field_interpolation = sp.interpolate.CubicSpline(self.z,
+                self.value)
+        return field_interpolation
 
     def calculate_field_integral(self, method='quad'):
         """Calculates the integral of the field between 0 and 1. Admitted scipy integration methods, 'quad', 'fixed_quad', 'guassian', 'quadrature'."""

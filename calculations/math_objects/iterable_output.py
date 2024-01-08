@@ -1,6 +1,8 @@
+import numpy as np
+
 def iterable_output(func):
     def wrapper(*args):
-        # Check if Om is iterable
+        # Check which of the arguments are iterable
         result = []
         for i, arg in enumerate(args):
             try:
