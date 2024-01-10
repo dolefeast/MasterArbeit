@@ -70,10 +70,13 @@ class System(Klein_Gordon):
             self._eigenstates = None
 
             try:
-                field_strength(0) #field_strength is callable, therefoere
+                #Since A0(z) = - λ (z-1/2) then  λ = 2*A0(0)
+                self.lambda_value = -2*field_strength(0) #field_strength is callable, therefoere
+                #Tread carefully since this above has to be imposed by hand
                 self.A_field_base = field_strength #it is already the electromagnetic potential
             except TypeError:
                 #field_strength is only the lambda factor. we are in the first iteration
+                self.lambda_value = field_strength
                 self.A_field_base = - field_strength * (self.z - 1/2)
 
             self.A0 = Vector_Potential(value=self.A_field_base,
@@ -121,20 +124,22 @@ class System(Klein_Gordon):
 
         for i, omega_guess in enumerate(np.linspace(omega_in, omega_end, N)):
 
-            guess = np.sin(omega_guess*self.z)
-            guess_derivative = np.diff(guess)
-            guess_derivative = np.append(guess_derivative, guess_derivative[-1])
+            eigenfunction_guess = np.sin(omega_guess*self.z) #Guessing the solution of the ODE
+            guess_derivative = np.diff(eigenfunction_guess)
+            guess_derivative = np.append(guess_derivative, guess_derivative[-1]) #so that they both have the same shape
 
-            solution = sp.integrate.solve_bvp(self.differential_equation,
+            solution = sp.integrate.solve_bvp(
+                    self.differential_equation,
                     boundary_conditions, 
                     self.z, 
-                    (guess, guess_derivative),
+                    (eigenfunction_guess, guess_derivative),
                     p=(omega_guess, ),
                     verbose=0,
                     max_nodes=max_nodes,
-                    tol=tolerance)
+                    tol=tolerance
+                    )
 
-            if solution.success:
+            if solution.success: #If it converged, add it to the solutions array
                 solution_array.append(solution)
 
         return solution_array
@@ -151,7 +156,7 @@ class System(Klein_Gordon):
         eigenvalue = solution.p[0]
         charge_density_no_normalization = lambda z: (eigenvalue - self.phi.charge * self.A0(z))*np.real(solution.sol(z)[0]**2)
         charge_density_norm_squared = sp.integrate.quad(charge_density_no_normalization, 0, 1)[0]
-        charge_density_normalized = lambda z: np.sign(eigenvalue)*charge_density_no_normalization(z)/charge_density_norm_squared
+        charge_density_normalized = lambda z: np.sign(eigenvalue)**2*charge_density_no_normalization(z)/charge_density_norm_squared
 
         return charge_density_normalized
 
@@ -163,14 +168,19 @@ class System(Klein_Gordon):
         Returns: 
             charge_density: np.array([float]) The total charge density at every node
         """
-
+        e = self.phi.charge
         def total_charge_density(z):
             total_charge_density = 0
-
+            cutoff_N = len(eigenstate_array)//2
             for i, solution in enumerate(eigenstate_array):
-                total_charge_density = total_charge_density + self.calculate_charge_density(solution)(z)
+                n = np.abs(i - cutoff_N)
+                #we are adding and substracting the series -2eλ lim(t -> 0) sum z(1-z) sin(pi n z) cos (pi n z) exp(i pi n(t + i epsilon)) = -eλ z(1-z)/2 cot(pi z)
+                #This way we can make the cutoff earlier, since each of the terms in the series will go to 0 faster.
+                renormalization_term = e * self.lambda_value * z * (1-z) * np.sin(np.pi * n * z) * np.sin(np.pi * n * z)
+                total_charge_density = total_charge_density + self.calculate_charge_density(solution)(z) + renormalization_term
 
-            return total_charge_density 
+            massless_charge_density = e * self.lambda_value * z * (1-z) /2/np.tan(np.pi * z)
+            return total_charge_density - massless_charge_density
 
         return total_charge_density
 

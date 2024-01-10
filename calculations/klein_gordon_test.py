@@ -8,11 +8,11 @@ from scipy.signal import savgol_filter
 import numpy as np
 import matplotlib.pyplot as plt
 
-lambda_value = 9
+lambda_value = 1
 TOL = 1e-2
-N_POINTS = 501
+N_POINTS = 1000
 scalar_value = 1
-scalar_mass = 10
+scalar_mass = 1
 scalar_charge = 1
 
 fig, (ax_fields, ax_omegas) = plt.subplots(1, 2, figsize=(16, 9))
@@ -31,7 +31,7 @@ omega_solution_array = []
 
 total_charge_density = 0
 
-omega_boundary = 150
+omega_boundary = 550
 n_of_solutions = int(omega_boundary/3)
 eigenstate_array = system.calculate_N_eigenstates(n_of_solutions, 
        -omega_boundary, 
@@ -57,25 +57,42 @@ for i, eigenstate in enumerate(eigenstate_array):
         omega_solution_array.append(omega_solution)
 
 total_charge_density_array = total_charge_density(system.z)
-ax_fields.plot(system.z, total_charge_density_array, label='Rough charge density')
+
+ax_fields.plot(
+        system.z,
+        total_charge_density_array,
+        label='Rough charge density'
+        )
 
 #SMOOTHING
-signal = savitzky_golay(total_charge_density_array, 45, 1)
-ax_fields.plot(system.z, signal, label='Savitzky golay smoothing')
+signal = savitzky_golay(
+        total_charge_density_array,
+        5*system.n_points/(n_of_solutions+1), 
+        1
+        )
+ax_fields.plot(
+        system.z,
+        signal,
+        label='Savitzky golay smoothing'
+        )
 
 def smooth(y, box_pts):
     box = np.ones(box_pts)/box_pts
     y_smooth = np.convolve(y, box, mode='same')
     return y_smooth
 
-signal = smooth(total_charge_density_array, n_of_solutions//5)
+signal = smooth(
+        total_charge_density_array,
+        n_of_solutions//5
+        )
+
 ax_fields.plot(system.z, signal, label='convolution smoothing')
 ax_fields.legend(loc='best')
 
 #electric_field = system.new_electric_field(eigenstate_array)
-vector_field = system.new_vector_field(eigenstate_array)
-print(vector_field)
-ax_fields.plot(vector_field.t, vector_field.y[0], label='EM field')
+#vector_field = system.new_vector_field(eigenstate_array)
+#print(vector_field)
+#ax_fields.plot(vector_field.t, vector_field.y[0], label='EM field')
 
 
 #ax_fields.plot(system.z,  total_charge_density, '-', linewidth=2)
