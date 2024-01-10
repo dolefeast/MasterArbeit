@@ -7,4 +7,3 @@ import math_objects
     The resultant PDE will then be
 
 """
-

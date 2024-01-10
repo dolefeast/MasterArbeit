@@ -1,5 +1,6 @@
 import numpy as np
 
+
 def float_in_array(element, array, tol=1e-3):
     for num in array:
         if np.abs(num - element) < tol:
@@ -10,11 +11,11 @@ def float_in_array(element, array, tol=1e-3):
 def unique_floats(array, precision=1e-3):
     seen = set()
     result = []
-    
+
     for num in array:
         rounded_num = round(num, int(-1 * np.floor(np.log10(precision))))
         if rounded_num not in seen:
             seen.add(rounded_num)
             result.append(num)
-    
+
     return result
