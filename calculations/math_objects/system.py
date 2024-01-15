@@ -2,6 +2,7 @@ from math_objects.fields import Field, Vector_Potential
 from math_objects.value_generator import value_generator
 from math_objects.iterable_output import iterable_output
 from math_objects.unique_floats import unique_floats, float_in_array
+from math_objects.savitzky_golay import savitzky_golay
 from math_objects.Klein_Gordon import Klein_Gordon
 
 import matplotlib.pyplot as plt
@@ -78,7 +79,7 @@ class System(Klein_Gordon):
             # Since A0(z) = - λ (z-1/2) then  λ = 2*A0(0)
             self.lambda_value = -2 * field_strength(
                 0
-            )  # field_strength is callable, therefoere
+            )  
             # Tread carefully since this above has to be imposed by hand
             self.A_field_base = (
                 field_strength  # it is already the electromagnetic potential
@@ -140,7 +141,7 @@ class System(Klein_Gordon):
             guess_derivative = np.diff(eigenfunction_guess)
             guess_derivative = np.append(
                 guess_derivative, guess_derivative[-1]
-            )  # so that they both have the same shape
+            )  # since calculating derivatives substracts the last point
 
             solution = sp.integrate.solve_bvp(
                 self.differential_equation,
@@ -199,24 +200,35 @@ class System(Klein_Gordon):
                 n = np.abs(i - cutoff_N)
                 # we are adding and substracting the series -2eλ lim(t -> 0) sum z(1-z) sin(pi n z) cos (pi n z) exp(i pi n(t + i epsilon)) = -eλ z(1-z)/2 cot(pi z)
                 # This way we can make the cutoff earlier, since each of the terms in the series will go to 0 faster.
+                adding_term = -1
                 renormalization_term = (
                     e
                     * self.lambda_value
                     * z
                     * (1 - z)
-                    * np.sin(np.pi * n * z)
+                    * np.sin(np.pi * np.abs(n) * z)
                     * np.cos(np.pi * n * z)
                 )
+                renormalization_term = savitzky_golay(
+                        renormalization_term,
+                        51,
+                        1
+                        )
                 total_charge_density = (
                     total_charge_density
                     + self.calculate_charge_density(solution)(z)
-                    + renormalization_term
+                    + adding_term*renormalization_term
                 )
 
             massless_charge_density = (
                 e * self.lambda_value * z * (1 - z) / 2 / np.tan(np.pi * z)
             )
-            return total_charge_density - massless_charge_density
+            potential_term = 1/np.pi * e**2 * self.A0(z) # Extra term coming from point-split renormalization
+            return (
+                    -total_charge_density 
+                    + adding_term * massless_charge_density 
+                    + potential_term
+                    )
 
         return total_charge_density
 
@@ -244,20 +256,18 @@ class System(Klein_Gordon):
 
         return modified_electric
 
-    def new_vector_field(self, eigenstate_array):
+    def new_vector_field(self, charge_density):
         """
         Calculates the new vector field A0 corresponding to a family of solutions to the previous one
         Parameters:
-            z: float. The z value at which A0 field is to be calculated
-            eigenstate_array: SolutionArray. A given solution array to calculate_charge_density
+            charge_density
         Returns:
-            new_vector_field: float, the electromagnetic field at z
+            new_vector_field: callable, the electromagnetic field at z
         """
         # Calculate this solving an ODE, not integrating
-        charge_density_at_z = self.calculate_total_charge_density(eigenstate_array)
 
         def dAdz(z, A):
-            return np.array(A[1], -charge_density_at_z(z))
+            return np.array(A[1], -charge_density(z))
 
         modified_electric = sp.integrate.solve_ivp(
             dAdz, y0=[0, 1], t_span=(self.z[0], self.z[-1]), t_eval=self.z
