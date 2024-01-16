@@ -9,7 +9,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import scipy as sp
 
-
 class System(Klein_Gordon):
     """The system that we are considering. This class
     is the final calculation, in the sense that after doing
@@ -93,9 +92,9 @@ class System(Klein_Gordon):
 
     def calculate_N_eigenstates(
         self,
-        N: int,
         omega_in: float,
         omega_end: float,
+        N: int,
         boundary_conditions=None,
         tolerance: float = 1e-2,
         n_points: int = 300,
@@ -133,6 +132,7 @@ class System(Klein_Gordon):
             boundary_conditions = self.dirichlet_boundary_conditions
 
         solution_array = []
+        print(f'omega_in={omega_in}, omega_end={omega_end}, N={N}')
 
         for i, omega_guess in enumerate(np.linspace(omega_in, omega_end, N)):
             eigenfunction_guess = np.sin(
@@ -266,11 +266,77 @@ class System(Klein_Gordon):
         """
         # Calculate this solving an ODE, not integrating
 
-        def dAdz(z, A):
-            return np.array(A[1], -charge_density(z))
+        try:
+            iter(charge_density) # Checking if charge_density is array
+            charge_density = sp.interpolate.CubicSpline(self.z, charge_density)
+        except TypeError:
+            try:
+                charge_density(0.5) # Check if charge_density is callable. 0.5 must be in the accepted values
+                                    # if callable, do nothing
+            except TypeError:
+                raise TypeError("charge_density should be either iterable or callable")
 
-        modified_electric = sp.integrate.solve_ivp(
-            dAdz, y0=[0, 1], t_span=(self.z[0], self.z[-1]), t_eval=self.z
+        def dAdz(z, A):
+            return [A[1], -charge_density(z)]
+
+        def bc(Aa, Ab):	
+            return [Aa[0], Ab[0]] # Since there should be no potential on the boundary.
+
+        modified_electric = sp.integrate.solve_bvp(
+            dAdz, bc, self.z, np.zeros((self.n_points, 2)).T
         )
 
         return modified_electric
+
+    def one_iteration(self,
+            omega_initial,
+            omega_final,
+            n_of_solutions
+            ):
+        """
+        Parameters:
+            n_of_solutions: int .how many eigenstates are wanted
+            omega_initial: int. initial value to guess for omega
+            omega_final: int. final value to guess for omega
+            keep_omegas: False, Whether an output of the eigenvalues is given
+        Returns: 
+            System class
+                    	
+        Iterates once the process of calculating the solution. In summary:
+            1. calculates n_of_solutions eigenstates with eigenvalues in between omega_initial and omega_final.
+            2. calculates the corresponding charge density as a function of z
+            3. calculates the corresponding electric potential.
+            4. returns 
+                system = System(
+                    scalar_name="phi",
+                    n_points=self.n_points,
+                    scalar_charge=self.scalar_charge,
+                    scalar_value=self.scalar_value,
+                    field_strength=new_A0,
+                    scalar_mass=scalar_mass,
+                )
+        """
+        eigenstate_array = self.calculate_N_eigenstates(
+            omega_initial, omega_final, n_of_solutions
+        )
+
+        total_charge_density_callable = self.calculate_total_charge_density(eigenstate_array)
+        total_charge_density_array = total_charge_density_callable(self.z)
+        total_charge_density_array = total_charge_density_array[0] 
+
+        smoothed_charge_density = savitzky_golay(
+            total_charge_density_array, 10*self.n_points // (n_of_solutions + 1), 2
+        )
+        #smoothed_charge_density = savitzky_golay(
+        #    smoothed_charge_density, 10*self.n_points // (n_of_solutions + 1), 4
+        #)
+        new_A0 = self.new_vector_field(smoothed_charge_density)
+
+        return System(
+                    scalar_name="phi",
+                    n_points=self.n_points,
+                    scalar_charge=self.scalar_charge,
+                    scalar_value=self.scalar_value,
+                    field_strength=new_A0,
+                    scalar_mass=self.scalar_mass,
+                    )

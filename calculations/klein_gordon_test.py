@@ -8,7 +8,7 @@ from scipy.signal import savgol_filter
 import numpy as np
 import matplotlib.pyplot as plt
 
-lambda_value = 10
+lambda_value = 1
 TOL = 1e-2
 N_POINTS = 1000
 scalar_value = 1
@@ -26,15 +26,16 @@ system = System(
     scalar_mass=scalar_mass,
 )
 
+omega_boundary = 100
+n_of_solutions = omega_boundary // 2
+
 # system.phi.value = np.sin(system.z)
 
 eigenstates = []
 omega_solution_array = []
 
-omega_boundary = 500
-n_of_solutions = omega_boundary // 2
 eigenstate_array = system.calculate_N_eigenstates(
-    n_of_solutions, -omega_boundary, omega_boundary
+    -omega_boundary, omega_boundary, n_of_solutions, 
 )
 
 
@@ -61,31 +62,23 @@ total_charge_density_array[0] = 0
 ax_fields.plot(system.z, total_charge_density_array, label="Rough charge density", alpha=0.6)
 
 # SMOOTHING
-print("Calculating forwards smoothing")
-signal = savitzky_golay(
+smoothed_charge_density = savitzky_golay(
     total_charge_density_array, 10*system.n_points // (n_of_solutions + 1), 2
 )
 
-print("Calculating backwards smoothing")
-signal_backwards = savitzky_golay(
-        total_charge_density_array[::-1], 10*system.n_points // (n_of_solutions + 1), 0
+ax_fields.plot(system.z, smoothed_charge_density, label="Savitzky golay smoothing 1st time")
+
+smoothed_charge_density = savitzky_golay(
+    smoothed_charge_density, 10*system.n_points // (n_of_solutions + 1), 4
 )
-
-ax_fields.plot(system.z, signal, label="Savitzky golay smoothing 1st time")
-ax_fields.plot(system.z, signal_backwards, label="Savitzky golay backwards smoothing 1st time")
-
-signal = savitzky_golay(
-    signal, 10*system.n_points // (n_of_solutions + 1), 4
-)
-# ax_fields.plot(system.z, signal, label="Savitzky golay smoothing 2nd time")
-
-#box_convolution(total_charge_density_array)
-ax_fields.legend(loc="best")
+ax_fields.plot(system.z, smoothed_charge_density, label="Savitzky golay smoothing 2nd time")
 
 # electric_field = system.new_electric_field(eigenstate_array)
-#vector_field = system.new_vector_field(total_charge_density_callable)
-#print(vector_field)
-#ax_fields.plot(vector_field.t, vector_field.y[0], label='EM field')
+vector_field = system.new_vector_field(smoothed_charge_density)
+#ax_fields.plot(system.z, vector_field.y[0], label='$A_0$ field')
+ax_fields.plot(system.z, vector_field.y[0], label='$A_0$ field')
+
+ax_fields.legend(loc="best")
 
 plt.tight_layout()
 plt.show()
