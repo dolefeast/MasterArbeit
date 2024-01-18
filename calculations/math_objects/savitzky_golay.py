@@ -59,9 +59,9 @@ def savitzky_golay(y, window_size, order, deriv=0, rate=1):
     if window_size < 1:
         raise TypeError(f"window_size={window_size} size must be a positive odd number")
     if window_size % 2 != 1:
-        print(
-            f"window_size={window_size} size must be a positive odd number\n\tChanged to window_size={window_size+1}"
-        )
+        #print(
+        #    f"window_size={window_size} size must be a positive odd number\n\tChanged to window_size={window_size+1}"
+        #)
         window_size = window_size + 1
     if window_size < order + 2:
         raise TypeError("window_size is too small for the polynomials order")
@@ -74,10 +74,7 @@ def savitzky_golay(y, window_size, order, deriv=0, rate=1):
     m = np.linalg.pinv(b).A[deriv] * rate**deriv * factorial(deriv)
     # pad the signal at the extremes with
     # values taken from the signal itself
-    print(y)
     firstvals = y[0] - np.abs(y[1 : half_window + 1][::-1] - y[0])
     lastvals = y[-1] + np.abs(y[-half_window - 1 : -1][::-1] - y[-1])
-    #print(f'firstvals = {firstvals}')
-    #print(f'lastvals = {lastvals}')
     y = np.concatenate((firstvals, y, lastvals))
     return np.convolve(m[::-1], y, mode="valid")
