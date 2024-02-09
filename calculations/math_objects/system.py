@@ -25,6 +25,7 @@ class System(Klein_Gordon):
                                     #If scalar, then it is just a repetition of that scalar.
         field_strength: float = 1    #The (external) electric field strength to which our system
                                     #is subject to.
+        self.eigenstates: [solve_bvp.solutions] # Array of solutions from a previous calculation
     Properties:
         eigenstates: The eigenstates to a certain electric potential
     """
@@ -55,12 +56,14 @@ class System(Klein_Gordon):
         n_points=100,
         scalar_name: str = "phi1",
         scalar_value: np.ndarray = 1,
+        eigenstates: [float]=None
     ):
         self.scalar_mass = scalar_mass
         self.scalar_charge = scalar_charge
         self.n_points = n_points
         self.scalar_name = scalar_name
         self.scalar_value = scalar_value
+        self.eigenstates = eigenstates 
 
         self.z = np.linspace(0, 1, n_points)
 
@@ -92,13 +95,12 @@ class System(Klein_Gordon):
 
     def calculate_N_eigenstates(
         self,
-        omega_in: float,
-        omega_end: float,
-        N: int,
+        *args,
         boundary_conditions=None,
         tolerance: float = 1e-2,
         n_points: int = 300,
         max_nodes: int = 3000,
+        tol: float= 1e-1
     ):
         """Calculates N (not necessarily normalized) KG eigenstates associated to a certain external classical field
         Parameters
@@ -123,25 +125,50 @@ class System(Klein_Gordon):
             [scipy.integrate.solve_bvp.solution] of len() = N
 
         """
-        if omega_in > 0:
-            print(
-                "Warning: The starting value for the omega guesses is positive, and the solution needs negative frequency solutions"
-            )
+        if not self.eigenstates is None:
+            omega_guess_array = [solution.p[0] for solution in self.eigenstates]
+        else:
+            try:
+                omega_in, omega_end, N = args
+                if omega_in > 0:
+                    print(
+                        "Warning: The starting value for the omega guesses is positive, and the solution needs negative frequency solutions"
+                    )
+                n_value_array = np.linspace(omega_in, omega_end, N)
+
+                # Massive perturbative case:
+                # omega_n = sign(n) * sqrt(n² pi² + m²)
+                omega_guess_array = (
+                        np.sign(n_value_array) *
+                        np.sqrt(
+                            n_value_array**2 * np.pi **2 
+                            + self.scalar_mass**2
+                            )
+                        ) 
+                        
+
+            except ValueError:
+                raise ValueError("There was no input omega_in, omega_end and N, and self.eigenstates=None.")
 
         if boundary_conditions is None:
             boundary_conditions = self.dirichlet_boundary_conditions
 
         solution_array = []
+        eigenvalue_solution_array = []
+
         print(f'omega_in={omega_in}, omega_end={omega_end}, N={N}')
 
-        for i, omega_guess in enumerate(np.linspace(omega_in, omega_end, N)):
-            eigenfunction_guess = np.sin(
+        repeated_count = 0
+        for omega_guess in omega_guess_array:
+            # print("Input previous solutions as new guesses")
+            # Guessing the solution of the ODE
+            eigenfunction_guess = np.sin( 
                 omega_guess * self.z
-            )  # Guessing the solution of the ODE
+            )  
             guess_derivative = np.diff(eigenfunction_guess)
             guess_derivative = np.append(
                 guess_derivative, guess_derivative[-1]
-            )  # since calculating derivatives substracts the last point
+            )  # since calculating derivatives removes the last point
 
             solution = sp.integrate.solve_bvp(
                 self.differential_equation,
@@ -154,30 +181,39 @@ class System(Klein_Gordon):
                 tol=tolerance,
             )
 
+            omega_n = solution.p[0]
+            if float_in_array(omega_n, eigenvalue_solution_array, tol=tol):
+                #print("Found a repeated eigenvalue!")
+                repeated_count += 1
+                continue
             if solution.success:  # If it converged, add it to the solutions array
+                eigenvalue_solution_array.append(omega_n)
                 solution_array.append(solution)
+
+        print(f'Found {repeated_count} repeated eigenvalues')
 
         return solution_array
 
-    def calculate_charge_density(self, solution):
+    def calculate_charge_density(self, solution, integration_limit = 200):
         """
         Calculates the charge density associated to certain eigenstate
         Parameters:
             eigenstates: scipy.integrate.solve_bvp solution object
+            integration_limit: float = 200. The integration limit for scipy.integrate.quad
         Returns:
             charge_density: callable, the charge density corresponding to the input eigenstate
         """
 
         eigenvalue = solution.p[0]
-        charge_density_no_normalization = lambda z: (
+        charge_density_without_normalization = lambda z: (
             eigenvalue - self.phi.charge * self.A0(z)
         ) * np.real(solution.sol(z)[0] ** 2)
         charge_density_norm_squared = sp.integrate.quad(
-            charge_density_no_normalization, 0, 1
+            charge_density_without_normalization, 0, 1,
+            limit=integration_limit
         )[0]
         charge_density_normalized = (
-            lambda z: np.sign(eigenvalue)
-            * charge_density_no_normalization(z)
+            lambda z: charge_density_without_normalization(z)
             / charge_density_norm_squared
         )
 
@@ -200,34 +236,38 @@ class System(Klein_Gordon):
                 n = np.abs(i - cutoff_N)
                 # we are adding and substracting the series -2eλ lim(t -> 0) sum z(1-z) sin(pi n z) cos (pi n z) exp(i pi n(t + i epsilon)) = -eλ z(1-z)/2 cot(pi z)
                 # This way we can make the cutoff earlier, since each of the terms in the series will go to 0 faster.
-                adding_term = -1
                 renormalization_term = (
                     e
                     * self.lambda_value
                     * z
                     * (1 - z)
-                    * np.sin(np.pi * np.abs(n) * z)
+                    * np.sin(np.pi * n * z)
                     * np.cos(np.pi * n * z)
                 )
                 renormalization_term = savitzky_golay(
-                        renormalization_term,
-                        51,
-                        1
-                        )
+                         renormalization_term,
+                         51,
+                         1
+                         )
+                tau = 0.001 # For the point split renormalization scheme, we
+                           # take the limit of tau going to 0
+                damping_factor = np.exp(-1j * np.abs(solution.p[0])*(tau+1j*tau))
+                adding_term = 1 # To add or remove renormalization at desire
                 total_charge_density = (
                     total_charge_density
-                    + self.calculate_charge_density(solution)(z)
-                    + adding_term*renormalization_term
+                    + np.sign(solution.p[0]) * (
+                        self.calculate_charge_density(solution)(z)
+                    + adding_term*renormalization_term)*damping_factor
                 )
 
             massless_charge_density = (
-                e * self.lambda_value * z * (1 - z) / 2 / np.tan(np.pi * z)
+                e * self.lambda_value * z * (1 - z) / 4 / np.tan(np.pi * z)
             )
             potential_term = 1/np.pi * e**2 * self.A0(z) # Extra term coming from point-split renormalization
-            return (
+            return - (
                     -total_charge_density 
                     + adding_term * massless_charge_density 
-                    + potential_term
+                    - potential_term
                     )
 
         return total_charge_density
@@ -243,7 +283,6 @@ class System(Klein_Gordon):
         """
 
         # Calculate this solving an ODE, not integration
-        print("I am again here, hello!")
         charge_density_at_z = self.calculate_total_charge_density(eigenstate_array)
 
         modified_electric = sp.integrate.solve_ivp(

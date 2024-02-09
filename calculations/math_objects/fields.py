@@ -2,7 +2,6 @@
 The ambient will be governed by two fields, the classical
 electric field and the scalar field. 
 """
-from __init__ import *
 from dataclasses import dataclass
 import matplotlib.pyplot as plt
 import scipy as sp

@@ -1,4 +1,4 @@
-from math_objects.system import System
+from math_objects import Vacuum_Solution
 from math_objects.unique_floats import float_in_array, unique_floats
 from math_objects.normalize import normalize
 from math_objects.savitzky_golay import savitzky_golay
@@ -8,77 +8,87 @@ from scipy.signal import savgol_filter
 import numpy as np
 import matplotlib.pyplot as plt
 
+omega_boundary = 80
+N_mode_cutoff = omega_boundary*3
+
 lambda_value = 1
 TOL = 1e-2
 N_POINTS = 1000
-scalar_value = 1
-scalar_mass = 5
-scalar_charge = 1
+m = 0
+e = 1
 
 fig, (ax_fields, ax_omegas) = plt.subplots(1, 2, figsize=(16, 9))
+fig.suptitle(f"$\lambda={lambda_value}, m={m}$")
 
-system = System(
+system = Vacuum_Solution(
+    lambda_value=lambda_value,
     scalar_name="phi",
     n_points=N_POINTS,
-    scalar_charge=scalar_charge,
-    scalar_value=scalar_value,
-    field_strength=lambda_value,
-    scalar_mass=scalar_mass,
+    N_mode_cutoff=N_mode_cutoff+1,
+    e=e,
+    m=m,
+    float_tol=1
 )
-
-omega_boundary = 100
-n_of_solutions = omega_boundary // 2
 
 # system.phi.value = np.sin(system.z)
 
 eigenstates = []
 omega_solution_array = []
 
-eigenstate_array = system.calculate_N_eigenstates(
-    -omega_boundary, omega_boundary, n_of_solutions, 
+eigenstate_array = system.calculate_eigenstates(
 )
 
 
-total_charge_density_callable = system.calculate_total_charge_density(eigenstate_array)
+z = system.z # Because I consistently make the mistake of only asking for z
 
 for i, eigenstate in enumerate(eigenstate_array):
-    if not eigenstate.success:
-        fmt = "r"
-    else:
-        fmt = "g"
+
+    # ax_fields.plot(system.z, 
+    #         system.calculate_eigenstate_charge_density(eigenstate)(system.z),
+    #         'g',
+    #         alpha=0.5,
+    #         linewidth=0.6
+    #         )
 
     omega_solution = eigenstate.p[0]
-    if float_in_array(omega_solution, omega_solution_array):
-        continue
+    if omega_solution < 0:
+        omega_scatter_color = 'r'
+        omega_scatter_marker = 'x'
+    elif omega_solution > 0:
+        omega_scatter_color = 'g'
+        omega_scatter_marker = 'o'
 
-    # ax_fields.plot(system.z,  system.calculate_charge_density(eigenstate)(system.z), fmt, alpha=0.5, linewidth=0.6)
-    ax_omegas.scatter(i, omega_solution, color=fmt)
-    ax_omegas.set_title(f"$\lambda={lambda_value}, m={scalar_mass}$")
+    ax_omegas.scatter(
+            np.sqrt(omega_solution**2 - m**2)/np.pi + 0.3*(omega_solution<0),
+            np.abs(omega_solution),
+            marker=omega_scatter_marker,
+            color=omega_scatter_color
+            )
+
     omega_solution_array.append(omega_solution)
 
-total_charge_density_array = total_charge_density_callable(system.z)
-total_charge_density_array[0] = 0
+ax_fields.plot(
+        z,
+        system.A0_field(z),
+        label='A_0 potential'
+        )
 
-ax_fields.plot(system.z, total_charge_density_array, label="Rough charge density", alpha=0.6)
+ax_fields.plot(
+        z,
+        system.calculate_total_charge_density(
+            eigenstate_array, 
+            renormalization=False,
+            smoothing=True
+            )(z), # calculate_... returns a function
+        label='Unfiltered charge density'
+        )
 
-# SMOOTHING
-smoothed_charge_density = savitzky_golay(
-    total_charge_density_array, 10*system.n_points // (n_of_solutions + 1), 2
-)
+ax_fields.set_xlabel('z')
+ax_fields.set_ylabel(r'$\rho(z)$')
 
-ax_fields.plot(system.z, smoothed_charge_density, label="Savitzky golay smoothing 1st time")
+ax_omegas.set_xlabel('n')
+ax_omegas.set_ylabel(r'$\omega_n$')
 
-smoothed_charge_density = savitzky_golay(
-    smoothed_charge_density, 10*system.n_points // (n_of_solutions + 1), 4
-)
-ax_fields.plot(system.z, smoothed_charge_density, label="Savitzky golay smoothing 2nd time")
-
-# electric_field = system.new_electric_field(eigenstate_array)
-vector_field = system.new_vector_field(smoothed_charge_density)
-#ax_fields.plot(system.z, vector_field.y[0], label='$A_0$ field')
-ax_fields.plot(system.z, vector_field.y[0], label='$A_0$ field')
-
-ax_fields.legend(loc="best")
-
+ax_fields.legend(loc='best')
 plt.tight_layout()
 plt.show()
