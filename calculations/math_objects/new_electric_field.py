@@ -1,5 +1,6 @@
 import scipy as sp
 
+
 def new_electric_field(self, eigenstate_array):
     """
     Calculates the corresponding electric field to a certain charge density
@@ -23,4 +24,3 @@ def new_electric_field(self, eigenstate_array):
     print("The ODE was completed!")
 
     return modified_electric
-

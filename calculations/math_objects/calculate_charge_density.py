@@ -1,6 +1,7 @@
 import numpy as np
 import scipy as sp
 
+
 def calculate_charge_density(self, solution):
     """
     Calculates the charge density associated to certain eigenstate
@@ -24,4 +25,3 @@ def calculate_charge_density(self, solution):
     )
 
     return charge_density_normalized
-

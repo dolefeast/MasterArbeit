@@ -1,20 +1,35 @@
-import numpy as np
+from math_objects.system import System
+from math_objects.unique_floats import float_in_array, unique_floats
+from math_objects.normalize import normalize
 import scipy as sp
+import numpy as np
+
 
 def calculate_N_eigenstates(
-    self,
+    electric_potential,
+    scalar_mass: float,
+    scalar_charge: float,
+    N: int,
     omega_in: float,
     omega_end: float,
-    N: int,
     boundary_conditions=None,
+    scalar_value: float = 1,
     tolerance: float = 1e-2,
     n_points: int = 300,
+    scalar_name: str = "phi",
     max_nodes: int = 3000,
 ):
-    """Calculates N (not necessarily normalized) KG eigenstates associated to a certain external classical field
+    """Calculates N  KG eigenstates associated to a certain external classical field
     Parameters
+        electric_potential: function, Can be a scalar.
+            If a function, electric_potential is the A0(z).
+            If scalar, electric_potential is the value lambda in A0(z) = - lambda (z-1/2)
+        scalar_mass: float,
+            The mass of the scalar field
+        scalar_charge: float,
+            The charge of the scalar field
         N: int,
-            Amount of desired eigenstates.
+            Amount of desired solutions
         omega_in: float,
             initial omega for the sweep of eigenvalue
         omega_end: float,
@@ -22,6 +37,8 @@ def calculate_N_eigenstates(
         boundary_conditions: float=None,
             boundary conditions tos solve the differential equation.
             If not given (None), they are assumed to be dirichlet (y(0) = y(1) = 0)
+        scalar_value: float=1,
+            The initial guess of the scalar field. For solve_bvp purposes
         tolerance: float=1e-2,
             The tolerance to check wether the solution converged
         n_points: int=300,
@@ -39,33 +56,32 @@ def calculate_N_eigenstates(
             "Warning: The starting value for the omega guesses is positive, and the solution needs negative frequency solutions"
         )
 
+    system = System(
+        field_strength=electric_potential,
+        scalar_mass=scalar_mass,
+        scalar_charge=scalar_charge,
+        n_points=n_points,
+        scalar_name=scalar_name,
+        scalar_values=scalar_name,
+    )
+
     if boundary_conditions is None:
-        boundary_conditions = self.dirichlet_boundary_conditions
+        boundary_conditions = system.dirichlet_boundary_conditions
 
     solution_array = []
-    #print(f'omega_in={omega_in}, omega_end={omega_end}, N={N}')
 
-    for i, omega_guess in enumerate(np.linspace(omega_in, omega_end, N)):
-        eigenfunction_guess = np.sin(
-            omega_guess * self.z
-        )  # Guessing the solution of the ODE
-        guess_derivative = np.diff(eigenfunction_guess)
-        guess_derivative = np.append(
-            guess_derivative, guess_derivative[-1]
-        )  # since calculating derivatives substracts the last point
-
+    for i, omega_guess in enumerate(np.linspace(omega_in, omega_end, 500)):
         solution = sp.integrate.solve_bvp(
-            self.differential_equation,
+            system.differential_equation,
             boundary_conditions,
-            self.z,
-            (eigenfunction_guess, guess_derivative),
+            system.z,
+            (system.phi.value, system.phi.gradient.value),
             p=(omega_guess,),
             verbose=0,
             max_nodes=max_nodes,
-            tol=tolerance,
+            tol=TOL,
         )
 
-        if solution.success:  # If it converged, add it to the solutions array
-            solution_array.append(solution)
+        solution_array.append(solution)
 
     return solution_array
