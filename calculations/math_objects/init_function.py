@@ -26,7 +26,7 @@ def __init__(self,
     self.scalar_name = scalar_name
     if not eigenstate_array is None: 
         if eigenvalue_guess_array is None:
-            # if it is not given, calculate it from the solutions array
+            # if it is not given, retrieve it from the solutions array
             self.eigenvalue_guess_array = [sol.p[0] for sol in eigenstate_array]
         else:  # If the eigenvalue_guess_array is given
             # They must have same length.
@@ -44,10 +44,11 @@ def __init__(self,
                     n**2 * np.pi**2
                     + self.m**2
                     )
+
         # Guesses for the boundary value problem solution.
         self.eigenstate_array = [1/omega * np.sin(omega*self.z) 
                 for omega in self.eigenvalue_guess_array]
-        print("Warning: Since no eigenstate array was given, creating it assuming Dirichlet boundary conditions")
+        print("Warning: No eigenstate array was given. It will be created assuming Dirichlet boundary conditions.")
         self.eigenstate_gradient_array = [np.cos(omega*self.z) 
                 for omega in self.eigenvalue_guess_array]
 

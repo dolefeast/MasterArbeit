@@ -81,7 +81,7 @@ def calculate_total_charge_density(self,
                 renormalization_term = 0
 
             total_charge_density += (
-                    self.normalized_eigenstate(eigenstate)(z) 
+                    0.5*self.normalized_eigenstate(eigenstate)(z) 
                     + renormalization_term
                                 )
             potential_term = self.e**2 / np.pi * self.A0_field(z)
