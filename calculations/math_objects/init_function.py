@@ -1,4 +1,5 @@
 import numpy as np
+from math_objects.perturbative_solutions import dirichlet_eigenstate, dirichlet_eigenstate_gradient
 from math_objects.Klein_Gordon import *
 from math_objects.fields import Vector_Potential
 
@@ -46,10 +47,10 @@ def __init__(self,
                     )
 
         # Guesses for the boundary value problem solution.
-        self.eigenstate_array = [1/omega * np.sin(omega*self.z) 
-                for omega in self.eigenvalue_guess_array]
         print("Warning: No eigenstate array was given. It will be created assuming Dirichlet boundary conditions.")
-        self.eigenstate_gradient_array = [np.cos(omega*self.z) 
+        self.eigenstate_array = [dirichlet_eigenstate(self.z, omega, m, lambda_value)
+                for omega in self.eigenvalue_guess_array]
+        self.eigenstate_gradient_array = [dirichlet_eigenstate_gradient(self.z, omega, m, lambda_value)
                 for omega in self.eigenvalue_guess_array]
 
     self.boundary_conditions = self.dirichlet_boundary_conditions
