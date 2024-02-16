@@ -26,10 +26,6 @@ def calculate_eigenstates(self,
             self.eigenstate_gradient_array,
             self.eigenvalue_guess_array
             ):
-        if np.abs(eigenvalue_guess-5.9) < float_tol:
-            verbose = 2
-        else:
-            verbose = 0
 
         true_eigenstate = sp.integrate.solve_bvp(
             self.Klein_Gordon,

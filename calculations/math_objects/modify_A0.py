@@ -19,7 +19,7 @@ def modify_A0(self, charge_density):
         try:
             charge_density(
                 0.5
-            )  # Check if charge_density is callable. 0.5 must be in the accepted values
+            )  # Check if charge_density is callable. z = 0.5 must be in the accepted values
         # if callable, do nothing
             pass
         except TypeError:
@@ -29,7 +29,7 @@ def modify_A0(self, charge_density):
         return [A[1], -charge_density(z)]
 
     def bc(Aa, Ab):
-        return [Aa[0], Ab[0]]  # There should be no potential on the boundary.
+        return [Aa[0], Ab[0]]  # There must be no potential on the boundary.
 
     print("self.n_points =", self.n_points)
     #print("np.shape(self.z) =", np.shape(self.n_points))

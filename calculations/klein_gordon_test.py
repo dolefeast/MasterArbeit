@@ -3,6 +3,8 @@ from math_objects.unique_floats import float_in_array, unique_floats
 from math_objects.normalize import normalize
 from math_objects.savitzky_golay import savitzky_golay
 
+from scripts.plotting import plot_each_eigenstate, plot_different_window, scatter_omegas
+
 import scipy as sp
 from scipy.signal import savgol_filter
 import numpy as np
@@ -10,40 +12,6 @@ import matplotlib.pyplot as plt
 from matplotlib.widgets import Slider
 
 def moving_average(x, w): return np.convolve(x, np.ones(w), 'full') / w
-
-def plot_different_window(total_charge_density, ax_fields):
-    while True:
-        plt.draw()
-        while True:
-            try:
-                val = int(input('Input desired window size: '))
-                break
-            except ValueError:
-                print('Input must be an integer')
-        ax_fields.clear()
-        ax_fields.plot(
-                moving_average(
-                    moving_average(
-                        total_charge_density,
-                        int(val)//5+1
-                        ),
-                    int(val),
-                    ),
-                label=f'Moving average filtering. window={val}'
-                )
-        plt.pause(0.01)
-
-def plot_each_eigenstate(eigenstate_array, m, lambda_value):
-    from math_objects.perturbative_solutions import dirichlet_eigenstate
-    fig, ax_array = plt.subplots(len(eigenstate_array))
-
-    for ax, eigenstate in zip(ax_array, eigenstate_array):
-        omega_n = eigenstate.p[0]
-        ax.plot(eigenstate.x, eigenstate.y[0])
-        ax.plot(eigenstate.x, dirichlet_eigenstate(eigenstate.x, omega_n, m, lambda_value))
-        ax.set_title(f'$\omega_n = {omega_n}$')
-
-    # plt.show() 
 
 def main(
         N_mode_cutoff,
@@ -78,24 +46,7 @@ def main(
 
     z = system.z # Because I consistently make the mistake of only asking for z
 
-    for i, eigenstate in enumerate(eigenstate_array):
-        omega_solution = eigenstate.p[0]
-        if omega_solution < 0:
-            omega_scatter_color = 'r'
-            omega_scatter_marker = 'x'
-        elif omega_solution > 0:
-            omega_scatter_color = 'g'
-            omega_scatter_marker = 'o'
-
-        ax_omegas.scatter(
-                 np.sqrt(omega_solution**2 - m**2)/np.pi + 0.3*(omega_solution<0),
-                 np.abs(omega_solution),
-                 marker=omega_scatter_marker,
-                 color=omega_scatter_color
-                 )
-     
-        omega_solution_array.append(omega_solution)
-
+    scatter_omegas(eigenstate_array, ax_omegas, m)
     total_charge_density = system.calculate_total_charge_density(
             eigenstate_array, 
                 renormalization=False,
@@ -104,18 +55,11 @@ def main(
 
     ax_fields.plot(
             total_charge_density,
-            label='Unfiltered charge density'
+            label='Unfiltered charge density',
+            alpha=0.4
             )
 
-    window_initial = 50
-    window_max = 600
-    window_frequency = 5
-    ax_fields.plot(
-           moving_average(total_charge_density, window_initial),
-           label=f'Moving average filtering. window={window_initial}'
-           )
-
-    plot_different_window(total_charge_density, ax_fields)
+    plot_different_window(total_charge_density, ax_fields, moving_average)
 
     ax_fields.set_xlabel('z')
     ax_fields.set_ylabel(r'$\rho(z)$')

@@ -44,6 +44,7 @@ class Vacuum_Solution:
     from math_objects.init_function import __init__
     from math_objects.calculate_eigenstates import calculate_eigenstates
     from math_objects.charge_density import normalized_eigenstate, calculate_total_charge_density
+    from math_objects.modify_A0 import modify_A0
 
 
 
