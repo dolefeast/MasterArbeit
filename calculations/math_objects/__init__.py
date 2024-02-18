@@ -1,5 +1,4 @@
 from math_objects.fields import Field, Vector_Potential
-from math_objects.value_generator import value_generator
 from math_objects.iterable_output import iterable_output
 from math_objects.unique_floats import unique_floats, float_in_array
 from math_objects.savitzky_golay import savitzky_golay
@@ -19,9 +18,9 @@ class Vacuum_Solution:
         n_points: int = 100         #The nodes to be considered
         scalar_name: str = 'phi'    #The name of the field, for plotting reasons
                                     #is subject to.
-        eigenvalue_guess_array: [float] # Array of eigenvalues for the bvp guess
+        eigenvalue_array: [float] # Array of eigenvalues for the bvp guess
         eigenstate_array: [solve_bvp.solutions] # Array of solutions from a previous calculation
-        N_mode_cutoff: int=150 # If both eigenstate_array and eigenvalue_guess_array are None, calculate 2 N_mode_cutoff modes (N_mode_cutoff positive and N_mode_cutoff negative energy solution)
+        N_mode_cutoff: int=150 # If both eigenstate_array and eigenvalue_array are None, calculate 2 N_mode_cutoff modes (N_mode_cutoff positive and N_mode_cutoff negative energy solution)
         float_tol: float=1e-3 # The tolerance with which two floats are considered the same
     Properties:
         eigenstate_array: The eigenstate_array to a certain electric potential
@@ -33,7 +32,7 @@ class Vacuum_Solution:
 
     The system to be considered. Takes as input the lamda value of the 
     electric potential 
-        A_0(z) = -lamda (z-1/2) 
+        A_0(z) = - lambda_value * (z-1/2) 
     and an array of eigenvalue omega_n guesses. These should be solutions to 
     easier cases of the problem we are considering. For lamda small:
         omega_n = sign(n) * np.sqrt(n² pi² + m²)
@@ -45,6 +44,8 @@ class Vacuum_Solution:
     from math_objects.calculate_eigenstates import calculate_eigenstates
     from math_objects.charge_density import normalized_eigenstate, calculate_total_charge_density
     from math_objects.modify_A0 import modify_A0
+    from math_objects.update_eigenstates import update_eigenstates
+
 
 
 

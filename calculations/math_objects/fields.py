@@ -208,22 +208,3 @@ class Vector_Potential(Field):
         diff_phi = np.diff(self.value, order)
         diff_phi = np.append(diff_phi, diff_phi[-1])
         return diff_phi * self.n_points
-
-
-if __name__ == "__main__":
-    n_points = 500
-
-    # f = lambda z, sigma, z0: 1/np.sqrt(2*np.pi*sigma**2) * np.exp(-(z-z0)**2/2/sigma**2)
-    f = lambda z, sigma, z0: z**2
-    g = lambda z, sigma, z0: np.cos(np.pi * z)
-    parabola1 = f(np.linspace(0, 1, n_points), 0.025, 0.5)
-    parabola2 = g(np.linspace(0, 1, n_points), 0.025, 0.5)
-    phi1 = Field(value=parabola1, name="phi1")
-    phi2 = Field(value=parabola2, name="phi2")
-
-    plt.plot(phi2.z, phi2.value, label=phi2)
-    plt.plot(phi2.z, phi2.gradient(phi2.z), label=phi2)
-
-    plt.legend(loc="best")
-
-    plt.show()

@@ -9,7 +9,7 @@ def calculate_eigenstates(self,
         max_nodes: int=3000,
         verbose: int=0,
         ):
-    """Calculates len(self.eigenvalue_guess_array) KG eigenstate_array associated to a certain external classical field.
+    """Calculates KG eigenstate_array of len(eigenstate_guess) associated to a certain external classical field.
     Parameters:
         float_tol: float=1e-2. The tolerance for which two floats are considered the same
         bvp_tol: float=1e-2. The tolerance for which the KG are submitted to
@@ -17,6 +17,7 @@ def calculate_eigenstates(self,
         verbose: int=0. Can take values in [0,1,2]. verbosity in increasing order
         """
     solution_array = []
+    solution_gradient_array = []
     true_eigenvalues_array = []
 
     repeated_eigenvalue_count = 0
@@ -24,7 +25,7 @@ def calculate_eigenstates(self,
     for eigenstate_guess, eigenstate_gradient_guess, eigenvalue_guess in zip(
             self.eigenstate_array,
             self.eigenstate_gradient_array,
-            self.eigenvalue_guess_array
+            self.eigenvalue_array
             ):
 
         true_eigenstate = sp.integrate.solve_bvp(
@@ -58,5 +59,3 @@ def calculate_eigenstates(self,
     print(f"Found and removed {repeated_eigenvalue_count} repeated eigenvalues!")
 
     return solution_array
-
-
