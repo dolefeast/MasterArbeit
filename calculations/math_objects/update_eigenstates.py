@@ -39,11 +39,11 @@ def update_eigenstates(
                     total_charge_density_array,
                     *filter_parameters
                     )
-            # Since the filtering sometimes changes the mesh array
-            z = (
-                    np.arange(len(total_charge_density_array))
-                    /len(total_charge_density_array)
-                    )
+    # Since the filtering sometimes changes the mesh array
+    z = (
+            np.arange(len(total_charge_density_array))
+            /len(total_charge_density_array)
+            )
     
     # I allow the calculations in between to change the shapes of the arrays
     A0_perturbation = modify_A0(z, total_charge_density_array)
@@ -53,5 +53,7 @@ def update_eigenstates(
     self.eigenstate_gradient_array = [eigenstate.sol(self.z)[1] for eigenstate in eigenstate_array]
     self.eigenvalue_array = get_eigenvalues(eigenstate_array)
 
-    self.A0_value = A0_perturbation.sol(self.z)[0] # Now its back to being shape = (self.N_points,)
+    self.A0_perturbation = A0_perturbation.sol(self.z)[0]
+
+    self.A0_value =  self.A0_value + A0_perturbation.sol(self.z)[0] # Now its back to being shape = (self.N_points,)
     self.A0_field.value = self.A0_value

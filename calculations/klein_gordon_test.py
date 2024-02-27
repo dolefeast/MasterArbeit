@@ -49,10 +49,10 @@ def main(
         ax_omegas.legend(loc='best')
         plt.tight_layout()
 
-    for i in np.linspace(0.3, 1, 5):
-        print(f'Iteration number {i}')
+    for index, i in enumerate(np.linspace(0.3, 1, 1)):
+        print(f'Iteration number {index+1}')
         system.update_eigenstates(
-                smoothing=True,
+                smoothing=False,
                 filtering_method=filtering.double_filtering,
                 filter_parameters=(150,)
                 )
@@ -61,13 +61,25 @@ def main(
         ax_fields.plot(x_density, y_density, 'b', alpha=0.3 + 0.3*i)
         ax_fields.plot(x_field, y_field, 'r', alpha=0.3 + 0.3*i)
 
-    scatter_omegas(system.eigenvalue_array, ax_omegas, m)
+    to_csv = np.asarray((x_density, y_density))
+    np.savetxt(f'./saved_solutions/lambda_{lambda_value}_mass_{m}.csv', to_csv, delimiter=",")
+    
+    # scatter_omegas(system.eigenvalue_array, ax_omegas, m)
     plt.show()
+
+    fig, ax = plt.subplots(1, 1)
+
+    ax.plot(system.A0_perturbation[0], label='A_0')
+    ax.plot(system.A0_perturbation[1], label='A_0 derivative')
+    ax.legend(loc='best')
+
+    plt.show()
+
 
 if __name__ == "__main__":
 
-    N_mode_cutoff = 120
-    lambda_value = 8
+    N_mode_cutoff = 50
+    lambda_value = 1
     TOL = 1e-2
     N_POINTS = 1000
     m = 1
