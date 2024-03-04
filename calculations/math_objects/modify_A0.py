@@ -30,11 +30,11 @@ def modify_A0(z, charge_density):
         return [A[1], -charge_density(z)]
 
     def bc(Aa, Ab):
-        return [Aa[1], Ab[1]]  # There must be no potential on the boundary.
-
+        return [Aa[1], Ab[1]]  # There must be no electric field on the boundary.
 
     modified_electric = sp.integrate.solve_bvp(
-        dAdz, bc, z, np.ones_like((z, z))
+        dAdz, bc, z, np.zeros_like((z, z))
     )
+    print(f'perturbation A0 status: {modified_electric.success}')
 
     return modified_electric

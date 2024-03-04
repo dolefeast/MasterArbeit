@@ -5,6 +5,8 @@ from math_objects.get_eigenvalues import get_eigenvalues
 from math_objects.fields import Vector_Potential
 from math_objects.modify_A0 import modify_A0
 
+from scripts.bao_filtering import bao_filtering
+
 def update_eigenstates(
         self,
         renormalization: bool=False,
@@ -33,7 +35,14 @@ def update_eigenstates(
 
     if smoothing:
         if filtering_method is None:
-            raise TypeError("smoothing=True but no filtering_method was given. Aborting...")
+            if filter_parameters is None:
+                filter_parameters = (0.06,)
+            print("No filtering method was given, but smoothing=True. Filtering using bao_smoothing...")
+            total_charge_density_array = bao_filtering(
+                    self.z, 
+                    total_charge_density_array,
+                    size=filter_parameters[0]
+                    )[1]
         else:
             total_charge_density_array = filtering_method(
                     total_charge_density_array,
@@ -55,5 +64,5 @@ def update_eigenstates(
 
     self.A0_perturbation = A0_perturbation.sol(self.z)[0]
 
-    self.A0_value =  self.A0_value + A0_perturbation.sol(self.z)[0] # Now its back to being shape = (self.N_points,)
-    self.A0_field.value = self.A0_value
+    self.A0_value = np.copy(self.A0_value) + self.A0_perturbation # Now its back to being shape = (self.N_points,)
+    self.A0_field.value = self.A0_value # This adds nothing since both arrays point to the same memory allocation. Each change in A0 field will change the value at self.A0_field.value
