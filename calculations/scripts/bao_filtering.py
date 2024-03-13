@@ -72,7 +72,6 @@ def remove_neighbourhood(
     # The points to take out of the array
     for p in points:
         window = np.where(abs(x_array - p)<=size/2)[0].tolist()
-        print(window[len(window)//2]) # The point to be forced through zero
         idx += window
 
     idx = np.reshape(

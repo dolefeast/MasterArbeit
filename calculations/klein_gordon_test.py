@@ -4,7 +4,8 @@ from math_objects.normalize import normalize
 from math_objects.savitzky_golay import savitzky_golay
 
 from scripts.plotting import plot_each_eigenstate, plot_different_window_filter, scatter_omegas, plot_from_0_to_1
-import scripts.filtering as filtering
+import scripts.filter_scripts as filter_scripts
+import scripts.filters as filters
 from scripts.bao_filtering import bao_filtering
 
 import scipy as sp
@@ -59,7 +60,8 @@ def main(
         N_POINTS,
         m,
         e,
-        smoothing=False,
+        n_iterations,
+        smoothing=True,
     ):
 
     system = init_main(
@@ -71,35 +73,61 @@ def main(
         e,
         )
 
-    n_interations = 1 # N of iterations to update the electric potential
+    #n_interations = 1 # N of iterations to update the electric potential
 
-    for index, i in enumerate(np.linspace(0.3, 1, n_interations)):
+    filter_method = filter_scripts.extend_and_filter
+    filter_parameters = (
+            filters.remove_wiggles_thrice, 
+            tuple((1, )),
+            0.07,
+            )
+
+    for index, i in enumerate(np.linspace(0.3, 1, n_iterations)):
+        print(20*'=')
         print(f'Iteration number {index+1}')
         system.update_eigenstates(
-                smoothing=True,
-                filter_parameters=(0.12,)
-                #  filtering_method=filtering.double_filtering,
+                smoothing=smoothing,
+                filter_method=filter_method,
+                filter_parameters=filter_parameters
+                #  filter_method=filtering.double_filtering,
                 #  filter_parameters=(150,)
                 )
         x_density, y_density = plot_from_0_to_1(system.charge_density_array)
-        x_field, y_field = plot_from_0_to_1(system.A0_perturbation)
-        ax_fields.plot(x_density, y_density, 'b', alpha=0.3 + 0.3*i)
-        # ax_fields.plot(x_field, y_field, 'r', alpha=0.3 + 0.3*i)
+        #x_field, y_field = plot_from_0_to_1(system.A0_field(system.z)) # to see perturbation
+
+        x_field, y_field = plot_from_0_to_1(
+                system.A0_field(system.z) 
+                + lambda_value * (system.z-1/2)
+            ) # to see perturbation
+
+        alpha = 0.3 + 0.7*((index+1)/n_iterations)**3
+
+        ax_fields.plot(
+                x_density,
+                y_density,
+                'b', 
+                alpha=alpha,
+                label=f'iteration n {index+1}'
+                )
+        ax_fields.plot(x_field, y_field, 'r', alpha=alpha)
+        scatter_omegas(system.eigenvalue_array, ax_omegas, m)
+
+    ax_fields.legend(loc='best')
 
     # to_csv = np.asarray((x_density, y_density))
     # np.savetxt(f'./saved_solutions/lambda_{lambda_value}_mass_{m}.csv', to_csv, delimiter=",")
     
-    scatter_omegas(system.eigenvalue_array, ax_omegas, m)
     plt.show()
 
 if __name__ == "__main__":
 
-    N_mode_cutoff = 50
+    N_mode_cutoff = 80
     lambda_value = 1
-    TOL = 1e-2
-    N_POINTS = 1000
     m = 5
+    N_POINTS = 1000
+    TOL = 1e-2
     e = 1
+    n_iterations = 4
 
     main(
         N_mode_cutoff,
@@ -108,5 +136,6 @@ if __name__ == "__main__":
         N_POINTS,
         m,
         e,
-        smoothing=True,
+        n_iterations,
+        smoothing=True
     )

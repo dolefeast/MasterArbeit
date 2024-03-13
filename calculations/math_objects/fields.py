@@ -23,7 +23,6 @@ class Field(object):
         deriv: the derivative wrt z of the field
     """
 
-    # Implement here Robin boundary conditions?
     value: None = None
     mass: float = 0
     charge: float = 0

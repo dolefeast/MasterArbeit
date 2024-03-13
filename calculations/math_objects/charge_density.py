@@ -9,7 +9,7 @@ import mpmath
 
 def normalized_eigenstate(self,
     eigenstate,
-    integration_limit=200):
+    integration_limit=300):
     """
     Calculates the charge density associated to certain eigenstate
     Parameters:
@@ -37,7 +37,7 @@ def normalized_eigenstate(self,
 def calculate_total_charge_density(self,
         eigenstates,
         renormalization=False,
-        smoothing:str='savgol'):
+        ):
 
     """
     Calculates total charge density as a callable from an array of eigenstates
@@ -61,8 +61,6 @@ def calculate_total_charge_density(self,
         else:
             renormalization_closed_form = 0
 
-
-        n_index_array = n_index_array
 
         adding_sign = 1 
         true_eigenstate_array = eigenstates
@@ -88,13 +86,6 @@ def calculate_total_charge_density(self,
 
         total_charge_density -= adding_sign * renormalization_closed_form 
         total_charge_density *= self.e
-
-        if smoothing:
-            total_charge_density = savitzky_golay(
-                    total_charge_density,
-                    int(90/1000 * self.n_points),
-                    3
-                    )
 
         return (
                 total_charge_density

@@ -45,6 +45,7 @@ def __init__(self,
                     n**2 * np.pi**2
                     + self.m**2
                     )
+                    
 
         # Guesses for the boundary value problem solution.
         print("Warning: No eigenstate array was given. It will be created assuming Dirichlet boundary conditions.")

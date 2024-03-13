@@ -11,7 +11,7 @@ def update_eigenstates(
         self,
         renormalization: bool=False,
         smoothing: bool=True,
-        filtering_method: callable=None,
+        filter_method: callable=None,
         filter_parameters: tuple=None
         ):
     """
@@ -19,7 +19,7 @@ def update_eigenstates(
     Parameters:
         renormalization: bool=False. Whether we want 'renormalization' to be applied
         smoothing: bool=False. Whether we want the output of charge_density to be filtered
-        filtering_method: callable=None. call signature filtering_method(signal, *filter_parameters) The filtering method to be used on the charge density. 
+        filter_method: callable=None. call signature filter_method(x, signal, *filter_parameters) The filtering method to be used on the charge density. 
         filter_parameters: tuple=None. The paraeters to be passed to the filter_method
     """
 
@@ -31,10 +31,10 @@ def update_eigenstates(
     total_charge_density_array = self.calculate_total_charge_density(
             eigenstate_array, 
                 renormalization=renormalization,
-                )(self.z) # calculate_... returns a function
+                )(self.z) # calculate_total_charge_density returns a function
 
     if smoothing:
-        if filtering_method is None:
+        if filter_method is None:
             if filter_parameters is None:
                 filter_parameters = (0.06,)
             print("No filtering method was given, but smoothing=True. Filtering using bao_smoothing...")
@@ -44,17 +44,17 @@ def update_eigenstates(
                     size=filter_parameters[0]
                     )[1]
         else:
-            total_charge_density_array = filtering_method(
+            print("Filtering with the given filter_method")
+            total_charge_density_array = filter_method(
+                    self.z,
                     total_charge_density_array,
                     *filter_parameters
                     )
     # Since the filtering sometimes changes the mesh array
-    z = (
-            np.arange(len(total_charge_density_array))
-            /len(total_charge_density_array)
-            )
+    z, total_charge_density_array = total_charge_density_array
     
-    # I allow the calculations in between to change the shapes of the arrays
+    # The mid-step calculations are allowed to change the shape of the arrays
+    # Calculate the A0 corresponding to the new charge distribution
     A0_perturbation = modify_A0(z, total_charge_density_array)
 
     self.charge_density_array = total_charge_density_array
@@ -62,7 +62,17 @@ def update_eigenstates(
     self.eigenstate_gradient_array = [eigenstate.sol(self.z)[1] for eigenstate in eigenstate_array]
     self.eigenvalue_array = get_eigenvalues(eigenstate_array)
 
-    self.A0_perturbation = A0_perturbation.sol(self.z)[0]
+    self.A0_perturbation = A0_perturbation.sol(self.z)[0] - A0_perturbation.sol(0.5)[0]# Back to original shape and upscaled it to go to 0
 
-    self.A0_value = np.copy(self.A0_value) + self.A0_perturbation # Now its back to being shape = (self.N_points,)
-    self.A0_field.value = self.A0_value # This adds nothing since both arrays point to the same memory allocation. Each change in A0 field will change the value at self.A0_field.value
+    self.A0_value = self.A0_base_value + self.A0_perturbation 
+
+
+    self.A0_field = Vector_Potential(
+            value = (
+        -self.lambda_value * (self.z - 1/2)
+        + A0_perturbation.sol(self.z)[0] # This adds nothing since both arrays point to the same memory allocation. Each change in A0 field will change the value at self.A0_field.value
+        - A0_perturbation.sol(0.5)[0] # To keep the problem antisymmetric wrt z=1/2
+            ),
+            n_points=self.n_points
+            )
+

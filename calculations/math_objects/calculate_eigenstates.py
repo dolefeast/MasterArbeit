@@ -5,7 +5,7 @@ import numpy as np
 
 def calculate_eigenstates(self,
         float_tol: float=1e-2,
-        bvp_tol: float=1e-2,
+        bvp_tol: float=5e-5,
         max_nodes: int=3000,
         verbose: int=0,
         ):
@@ -40,7 +40,7 @@ def calculate_eigenstates(self,
         )
 
         true_eigenvalue = true_eigenstate.p[0]
-        # Check if eigenvalue is double counted, or if it converged.
+        # Check if eigenvalue is double counted, or if solve_bvp converged
         if float_in_array(true_eigenvalue, true_eigenvalues_array, tol=self.float_tol):
             # Discarding either repeated eigenvalues or non convergent solutions
             print(f'Found repeated eigenvalue: {true_eigenstate.p[0]} with\neigenvalue_guess={eigenvalue_guess}\n')
@@ -54,7 +54,7 @@ def calculate_eigenstates(self,
             print(true_eigenstate)
 
         solution_array.append(true_eigenstate)
-        true_eigenvalues_array.append(true_eigenvalue)
+        # true_eigenvalues_array.append(true_eigenvalue)
 
     print(f"Found and removed {repeated_eigenvalue_count} repeated eigenvalues!")
 
