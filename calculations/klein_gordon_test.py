@@ -12,7 +12,6 @@ import scipy as sp
 from scipy.signal import savgol_filter
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib.widgets import Slider
 
 def init_main(
         N_mode_cutoff,
@@ -127,7 +126,7 @@ if __name__ == "__main__":
     N_POINTS = 1000
     TOL = 1e-2
     e = 1
-    n_iterations = 4
+    n_iterations = 1
 
     main(
         N_mode_cutoff,

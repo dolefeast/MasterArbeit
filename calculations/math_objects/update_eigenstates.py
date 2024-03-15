@@ -29,7 +29,6 @@ def update_eigenstates(
 
     # Calculate corresponding charge density
     total_charge_density_array = self.calculate_total_charge_density(
-            eigenstate_array, 
                 renormalization=renormalization,
                 )(self.z) # calculate_total_charge_density returns a function
 
@@ -58,9 +57,6 @@ def update_eigenstates(
     A0_perturbation = modify_A0(z, total_charge_density_array)
 
     self.charge_density_array = total_charge_density_array
-    self.eigenstate_array = [eigenstate.sol(self.z)[0] for eigenstate in eigenstate_array]
-    self.eigenstate_gradient_array = [eigenstate.sol(self.z)[1] for eigenstate in eigenstate_array]
-    self.eigenvalue_array = get_eigenvalues(eigenstate_array)
 
     self.A0_perturbation = A0_perturbation.sol(self.z)[0] - A0_perturbation.sol(0.5)[0]# Back to original shape and upscaled it to go to 0
 

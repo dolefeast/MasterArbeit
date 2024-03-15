@@ -35,7 +35,6 @@ def normalized_eigenstate(self,
     return charge_density_normalized
 
 def calculate_total_charge_density(self,
-        eigenstates,
         renormalization=False,
         ):
 
@@ -51,7 +50,8 @@ def calculate_total_charge_density(self,
     """
     
     def total_charge_density(z, renormalization=renormalization):
-        n_index_array = np.sqrt(get_eigenvalues(eigenstates)**2 - self.m**2)/np.pi
+        N = len(self.eigenstate_array)
+        n_index_array = np.arange(-N//2, N//2+1)
         if renormalization:
             renormalization_closed_form = (
                     self.e
@@ -63,9 +63,9 @@ def calculate_total_charge_density(self,
 
 
         adding_sign = 1 
-        true_eigenstate_array = eigenstates
+        true_eigenstate_array = self.eigenstate_array
         total_charge_density = 0
-        for eigenstate, n in zip(eigenstates, n_index_array):
+        for charge_density, n in zip(self.charge_densities_array, n_index_array):
             if renormalization:
                 renormalization_term = (
                               adding_sign
@@ -79,7 +79,7 @@ def calculate_total_charge_density(self,
                 renormalization_term = 0
 
             total_charge_density += (
-                    0.5*self.normalized_eigenstate(eigenstate)(z) 
+                    0.5*charge_density
                     + renormalization_term
                                 )
             potential_term = self.e**2 / np.pi * self.A0_field(z)
