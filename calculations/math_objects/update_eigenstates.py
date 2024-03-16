@@ -12,7 +12,8 @@ def update_eigenstates(
         renormalization: bool=False,
         smoothing: bool=True,
         filter_method: callable=None,
-        filter_parameters: tuple=None
+        filter_parameters: tuple=None,
+        save_results: bool=True,
         ):
     """
     Given the state of the system, returns the corresponding eigenstates off it
@@ -72,3 +73,50 @@ def update_eigenstates(
             n_points=self.n_points
             )
 
+    if save_results:
+        lambda_string = str(float(self.lambda_value)).replace(".", "_")
+        m_string = str(float(self.m)).replace(".", "_")
+        file_id = f'lambda_{lambda_string}_mass_{m_string}.txt'
+        to_csv = np.concatenate(((self.eigenvalue_array,), 
+                            np.array(self.eigenstate_array).T)).T
+        np.savetxt(f'saved_solutions/normalized_eigenstate/{file_id}', to_csv, delimiter= ",")
+
+        to_csv = np.concatenate(((self.eigenvalue_array,), 
+                            np.array(self.eigenstate_gradient_array).T)).T
+        np.savetxt(f'saved_solutions/normalized_eigenstate_gradient/{file_id}', to_csv, delimiter= ",")
+
+
+        to_csv = self.A0_field.value
+        np.savetxt(f'saved_solutions/A0_field/{file_id}', to_csv, delimiter= ",")
+
+        np.savetxt(f'saved_solutions/charge_density/{file_id}', to_csv, delimiter= ",")
+
+def update_eigenstates_iteration(
+    self,
+    n_iterations:int=3,
+    renormalization: bool=False,
+    smoothing: bool=True,
+    filter_method: callable=None,
+    filter_parameters: tuple=None,
+    save_results: bool=True,
+    ):
+    """
+    Updates the eigenstates iteratively
+    Parameters:
+    n_iterations;int =3, how many iterations of the routine
+    renormalization: bool=False, whether to apply the trick
+    smoothing: bool=True, if the total_charge_density_array is to be smoothed
+    filter_method: callable=None, the filtering method to be used if smoothing=True
+    filter_parameters: tuple=None, the filter parameters to pass to the filter_method
+    save_results: bool=True, if the results are to be saved
+    """
+
+
+    for i in range(n_iterations):
+        self.update_eigenstates(
+        renormalization,
+        smoothing,
+        filter_method,
+        filter_parameters,
+        save_results,
+                )

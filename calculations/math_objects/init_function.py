@@ -12,6 +12,7 @@ def __init__(self,
         scalar_name: str = "phi1",
         eigenvalue_array: [float]=None,
         eigenstate_array=None,
+        eigenstate_gradient_array=None,
         N_mode_cutoff: int = 150,
         float_tol=1e-2,
         boundary_conditions: callable = dirichlet_boundary_conditions
@@ -33,8 +34,8 @@ def __init__(self,
             # They must have same length.
             assert len(eigenvalue_array) == len(eigenstate_array)
         # not anymore interested in the solve_bvp.solution format
-        self.eigenstate_array = [sol.y[0] for sol in eigenstate_array] 
-        self.eigenstate_gradient_array = [sol.y[1] for sol in eigenstate_array] 
+        self.eigenstate_array = eigenstate_array 
+        self.eigenstate_gradient_array = eigenstate_gradient_array 
     else:
         if not eigenvalue_array is None:
             self.eigenvalue_array = eigenvalue_array
@@ -62,8 +63,6 @@ def __init__(self,
     self.A0_base_value = - self.lambda_value/self.e * (self.z - 1/2)
 
     if not A0_modification is None:
-        if np.abs(A0_modification[0]) < float_tol or  np.abs(A0_modification[-1]) < float_tol: 
-            raise AssertionError("The electric potential is not 0 in the boundaries of the problem.")
 
         # This can be done better, I don't think there's a need to, right now.
         self.A0_modification = A0_modification
