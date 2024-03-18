@@ -43,7 +43,31 @@ def remove_wiggles_thrice(x, y, p):
     y = remove_wiggles_twice(x, y, p)
     return remove_wiggles(x, y, p)
 
-
 def moving_average(x, signal, w):
     signal_filtered = np.convolve(signal, np.ones(w), 'full') / w
-    return signal_filtered
+    X = np.linspace(
+               x[0],
+               x[-1],
+               len(signal_filtered
+                )
+               )
+
+    signal_interpolated = sp.interpolate.UnivariateSpline(
+        X,
+            signal_filtered,
+            k=3,
+            s=0
+            )
+    signal_x_shape = signal_interpolated(x)
+    return signal_x_shape
+
+def moving_average_twice(x, signal, w):
+    signal_filtered = np.convolve(signal, np.ones(w), 'full') / w
+    signal_interpolated = sp.interpolate.UnivariateSpline(
+            x, 
+            signal_filtered,
+            k=3,
+            s=0
+            )
+    signal_x_shape = signal_interpolated(x)
+    return moving_average(x, signal_filtered, w)

@@ -1,5 +1,6 @@
 import numpy as np
 import scipy as sp
+import matplotlib.pyplot as plt
 
 from math_objects.get_eigenvalues import get_eigenvalues
 from math_objects.fields import Vector_Potential
@@ -38,20 +39,23 @@ def update_eigenstates(
             if filter_parameters is None:
                 filter_parameters = (0.06,)
             print("No filtering method was given, but smoothing=True. Filtering using bao_smoothing...")
-            total_charge_density_array = bao_filtering(
+            z, total_charge_density_array = bao_filtering(
                     self.z, 
                     total_charge_density_array,
                     size=filter_parameters[0]
                     )[1]
         else:
             print("Filtering with the given filter_method")
-            total_charge_density_array = filter_method(
+            z, total_charge_density_array = filter_method(
                     self.z,
                     total_charge_density_array,
                     *filter_parameters
                     )
+    else:
+        z = np.linspace(0, 1, len(total_charge_density_array))
+
     # Since the filtering sometimes changes the mesh array
-    z, total_charge_density_array = total_charge_density_array
+    #z, total_charge_density_array = total_charge_density_array
     
     # The mid-step calculations are allowed to change the shape of the arrays
     # Calculate the A0 corresponding to the new charge distribution
@@ -59,16 +63,20 @@ def update_eigenstates(
 
     self.charge_density_array = total_charge_density_array
 
-    self.A0_perturbation = A0_perturbation.sol(self.z)[0] - A0_perturbation.sol(0.5)[0]# Back to original shape and upscaled it to go to 0
+    self.A0_perturbation = A0_perturbation.sol(self.z)[0] - A0_perturbation.sol(0.5)[0]# Back to original shape and shifted to go to 0 at z=1/2
 
-    self.A0_value = self.A0_base_value + self.A0_perturbation 
-
+    self.A0_value = (
+            - self.lambda_value * (self.z - 1/2) 
+            + self.A0_perturbation
+            )
 
     self.A0_field = Vector_Potential(
             value = (
         -self.lambda_value * (self.z - 1/2)
+         + 1 * (
         + A0_perturbation.sol(self.z)[0] # This adds nothing since both arrays point to the same memory allocation. Each change in A0 field will change the value at self.A0_field.value
         - A0_perturbation.sol(0.5)[0] # To keep the problem antisymmetric wrt z=1/2
+             )
             ),
             n_points=self.n_points
             )
@@ -79,17 +87,17 @@ def update_eigenstates(
         file_id = f'lambda_{lambda_string}_mass_{m_string}.txt'
         to_csv = np.concatenate(((self.eigenvalue_array,), 
                             np.array(self.eigenstate_array).T)).T
-        np.savetxt(f'saved_solutions/normalized_eigenstate/{file_id}', to_csv, delimiter= ",")
+        np.savetxt(f'saved_solutions/dirichlet/normalized_eigenstate/{file_id}', to_csv, delimiter= ",")
 
         to_csv = np.concatenate(((self.eigenvalue_array,), 
                             np.array(self.eigenstate_gradient_array).T)).T
-        np.savetxt(f'saved_solutions/normalized_eigenstate_gradient/{file_id}', to_csv, delimiter= ",")
+        np.savetxt(f'saved_solutions/dirichlet/normalized_eigenstate_gradient/{file_id}', to_csv, delimiter= ",")
 
 
         to_csv = self.A0_field.value
-        np.savetxt(f'saved_solutions/A0_field/{file_id}', to_csv, delimiter= ",")
+        np.savetxt(f'saved_solutions/dirichlet/A0_field/{file_id:0.2f}', to_csv, delimiter= ",")
 
-        np.savetxt(f'saved_solutions/charge_density/{file_id}', to_csv, delimiter= ",")
+        np.savetxt(f'saved_solutions/dirichlet/charge_density/{file_id:0.2f}', to_csv, delimiter= ",")
 
 def update_eigenstates_iteration(
     self,
@@ -99,6 +107,8 @@ def update_eigenstates_iteration(
     filter_method: callable=None,
     filter_parameters: tuple=None,
     save_results: bool=True,
+    plot: bool=False,
+    axis=None,
     ):
     """
     Updates the eigenstates iteratively
@@ -111,7 +121,6 @@ def update_eigenstates_iteration(
     save_results: bool=True, if the results are to be saved
     """
 
-
     for i in range(n_iterations):
         self.update_eigenstates(
         renormalization,
@@ -120,3 +129,22 @@ def update_eigenstates_iteration(
         filter_parameters,
         save_results,
                 )
+        if plot:
+            if not axis is None:
+                alpha = 0.3 + 0.7 * ((i+1)/n_iterations) ** 3
+                axis.plot(
+                        self.z,
+                        self.charge_density_array,
+                        'b',
+                        alpha=alpha
+                        )
+                axis.plot(
+                        self.z,
+                        self.A0_perturbation,
+                        'r',
+                        alpha=alpha
+                        )
+
+
+
+

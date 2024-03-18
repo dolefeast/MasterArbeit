@@ -80,3 +80,26 @@ def plot_from_0_to_1(array):
     """Given an array [f(x_i)], returns the x such that the plot goes from 0 to 1"""
     x = np.arange(len(array))/len(array)
     return x, array
+
+
+def plot_eigenstates(
+    self,
+    modes=(-2, -1, 1, 2),
+    axes=None
+    ):
+    """
+    
+    Parameters:
+    	
+    """
+    N = len(self.eigenstate_array)
+    for i, mode_index in enumerate(modes):
+        if mode_index<0: shift = -1
+        elif mode_index>0: shift = 0
+        else: print('mode_index=0 is not a valid index'); continue;
+        ax[i].plot(
+                self.z,
+                self.eigenstate_array[N//2 + mode_index + shift], 
+                alpha=alpha
+                )
+

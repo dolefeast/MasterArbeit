@@ -5,7 +5,7 @@ from math_objects.fields import Vector_Potential
 
 def __init__(self,
         lambda_value: float=None,
-        A0_modification: [float]=None,
+        A0_perturbation: [float]=None,
         m: float=1,
         e: float=1,
         n_points=500,
@@ -25,14 +25,18 @@ def __init__(self,
     self.m = m
     self.e = e
     self.z = np.linspace(0, 1, n_points)
+    self.N_mode_cutoff = N_mode_cutoff
     self.scalar_name = scalar_name
+    # If the eigenstate arrray is given:
     if not eigenstate_array is None: 
         if eigenvalue_array is None:
             # if it is not given, retrieve it from the solutions array
+            # this is outdated. i dont use bvp solutions anymore
             self.eigenvalue_array = [sol.p[0] for sol in eigenstate_array]
         else:  # If the eigenvalue_array is given
             # They must have same length.
             assert len(eigenvalue_array) == len(eigenstate_array)
+            self.eigenvalue_array = eigenvalue_array
         # not anymore interested in the solve_bvp.solution format
         self.eigenstate_array = eigenstate_array 
         self.eigenstate_gradient_array = eigenstate_gradient_array 
@@ -50,10 +54,14 @@ def __init__(self,
 
         # Guesses for the boundary value problem solution.
         print("Warning: No eigenstate array was given. It will be created assuming Dirichlet boundary conditions.")
-        self.eigenstate_array = [dirichlet_eigenstate(self.z, omega, m, lambda_value)
-                for omega in self.eigenvalue_array]
-        self.eigenstate_gradient_array = [dirichlet_eigenstate_gradient(self.z, omega, m, lambda_value)
-                for omega in self.eigenvalue_array]
+        self.eigenstate_array = [
+                dirichlet_eigenstate(self.z, omega, m, lambda_value)
+                for omega in self.eigenvalue_array
+                ]
+        self.eigenstate_gradient_array = [
+                dirichlet_eigenstate_gradient(self.z, omega, m, lambda_value)
+                for omega in self.eigenvalue_array
+                ]
 
     self.boundary_conditions = self.dirichlet_boundary_conditions
 
@@ -62,14 +70,12 @@ def __init__(self,
     self.lambda_value = lambda_value
     self.A0_base_value = - self.lambda_value/self.e * (self.z - 1/2)
 
-    if not A0_modification is None:
-
-        # This can be done better, I don't think there's a need to, right now.
-        self.A0_modification = A0_modification
-
-        self.A0_value = self.A0_base_value + self.A0_modification
+    if not A0_perturbation is None:
+        self.A0_perturbation = A0_perturbation
+        self.A0_value = self.A0_base_value + self.A0_perturbation
     else: 
         self.A0_value = self.A0_base_value
 
-    self.A0_field = Vector_Potential(value=self.A0_value, n_points=self.n_points
+    self.A0_field = Vector_Potential(
+            value=self.A0_value, n_points=self.n_points
             )
