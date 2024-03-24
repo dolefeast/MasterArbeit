@@ -94,10 +94,11 @@ def update_eigenstates(
         np.savetxt(f'saved_solutions/dirichlet/normalized_eigenstate_gradient/{file_id}', to_csv, delimiter= ",")
 
 
-        to_csv = self.A0_field.value
-        np.savetxt(f'saved_solutions/dirichlet/A0_field/{file_id:0.2f}', to_csv, delimiter= ",")
+        to_csv = self.A0_field.value + self.lambda_value * (z - 1/2)
+        np.savetxt(f'saved_solutions/dirichlet/A0_field/{file_id}', to_csv, delimiter= ",")
 
-        np.savetxt(f'saved_solutions/dirichlet/charge_density/{file_id:0.2f}', to_csv, delimiter= ",")
+        to_csv = self.charge_density_array
+        np.savetxt(f'saved_solutions/dirichlet/charge_density/{file_id}', to_csv, delimiter= ",")
 
 def update_eigenstates_iteration(
     self,
@@ -127,7 +128,7 @@ def update_eigenstates_iteration(
         smoothing,
         filter_method,
         filter_parameters,
-        save_results,
+        save_results=save_results,
                 )
         if plot:
             if not axis is None:

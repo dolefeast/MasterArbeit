@@ -63,6 +63,7 @@ def main(
         m,
         e,
         n_iterations,
+        save_results=True,
         smoothing=True
     ):
 
@@ -77,8 +78,8 @@ def main(
 
     filter_method = filter_scripts.extend_and_filter
     filter_parameters = (
-            filters.remove_wiggles_thrice,
-            tuple((150, )),
+            filters.convolve_twice,
+            tuple((1, )),
             0.06,
             )
 
@@ -96,7 +97,7 @@ def main(
                 smoothing=smoothing,
                 filter_method=filter_method,
                 filter_parameters=filter_parameters,
-                save_results=True,
+                save_results=save_results,
                 plot=True,
                 axis=ax_fields,
                 #  filter_method=filtering.double_filtering,
@@ -145,17 +146,17 @@ def main(
 if __name__ == "__main__":
     from scripts.input_list import input_list
 
-    N_mode_cutoff = 60
+    N_mode_cutoff = 49
     lambda_value = 1
     m = 5
-    N_POINTS = 1000
+    N_POINTS = (N_mode_cutoff+1)*8
     TOL = 1e-2
     e = 1
-    n_iterations = 1
+    n_iterations = 3
 
     lambda_min = 1
     lambda_max = 2
-    lambda_div = 4
+    lambda_div = 1
     system = main(
         N_mode_cutoff,
         lambda_min,
@@ -166,6 +167,7 @@ if __name__ == "__main__":
         m,
         e,
         n_iterations,
-        smoothing=True
+        smoothing=True,
+        save_results=True
     )
 
