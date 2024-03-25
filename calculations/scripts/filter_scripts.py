@@ -117,11 +117,9 @@ def extend_and_filter(
     5. Returns the signal only in the interval (0, 1)
 
     """
-    print('Extending signal')
     # First extend the signal
     x_extended, y_extended = extend_signal(x, y, padding_size=padding_size)
 
-    print('Filtering signal')
     # Second filter it
     y_extended_filtered = filter_method(
             x_extended,
@@ -129,7 +127,6 @@ def extend_and_filter(
             *filter_parameters
             )
 
-    print('Removing and interpolating')
     # Third and fourth remove the boundaries and interpolate
     x_extended_removed, y_extended_filtered_removed = remove_and_interpolate(
             x_extended,
@@ -139,11 +136,8 @@ def extend_and_filter(
             force_zero=force_zero,
             )
 
-    print('Returning from 0 to 1') 
     # Fifth return the signal only in the interval 0 to 1
     x_0_to_1, y_0_to_1 = return_to_0_1(x_extended_removed, y_extended_filtered_removed)
-
-    print('got to the end of extend_and_filter')
 
     return x_0_to_1, y_0_to_1
 

@@ -48,9 +48,11 @@ def calculate_eigenstates(self,
             # Discarding either repeated eigenvalues or non convergent solutions
             print(f'Found repeated eigenvalue: {true_eigenstate.p[0]} with\neigenvalue_guess={eigenvalue_guess}\n')
             repeated_eigenvalue_count += 1
+            self.broken = 1
             continue
         if not true_eigenstate.success:
             print(f'Eigenvalue={eigenvalue_guess} did not converge')
+            self.broken = 1
             continue
 
         charge_density_without_normalization = lambda z: (

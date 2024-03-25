@@ -7,7 +7,7 @@ from scripts.plotting import plot_from_0_to_1
 
 things = ['A0_field', 'charge_density']
 A0_list, charge_density_list = [
-        list(Path(f'saved_solutions/dirichlet/{thing}').glob('*lambda_*_mass_1_12*'))
+        list(Path(f'saved_solutions/dirichlet/{thing}').glob('*lambda_*_mass_0_01*'))
         for thing in things
         ]
 

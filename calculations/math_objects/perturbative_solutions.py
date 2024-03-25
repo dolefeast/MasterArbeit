@@ -1,5 +1,5 @@
 from math import pi, sin, cos, sqrt
-from math_objects.iterable_output import iterable_output
+from scripts.iterable_output import iterable_output
 
 def sign(x):
     if x>0:

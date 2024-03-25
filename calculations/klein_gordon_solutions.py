@@ -11,7 +11,6 @@ from scripts.bao_filtering import bao_filtering
 import scipy as sp
 from scipy.signal import savgol_filter
 import numpy as np
-import matplotlib.pyplot as plt
 from pathlib import Path
 
 def init_main(
@@ -22,6 +21,8 @@ def init_main(
         m,
         e,
         smoothing=False,
+        plot=True,
+        read_solutions=True,
         ):
     # Initialize physical system
     system = Vacuum_Solution(
@@ -31,10 +32,13 @@ def init_main(
         N_mode_cutoff=N_mode_cutoff+1,
         e=e,
         m=m,
-        float_tol=1e-1
+        float_tol=1e-1,
+        read_solutions=read_solutions,
     )
 
-    if True: # Just to fold this
+    if plot: # Just to fold this
+        global plt
+        import matplotlib.pyplot as plt
         global fig, ax_fields, ax_omegas
         fig, (ax_fields, ax_omegas) = plt.subplots(1, 2, figsize=(16, 9))
         fig.suptitle(f"$\lambda={lambda_value}, m={m}$")
@@ -50,6 +54,10 @@ def init_main(
         ax_fields.legend(loc='best')
         ax_omegas.legend(loc='best')
         plt.tight_layout()
+    else: 
+        ax_fields = None
+        ax_omegas = None
+
         
     return system
 
@@ -64,7 +72,9 @@ def main(
         e,
         n_iterations,
         save_results=True,
-        smoothing=True
+        smoothing=True,
+        plot=True,
+        read_solutions=True,
     ):
 
     system = init_main(
@@ -74,13 +84,15 @@ def main(
         N_POINTS,
         m,
         e,
+        plot=plot,
+        read_solutions=read_solutions
         )
 
     filter_method = filter_scripts.extend_and_filter
     filter_parameters = (
             filters.convolve_twice,
             tuple((1, )),
-            0.06,
+            9/N_POINTS,
             )
 
     for i, iterating_lambda in enumerate(
@@ -92,13 +104,35 @@ def main(
             ):
         print(20*'=')
         print(f'iterating_lambda = {iterating_lambda}')
+        if system.broken:
+            print("The calculation broke in the previous iteration. Breaking for loop...")
+
+        system = Vacuum_Solution(
+                lambda_value=iterating_lambda,
+                A0_perturbation= (
+                    (
+                        system.A0_field.value 
+                        + system.lambda_value * (system.z - 1/2)
+                        )
+                    *iterating_lambda
+                    /system.lambda_value
+                    ),
+                m=m,
+                e=e,
+                n_points=N_POINTS,
+                eigenvalue_array=system.eigenvalue_array,
+                eigenstate_array=system.eigenstate_array,
+                eigenstate_gradient_array=system.eigenstate_gradient_array,
+                float_tol=1e-2
+                )
+                
         system.update_eigenstates_iteration(
                 n_iterations=n_iterations,
                 smoothing=smoothing,
                 filter_method=filter_method,
                 filter_parameters=filter_parameters,
                 save_results=save_results,
-                plot=True,
+                plot=plot,
                 axis=ax_fields,
                 #  filter_method=filtering.double_filtering,
                 #  filter_parameters=(150,)
@@ -113,61 +147,41 @@ def main(
         # The higher the exponent, the more the first iterations will be'muted'
         alpha = 0.3 + 0.7*((i+1)/lambda_div)**5
 
-        # ax_fields.plot(
-        #         x_density,
-        #         y_density,
-        #         'g',
-        #         alpha=alpha,
-        #         )
-        # ax_fields.plot(x_field, y_field, 'm', alpha=alpha)
 
-        system = Vacuum_Solution(
-                lambda_value=iterating_lambda,
-                A0_perturbation= (
-                    y_field
-                    *iterating_lambda
-                    /system.lambda_value
-                    ),
-                m=m,
-                e=e,
-                n_points=N_POINTS,
-                eigenvalue_array=system.eigenvalue_array,
-                eigenstate_array=system.eigenstate_array,
-                eigenstate_gradient_array=system.eigenstate_gradient_array,
-                float_tol=1e-2
-                )
-                
+    if plot:
         scatter_omegas(system.eigenvalue_array, ax_omegas, m)
-
-    ax_fields.legend(loc='best')
-    plt.show()
+        ax_fields.legend(loc='best')
+        plt.show()
     
 
 if __name__ == "__main__":
     from scripts.input_list import input_list
 
-    N_mode_cutoff = 49
+    N_mode_cutoff = 49 # Resulting rho(z) has freq of 1/(N+1)
     lambda_value = 1
-    m = 5
+    m = 6
     N_POINTS = (N_mode_cutoff+1)*8
     TOL = 1e-2
     e = 1
-    n_iterations = 3
+    n_iterations = 4
 
     lambda_min = 1
-    lambda_max = 2
-    lambda_div = 1
-    system = main(
-        N_mode_cutoff,
-        lambda_min,
-        lambda_max,
-        lambda_div,
-        TOL,
-        N_POINTS,
-        m,
-        e,
-        n_iterations,
-        smoothing=True,
-        save_results=True
-    )
+    lambda_max = 15
+    lambda_div = 20
+    for m in np.linspace(0.01, 10, 3):
+        system = main(
+            N_mode_cutoff,
+            lambda_min,
+            lambda_max,
+            lambda_div,
+            TOL,
+            N_POINTS,
+            m,
+            e,
+            n_iterations,
+            smoothing=True,
+            save_results=True,
+            read_solutions=True,
+            plot=False,
+        )
 

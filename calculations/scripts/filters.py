@@ -52,8 +52,6 @@ def convolve(
     #To normalize
     array = np.array(array) / sum(array)
 
-    print(y, array)
-
     y_filtered = np.convolve(y, array, mode='same')
 
     return y_filtered

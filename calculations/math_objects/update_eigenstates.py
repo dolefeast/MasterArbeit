@@ -7,6 +7,8 @@ from math_objects.fields import Vector_Potential
 from math_objects.modify_A0 import modify_A0
 
 from scripts.bao_filtering import bao_filtering
+from scripts.float_to_str import float_to_str
+
 
 def update_eigenstates(
         self,
@@ -15,6 +17,7 @@ def update_eigenstates(
         filter_method: callable=None,
         filter_parameters: tuple=None,
         save_results: bool=True,
+        sig_digs: int=2,
         ):
     """
     Given the state of the system, returns the corresponding eigenstates off it
@@ -45,7 +48,6 @@ def update_eigenstates(
                     size=filter_parameters[0]
                     )[1]
         else:
-            print("Filtering with the given filter_method")
             z, total_charge_density_array = filter_method(
                     self.z,
                     total_charge_density_array,
@@ -81,22 +83,30 @@ def update_eigenstates(
             n_points=self.n_points
             )
 
-    if save_results:
-        lambda_string = str(float(self.lambda_value)).replace(".", "_")
-        m_string = str(float(self.m)).replace(".", "_")
+    if save_results and not self.broken:
+        lambda_string = float_to_str(self.lambda_value, sig_digs)
+        m_string = float_to_str(self.m, sig_digs)
         file_id = f'lambda_{lambda_string}_mass_{m_string}.txt'
-        to_csv = np.concatenate(((self.eigenvalue_array,), 
-                            np.array(self.eigenstate_array).T)).T
+        print(f"Saving results under {file_id}")
+
+        # Saving the eigenvalues 
+        to_csv = self.eigenvalue_array
+        np.savetxt(f'saved_solutions/dirichlet/eigenvalue/{file_id}', to_csv, delimiter= ",")
+
+        # Saving the eigenstates 
+        to_csv = self.eigenstate_array
         np.savetxt(f'saved_solutions/dirichlet/normalized_eigenstate/{file_id}', to_csv, delimiter= ",")
 
-        to_csv = np.concatenate(((self.eigenvalue_array,), 
-                            np.array(self.eigenstate_gradient_array).T)).T
+        # Saving the eigenstates gradient
+        to_csv = self.eigenstate_gradient_array
         np.savetxt(f'saved_solutions/dirichlet/normalized_eigenstate_gradient/{file_id}', to_csv, delimiter= ",")
 
 
+        # Saving the perturbation in the field
         to_csv = self.A0_field.value + self.lambda_value * (z - 1/2)
         np.savetxt(f'saved_solutions/dirichlet/A0_field/{file_id}', to_csv, delimiter= ",")
 
+        # Saving the resulting charge density
         to_csv = self.charge_density_array
         np.savetxt(f'saved_solutions/dirichlet/charge_density/{file_id}', to_csv, delimiter= ",")
 
@@ -108,6 +118,7 @@ def update_eigenstates_iteration(
     filter_method: callable=None,
     filter_parameters: tuple=None,
     save_results: bool=True,
+    sig_digs: int=2,
     plot: bool=False,
     axis=None,
     ):
@@ -129,6 +140,7 @@ def update_eigenstates_iteration(
         filter_method,
         filter_parameters,
         save_results=save_results,
+        sig_digs=sig_digs,
                 )
         if plot:
             if not axis is None:
