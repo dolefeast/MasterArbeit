@@ -1,7 +1,6 @@
 from math_objects import Vacuum_Solution
 from math_objects.unique_floats import float_in_array, unique_floats
 from math_objects.normalize import normalize
-from math_objects.savitzky_golay import savitzky_golay
 
 from scripts.plotting import plot_each_eigenstate, plot_different_window_filter, scatter_omegas, plot_from_0_to_1
 import scripts.filter_scripts as filter_scripts
@@ -105,7 +104,8 @@ def main(
         print(20*'=')
         print(f'iterating_lambda = {iterating_lambda}')
         if system.broken:
-            print("The calculation broke in the previous iteration. Breaking for loop...")
+            print("The calculation broke in the previous iteration. Breaking iteration...")
+            break
 
         system = Vacuum_Solution(
                 lambda_value=iterating_lambda,
@@ -126,8 +126,9 @@ def main(
                 float_tol=1e-2
                 )
                 
-        system.update_eigenstates_iteration(
-                n_iterations=n_iterations,
+        system.update_eigenstates_until_convergence(
+                #n_iterations=2,
+                tol=1e-1,
                 smoothing=smoothing,
                 filter_method=filter_method,
                 filter_parameters=filter_parameters,
@@ -137,7 +138,7 @@ def main(
                 #  filter_method=filtering.double_filtering,
                 #  filter_parameters=(150,)
                 )
-        x_density, y_density = plot_from_0_to_1(system.charge_density_array)
+        x_density, y_density = plot_from_0_to_1(system.rho_array)
 
         x_field, y_field = plot_from_0_to_1(
                 system.A0_field(system.z) 
@@ -165,10 +166,10 @@ if __name__ == "__main__":
     e = 1
     n_iterations = 4
 
-    lambda_min = 1
-    lambda_max = 15
+    lambda_min = 23.354
+    lambda_max = 30
     lambda_div = 20
-    for m in np.linspace(0.01, 10, 3):
+    for m in np.linspace(4, 10, 1):
         system = main(
             N_mode_cutoff,
             lambda_min,
@@ -182,6 +183,6 @@ if __name__ == "__main__":
             smoothing=True,
             save_results=True,
             read_solutions=True,
-            plot=False,
+            plot=True,
         )
 

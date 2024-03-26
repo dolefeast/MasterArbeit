@@ -50,10 +50,12 @@ def __init__(self,
             # Check and read if corresponding file exists
             if read_solutions:
                 self.read_solutions()
+                print(f'Reading the solutions for lambda={self.lambda_value}, mass={self.m}')
             else: 
+                print(f'Could not read the solutions for lambda={self.lambda_value}, mass={self.m}')
                 raise FileNotFoundError
         except FileNotFoundError:
-            print('Tried to read the solutions for lambda = {self.lambda_value} and mass = {self.m} but could not find it.\n\tEigenstates will be generated assuming Dirichlet boundary conditions.')
+            print(f'Tried to read the solutions for lambda = {self.lambda_value} and mass = {self.m} but could not find it.\n\tEigenstates will be generated assuming Dirichlet boundary conditions.')
             # File did not exist => generate guesses
             if not eigenvalue_array is None:
                 self.eigenvalue_array = eigenvalue_array

@@ -21,7 +21,7 @@ def calculate_eigenstates(self,
     solution_array = []
     solution_gradient_array = []
     true_eigenvalue_array = []
-    charge_densities_array = []
+    rho_n_array = []
 
     repeated_eigenvalue_count = 0
 
@@ -30,6 +30,10 @@ def calculate_eigenstates(self,
             self.eigenstate_gradient_array,
             self.eigenvalue_array
             ):
+
+        # This never converges, it is a non physical solution
+        if eigenvalue_guess == 0.0:
+            continue
 
         true_eigenstate = sp.integrate.solve_bvp(
             self.Klein_Gordon,
@@ -46,22 +50,22 @@ def calculate_eigenstates(self,
         # Check if eigenvalue is double counted, or if solve_bvp converged
         if float_in_array(true_eigenvalue, true_eigenvalue_array, tol=self.float_tol):
             # Discarding either repeated eigenvalues or non convergent solutions
-            print(f'Found repeated eigenvalue: {true_eigenstate.p[0]} with\neigenvalue_guess={eigenvalue_guess}\n')
+            print(f'Found repeated eigenvalue: {true_eigenstate.p[0]} with\neigenvalue_guess={eigenvalue_guess}. self.broken=1\n')
             repeated_eigenvalue_count += 1
             self.broken = 1
             continue
-        if not true_eigenstate.success:
-            print(f'Eigenvalue={eigenvalue_guess} did not converge')
+        if not true_eigenstate.success and eigenvalue_guess!=0.0:
+            print(f'Warning: Eigenvalue={eigenvalue_guess} did not converge.\n\tself.broken=1')
             self.broken = 1
             continue
 
-        charge_density_without_normalization = lambda z: (
+        rho_without_normalization = lambda z: (
                 (true_eigenvalue - self.e * self.A0_field(z))
                 * np.abs(true_eigenstate.sol(z)[0])**2
                 )
 
         norm_squared = mpmath.quad(
-                charge_density_without_normalization, 
+                rho_without_normalization, 
                 [0, 1]
                 )
 
@@ -69,26 +73,25 @@ def calculate_eigenstates(self,
 
         eigenstate_normalized = true_eigenstate.sol(self.z)[0]/norm
         eigenstate_gradient_normalized = true_eigenstate.sol(self.z)[1]/norm
-        charge_density_normalized = (
+        rho_n_normalized = (
                 np.sign(true_eigenvalue)
-                * charge_density_without_normalization(self.z) 
+                * rho_without_normalization(self.z) 
                 / norm_squared
                 )
         solution_array.append(eigenstate_normalized)
         solution_gradient_array.append(eigenstate_gradient_normalized)
         true_eigenvalue_array.append(true_eigenvalue)
-        charge_densities_array.append(charge_density_normalized)
+        rho_n_array.append(rho_n_normalized)
 
         if verbose:
             print(true_eigenstate)
 
         # true_eigenvalues_array.append(true_eigenvalue)
 
-    print(f"Found and removed {repeated_eigenvalue_count} repeated eigenvalues!")
-
     self.eigenstate_array = solution_array
     self.eigenstate_gradient_array = solution_gradient_array
     self.eigenvalue_array = true_eigenvalue_array
-    self.charge_densities_array = charge_densities_array
+    self.rho_n_array = rho_n_array
+    
 
     # return solution_array

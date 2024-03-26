@@ -1,8 +1,8 @@
 import numpy as np
-from math_objects.modify_A0 import modify_A0
 import matplotlib.pyplot as plt
 
 def plot_different_window_filter(total_charge_density, ax_fields, filter_method):
+    from math_objects.modify_A0 import modify_A0
     while True:
         plt.draw()
         while True:

@@ -1,7 +1,6 @@
 from math_objects.fields import Field, Vector_Potential
 from scripts.iterable_output import iterable_output
 from math_objects.unique_floats import unique_floats, float_in_array
-from math_objects.savitzky_golay import savitzky_golay
 
 
 import matplotlib.pyplot as plt
@@ -43,10 +42,11 @@ class Vacuum_Solution:
 
     from math_objects.Klein_Gordon import Klein_Gordon, dirichlet_boundary_conditions, neumann_boundary_conditions
     from math_objects.read_solutions import read_solutions
+    from math_objects.save_solutions import save_solutions
     from math_objects.calculate_eigenstates import calculate_eigenstates
-    from math_objects.charge_density import normalized_eigenstate, calculate_total_charge_density
+    from math_objects.charge_density import normalized_eigenstate, calculate_total_rho
     from math_objects.modify_A0 import modify_A0
-    from math_objects.update_eigenstates import update_eigenstates, update_eigenstates_iteration
+    from math_objects.update_eigenstates import update_eigenstates, update_eigenstates_iteration, update_eigenstates_until_convergence
 
 
 

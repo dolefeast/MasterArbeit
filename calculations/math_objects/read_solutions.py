@@ -8,8 +8,8 @@ def read_solutions(self):
     lambda_string = float_to_str(self.lambda_value, self.sig_digs)
     file_id = f'lambda_{lambda_string}_mass_{m_string}.txt'
 
-    self.charge_density_array  = np.genfromtxt(
-            f"saved_solutions/dirichlet/charge_density/{file_id}",
+    self.rho_array  = np.genfromtxt(
+            f"saved_solutions/dirichlet/rho/{file_id}",
             dtype=float, 
             delimiter="\n",
             )
