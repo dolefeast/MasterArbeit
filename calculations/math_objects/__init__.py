@@ -1,12 +1,3 @@
-from math_objects.fields import Field, Vector_Potential
-from scripts.iterable_output import iterable_output
-from math_objects.unique_floats import unique_floats, float_in_array
-
-
-import matplotlib.pyplot as plt
-import numpy as np
-import scipy as sp
-
 class Vacuum_Solution:
     """
     Parameters:
@@ -26,28 +17,34 @@ class Vacuum_Solution:
     -------------
     Calculates the solution to the coupled differential equations
         (d²/dz² + (omega_n - eA_0(z))² - m²) phi = 0
-        d²/dz² A = - rho 
+        d²/dz² A = - rho
     In the context of a quantum charged scalar field phi and a classical electromagnetic potential (A_0, A_1) = (A_0, 0) under a certain gauge choice.
 
-    The system to be considered. Takes as input the lamda value of the 
-    electric potential 
-        A_0(z) = - lambda_value * (z-1/2) 
-    and an array of eigenvalue omega_n guesses. These should be solutions to 
+    The system to be considered. Takes as input the lamda value of the
+    electric potential
+        A_0(z) = - lambda_value * (z-1/2)
+    and an array of eigenvalue omega_n guesses. These should be solutions to
     easier cases of the problem we are considering. For lamda small:
         omega_n = sign(n) * np.sqrt(n² pi² + m²)
 
 
     """
+
     from math_objects.init_function import __init__
 
-    from math_objects.Klein_Gordon import Klein_Gordon, dirichlet_boundary_conditions, neumann_boundary_conditions
+    from math_objects.Klein_Gordon import (
+        Klein_Gordon,
+        dirichlet_boundary_conditions,
+        neumann_boundary_conditions,
+    )
     from math_objects.read_solutions import read_solutions
     from math_objects.save_solutions import save_solutions
     from math_objects.calculate_eigenstates import calculate_eigenstates
     from math_objects.charge_density import normalized_eigenstate, calculate_total_rho
     from math_objects.modify_A0 import modify_A0
-    from math_objects.update_eigenstates import update_eigenstates, update_eigenstates_iteration, update_eigenstates_until_convergence
-
-
-
-
+    from math_objects.update_eigenstates import (
+        update_eigenstates,
+        update_eigenstates_iteration,
+        update_eigenstates_until_convergence,
+        update_eigenstates_script,
+    )

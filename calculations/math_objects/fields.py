@@ -3,10 +3,8 @@ The ambient will be governed by two fields, the classical
 electric field and the scalar field. 
 """
 from dataclasses import dataclass
-import matplotlib.pyplot as plt
 import scipy as sp
 import numpy as np
-import sys
 
 
 @dataclass
@@ -133,7 +131,11 @@ class Field(object):
                 f"The supplied method of integration {method} is not a valid one!\n\t Please input one of the following: {self.methods.keys()}"
             )
 
-        return self.methods[method](self, z0, z1)[
+        return self.methods[
+            method
+        ](
+            self, z0, z1
+        )[
             0
         ]  # Watch out! This is total integral of the field, not F(x) s.t. F'(x) = phi(x)
 
