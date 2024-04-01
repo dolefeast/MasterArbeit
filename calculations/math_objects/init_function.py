@@ -4,6 +4,8 @@ from math_objects.perturbative_solutions import dirichlet_eigenstate, dirichlet_
 from math_objects.Klein_Gordon import *
 from math_objects.fields import Vector_Potential
 
+from scripts.antisymmetry import antisymmetry
+
 
 def __init__(self,
         lambda_value: float=None,
@@ -40,8 +42,14 @@ def __init__(self,
     self.lambda_value = round(lambda_value, sig_digs)
     self.m = round(m, sig_digs)
 
+    if A0_perturbation is None:
+        self.A0_perturbation = np.zeros(self.n_points)
+    else:
+        self.A0_perturbation = A0_perturbation
+
     self.A0_field = Vector_Potential(
-    n_points=self.n_points
+    n_points=self.n_points,
+    value = -self.lambda_value*(self.z - 1/2) + self.A0_perturbation
             )
     self.boundary_conditions = self.dirichlet_boundary_conditions
 
@@ -58,6 +66,7 @@ def __init__(self,
             print(f'Tried to read the solutions for lambda = {self.lambda_value} and mass = {self.m} but could not find it.\n\tEigenstates will be generated assuming Dirichlet boundary conditions.')
             # File did not exist => generate guesses
             if not eigenvalue_array is None:
+                #self.eigenvalue_array = antisymmetry(eigenvalue_array)
                 self.eigenvalue_array = eigenvalue_array
             else: 
                 n = np.arange(-N_mode_cutoff, N_mode_cutoff+1)
@@ -85,19 +94,13 @@ def __init__(self,
         else:  # If the eigenvalue_array is given
             # They must have same length.
             assert len(eigenvalue_array) == len(eigenstate_array)
-            self.eigenvalue_array = eigenvalue_array
+            self.eigenvalue_array = antisymmetry(eigenvalue_array)
+            #print(self.eigenvalue_array[0] + self.eigenvalue_array[-1])
         # not anymore interested in the solve_bvp.solution format
         self.eigenstate_array = eigenstate_array 
-        self.eigenstate_gradient_array = eigenstate_gradient_array 
+        self.eigenstate_gradient_array = eigenstate_gradient_array
+
 
     self.A0_base_value = - self.lambda_value/self.e * (self.z - 1/2)
 
-    if not A0_perturbation is None:
-        self.A0_perturbation = A0_perturbation
-        self.A0_value = self.A0_base_value + self.A0_perturbation
-    else: 
-        self.A0_value = self.A0_base_value
 
-    self.A0_field = Vector_Potential(
-            value=self.A0_value, n_points=self.n_points
-            )

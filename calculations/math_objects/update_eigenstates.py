@@ -8,6 +8,7 @@ from math_objects.modify_A0 import modify_A0
 
 from scripts.bao_filtering import bao_filtering
 from scripts.float_to_str import float_to_str
+from scripts.antisymmetry import antisymmetry
 
 def root_mean_square(x):
     return np.sqrt(
@@ -69,11 +70,13 @@ def update_eigenstates(
     
     # The mid-step calculations are allowed to change the shape of the arrays
     # Calculate the A0 corresponding to the new charge distribution
+    total_rho_array = (total_rho_array)
     A0_perturbation = modify_A0(z, total_rho_array)
 
-    self.rho_array = total_rho_array
+    self.rho_array = antisymmetry(total_rho_array)
 
-    self.A0_perturbation = A0_perturbation.sol(self.z)[0] - A0_perturbation.sol(0.5)[0]# Back to original shape and shifted to go to 0 at z=1/2
+    #self.A0_perturbation = A0_perturbation.sol(self.z)[0] - A0_perturbation.sol(0.5)[0]# Back to original shape and shifted to go to 0 at z=1/2
+    self.A0_perturbation = antisymmetry(A0_perturbation.sol(self.z)[0] - A0_perturbation.sol(0.5)[0])# Back to original shape and shifted to go to 0 at z=1/2)
 
     self.A0_value = (
             - self.lambda_value * (self.z - 1/2) 
@@ -140,7 +143,6 @@ def update_eigenstates_iteration(
                         alpha=alpha
                         )
 
-
 def update_eigenstates_until_convergence(
     self,
     tol:float=1e-2,
@@ -165,6 +167,8 @@ def update_eigenstates_until_convergence(
     """
 
     # update the rho to create rho_array
+
+    import matplotlib.pyplot as plt
 
     self.update_eigenstates(
         renormalization,
@@ -241,4 +245,5 @@ def update_eigenstates_until_convergence(
                     )
 
     print(f"Convergence was reached after {count} iterations")
+
 

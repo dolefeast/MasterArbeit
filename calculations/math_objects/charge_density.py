@@ -2,6 +2,8 @@ from math_objects.unique_floats import float_in_array, unique_floats
 from math_objects.normalize import normalize
 from math_objects.get_eigenvalues import get_eigenvalues
 
+from scripts.antisymmetry import antisymmetry
+
 import scipy as sp
 import numpy as np
 import mpmath
@@ -92,6 +94,3 @@ def calculate_total_rho(self,
                 )
 
     return total_rho
-
-
-    
