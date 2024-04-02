@@ -14,4 +14,3 @@ def input_list(data_type=int):
         item = input("Insert data...")
 
     return array
-

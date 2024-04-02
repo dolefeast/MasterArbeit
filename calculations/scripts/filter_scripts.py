@@ -1,35 +1,30 @@
 import numpy as np
 import scipy as sp
 
+
 def extend_signal(x, y, padding_size=None):
     assert len(x) == len(y)
-    
+
     # if padding_size is not specified,
     # then the padding is y itself
     if padding_size is None:
         padding_size = len(y)
     # wrap gives periodization of the function
-    y_padded = np.pad(y, padding_size, mode='wrap') 
+    y_padded = np.pad(y, padding_size, mode="wrap")
 
     # need to periodize x
     dx = x[1] - x[0]
-    
-    x_padded = np.linspace(
-            -dx*padding_size,
-            1+dx*padding_size,
-            len(y_padded)
-            )
+
+    x_padded = np.linspace(-dx * padding_size, 1 + dx * padding_size, len(y_padded))
 
     return x_padded, y_padded
 
+
 def remove_neighbourhood(
-        x, 
-        y,
-        points:[float],
-        neighbourhood_size:float,
-        force_zero: bool=True):
+    x, y, points: [float], neighbourhood_size: float, force_zero: bool = True
+):
     """
-    Given curve (x, y) with problematic points=(x1, x2, ...), take their neighbourhood with neighbourhood_size=neighbourhood_size away and interpolate around it, thus smoothing the curve. 
+    Given curve (x, y) with problematic points=(x1, x2, ...), take their neighbourhood with neighbourhood_size=neighbourhood_size away and interpolate around it, thus smoothing the curve.
     """
     x_list = list(x)
     y_list = list(y)
@@ -37,17 +32,17 @@ def remove_neighbourhood(
     idx = []
     # The points to take out of the array
     for p in points:
-        window = np.where(abs(x_array - p)<=neighbourhood_size)[0].tolist()
+        window = np.where(abs(x_array - p) <= neighbourhood_size)[0].tolist()
         idx += window
 
     idx = np.reshape(
-                np.array(idx),
-                -1 # 1-d array
-            )
+        np.array(idx),
+        -1,  # 1-d array
+    )
     x_list = [x for i, x in enumerate(x_list) if i not in idx]
     y_list = [y for i, y in enumerate(y_list) if i not in idx]
 
-    if force_zero: # Force the removed values to go through 0
+    if force_zero:  # Force the removed values to go through 0
         for p in points:
             for x_index, x_value in enumerate(x_list):
                 if x_value > p:
@@ -57,34 +52,29 @@ def remove_neighbourhood(
 
     return np.array(x_list), np.array(y_list)
 
-def remove_and_interpolate(
-        x: [float],
-        y: [float],
-        points=(0,1),
-        neighbourhood_size=float,
-        force_zero:bool=True,
-        ):
-    x_removed, y_removed = remove_neighbourhood(x, 
-            y, 
-            points=points, 
-            neighbourhood_size=neighbourhood_size,
-            force_zero=True)
 
-    interpolated_curve = sp.interpolate.UnivariateSpline(
-            x_removed, 
-            y_removed,
-            k=3,
-            s=0
-            )
-    return x, interpolated_curve(x) # So both are arrays
+def remove_and_interpolate(
+    x: [float],
+    y: [float],
+    points=(0, 1),
+    neighbourhood_size=float,
+    force_zero: bool = True,
+):
+    x_removed, y_removed = remove_neighbourhood(
+        x, y, points=points, neighbourhood_size=neighbourhood_size, force_zero=True
+    )
+
+    interpolated_curve = sp.interpolate.UnivariateSpline(x_removed, y_removed, k=3, s=0)
+    return x, interpolated_curve(x)  # So both are arrays
+
 
 def return_to_0_1(x, y):
-    idx = np.where(np.logical_and
-            (
-                x>=0,
-                x<=1,
-                )
-            )
+    idx = np.where(
+        np.logical_and(
+            x >= 0,
+            x <= 1,
+        )
+    )
     return x[idx], y[idx]
 
 
@@ -92,12 +82,12 @@ def extend_and_filter(
     x,
     y,
     filter_method,
-    filter_parameters,	
+    filter_parameters,
     neighbourhood_size,
     padding_size=None,
     points=(0, 1),
     force_zero=True,
-    ):
+):
     """
     Parameters:
     x: [float], the x-array of the signal. increasing and goes from 0 to 1
@@ -121,43 +111,38 @@ def extend_and_filter(
     x_extended, y_extended = extend_signal(x, y, padding_size=padding_size)
 
     # Second filter it
-    y_extended_filtered = filter_method(
-            x_extended,
-            y_extended,
-            *filter_parameters
-            )
+    y_extended_filtered = filter_method(x_extended, y_extended, *filter_parameters)
 
     # Third and fourth remove the boundaries and interpolate
     x_extended_removed, y_extended_filtered_removed = remove_and_interpolate(
-            x_extended,
-            y_extended_filtered,
-            points=points,
-            neighbourhood_size=neighbourhood_size,
-            force_zero=force_zero,
-            )
+        x_extended,
+        y_extended_filtered,
+        points=points,
+        neighbourhood_size=neighbourhood_size,
+        force_zero=force_zero,
+    )
 
     # Fifth return the signal only in the interval 0 to 1
     x_0_to_1, y_0_to_1 = return_to_0_1(x_extended_removed, y_extended_filtered_removed)
 
     return x_0_to_1, y_0_to_1
 
+
 def double_filtering(
-        signal: [float],
-        window: [int],
-        ):
-    first_filter = moving_average(signal, window//4+1)
+    signal: [float],
+    window: [int],
+):
+    first_filter = moving_average(signal, window // 4 + 1)
     second_filter = moving_average(first_filter, window)
     return second_filter
 
+
 def recursive_filtering(
-        signal: [float],
-        filter_method: callable,
-        filter_parameters: tuple, 
-        n_recursion: int
-        ):
-    """ Recursively applies filter
+    signal: [float], filter_method: callable, filter_parameters: tuple, n_recursion: int
+):
+    """Recursively applies filter
     Parameters:
-        signal: list. 
+        signal: list.
         filter_method: callable. Call signal: filter_method(signal, *filter_parameters) The filter method to be applied
         filter_parameters. the parameters to be passed to the filtering method
         n_recursion: int=3: How many times the filtering is applied
@@ -165,7 +150,9 @@ def recursive_filtering(
         filtered_signal: [float]
     """
     # When n_recursion reaches 0
-    print('The filter_parameters are:', filter_parameters)
+    print("The filter_parameters are:", filter_parameters)
     if not n_recursion:
         return filter_method(signal, *filter_parameters)
-    return recursive_filtering(signal, filter_method, *filter_parameters[:-1], filter_parameters-1)
+    return recursive_filtering(
+        signal, filter_method, *filter_parameters[:-1], filter_parameters - 1
+    )
