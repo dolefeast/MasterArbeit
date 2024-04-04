@@ -55,13 +55,16 @@ def calculate_eigenstates(
             repeated_eigenvalue_count += 1
             self.broken = 1
             break
-        if not true_eigenstate.success and eigenvalue_guess != 0.0:
+        if not true_eigenstate.success and eigenvalue_guess != 0.0 and len(solution_array) < len(self.eigenstate_array)//2:
             print(
                 f"Warning: Eigenvalue={eigenvalue_guess} did not converge.\n\tEscaping iteration... "
             )
             print("Status of the bvp solution:", true_eigenstate.message)
             self.broken = 1
             break
+        elif len(solution_array) >= len(self.eigenstate_array)//2:
+            pass
+
 
         rho_without_normalization = lambda z: (
             (true_eigenvalue - self.e * self.A0_field(z))

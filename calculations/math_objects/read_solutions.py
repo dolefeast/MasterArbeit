@@ -5,7 +5,7 @@ from scripts.antisymmetry import  antisymmetry, antisymmetry_eigenstates
 from math_objects.fields import Vector_Potential
 
 
-def read_solutions(self):
+def read_solutions_from_file(self):
     m_string = float_to_str(self.m, self.sig_digs)
     lambda_string = float_to_str(self.lambda_value, self.sig_digs)
     file_id = f"lambda_{lambda_string}_mass_{m_string}.txt"
@@ -23,10 +23,7 @@ def read_solutions(self):
         delimiter="\n",
     )
 
-
-
     self.A0_field.value = -self.lambda_value * (self.z - 1/2) + A0_modification
-
 
     self.eigenstate_array = np.genfromtxt(
         f"saved_solutions/dirichlet/normalized_eigenstate/{file_id}", delimiter=","

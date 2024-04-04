@@ -37,11 +37,12 @@ class Vacuum_Solution:
         dirichlet_boundary_conditions,
         neumann_boundary_conditions,
     )
-    from math_objects.read_solutions import read_solutions
+    from math_objects.read_solutions import read_solutions_from_file
     from math_objects.save_solutions import save_solutions
     from math_objects.calculate_eigenstates import calculate_eigenstates
     from math_objects.charge_density import normalized_eigenstate, calculate_total_rho
     from math_objects.modify_A0 import modify_A0
+    from math_objects.generate_eigenstates import generate_eigenstates
     from math_objects.update_eigenstates import (
         update_eigenstates,
         update_eigenstates_iteration,

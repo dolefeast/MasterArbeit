@@ -114,21 +114,10 @@ def update_eigenstates_iteration(
     
     print(f"Calculating {n_iterations} iterations")
 
-    #print('From update_eigenstates, L116:',self.A0_field.value + self.lambda_value * (self.z - 1/2))
     if plot:
         import matplotlib.pyplot as plt
 
     for i in range(n_iterations):
-        if i==0:
-            print('i was 0')
-            fmt = 'k-'
-            alpha = 1
-        if i==6:
-            fmt = 'x'
-            alpha = 0.8
-        else:
-            fmt = '--'
-            alpha = 0.3
 #        plt.plot(self.eigenstate_array[53], fmt, alpha=alpha)
 #        plt.plot(self.A0_field.value+ self.lambda_value*(self.z-1/2), fmt, alpha=alpha, label = f'iteration nº {i}')
         self.update_eigenstates(
@@ -181,8 +170,6 @@ def update_eigenstates_until_convergence(
     print('Iterating the solutions until convergence is reached')
     # update the rho to create rho_array
 
-    import matplotlib.pyplot as plt
-
     self.update_eigenstates(
         renormalization,
         smoothing,
@@ -212,7 +199,7 @@ def update_eigenstates_until_convergence(
         previous_rho = np.copy(self.rho_array)
         if plot:
             if axis is not None:
-                axis.plot(self.z, self.rho_array, "b", alpha=0.3)
+                axis.plot(self.z, self.rho_array, "b", alpha=0.3, label='intermediate step')
                 axis.plot(self.z, self.A0_perturbation, "r", alpha=0.3)
         self.update_eigenstates(
             renormalization,
@@ -235,6 +222,7 @@ def update_eigenstates_until_convergence(
                 self.rho_array,
                 "b",
                 #        alpha=alpha
+                label='final step'
             )
             axis.plot(
                 self.z,
@@ -268,6 +256,7 @@ def update_eigenstates_script(
     filter_parameters: tuple=None, the filter parameters to pass to the filter_method
     save_results: bool=True, if the results are to be saved
     """
+
     if n_iterations is None:
         self.update_eigenstates_until_convergence(
             tol,
@@ -292,4 +281,3 @@ def update_eigenstates_script(
             plot=plot,
             axis=axis,
                 )
-

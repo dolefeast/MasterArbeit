@@ -81,5 +81,4 @@ def calculate_total_rho(
         total_rho *= self.e
 
         return total_rho + potential_term
-
     return total_rho
