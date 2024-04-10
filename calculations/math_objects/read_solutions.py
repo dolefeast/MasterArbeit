@@ -1,8 +1,7 @@
 import numpy as np
 
 from scripts.float_to_str import  float_to_str
-from scripts.antisymmetry import  antisymmetry, antisymmetry_eigenstates
-from math_objects.fields import Vector_Potential
+from scripts.antisymmetry import  antisymmetry
 
 
 def read_solutions_from_file(self):
@@ -10,29 +9,32 @@ def read_solutions_from_file(self):
     lambda_string = float_to_str(self.lambda_value, self.sig_digs)
     file_id = f"lambda_{lambda_string}_mass_{m_string}.txt"
 
-    self.rho_array  = antisymmetry(
-            np.genfromtxt(
-            f"saved_solutions/dirichlet/rho/{file_id}",
+    self.rho_array  = np.genfromtxt(
+            f"saved_solutions/dirichlet/rho_array/{file_id}",
             dtype=float, 
             delimiter="\n",
             )
-        )    
-    A0_modification = np.genfromtxt(
-        f"saved_solutions/dirichlet/A0_field/{file_id}",
+
+    self.A0_induced = np.genfromtxt(
+        f"saved_solutions/dirichlet/A0_induced/{file_id}",
         dtype=float,
         delimiter="\n",
     )
 
-    self.A0_field.value = -self.lambda_value * (self.z - 1/2) + A0_modification
+    self.A0_field.value = -self.lambda_value * (self.z - 1/2) + self.A0_induced
 
-    self.eigenstate_array = np.genfromtxt(
-        f"saved_solutions/dirichlet/normalized_eigenstate/{file_id}", delimiter=","
-    )
+    self.eigenstate_array = list(
+            np.genfromtxt(
+                    f"saved_solutions/dirichlet/eigenstate_array/{file_id}", delimiter=","
+                )
+            )
 
-    self.eigenstate_gradient_array = np.genfromtxt(
-        f"saved_solutions/dirichlet/normalized_eigenstate_gradient/{file_id}",
+    self.eigenstate_gradient_array = list(
+            np.genfromtxt(
+        f"saved_solutions/dirichlet/eigenstate_gradient_array/{file_id}",
         delimiter=",",
-    )
-    self.eigenvalue_array = np.genfromtxt(
-        f"saved_solutions/dirichlet/eigenvalue/{file_id}", delimiter="\n"
-    )
+    ))
+    self.eigenvalue_array = list(
+            np.genfromtxt(
+        f"saved_solutions/dirichlet/eigenvalue_array/{file_id}", delimiter="\n"
+    ))

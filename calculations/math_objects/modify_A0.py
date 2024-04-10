@@ -1,8 +1,6 @@
 import numpy as np
 import scipy as sp
-from mpmath import odefun
 
-from scripts.antisymmetry import antisymmetry
 
 def modify_A0(z, rho):
     """

@@ -4,8 +4,10 @@ from math_objects.fields import Vector_Potential
 from math_objects.modify_A0 import modify_A0
 
 from scripts.bao_filtering import bao_filtering
-from scripts.float_to_str import float_to_str
 from scripts.antisymmetry import antisymmetry
+import scripts.filter_scripts as filter_scripts
+import scripts.filters as filters
+
 
 def root_mean_square(x):
     return np.sqrt(np.mean(np.square(x)))
@@ -27,6 +29,15 @@ def update_eigenstates(
         filter_method: callable=None. call signature filter_method(x, signal, *filter_parameters) The filtering method to be used on the charge density.
         filter_parameters: tuple=None. The paraeters to be passed to the filter_method
     """
+
+    
+    if filter_method is None and smoothing:
+        filter_method = filter_scripts.extend_and_filter
+        filter_parameters = (
+            filters.convolve_twice,
+            tuple((1,)),
+            9 / self.n_points,
+        )
 
     # Calculate the eigenstates of the actual state of the system,
     # given present A0 value
@@ -115,7 +126,7 @@ def update_eigenstates_iteration(
     print(f"Calculating {n_iterations} iterations")
 
     if plot:
-        import matplotlib.pyplot as plt
+        pass
 
     for i in range(n_iterations):
 #        plt.plot(self.eigenstate_array[53], fmt, alpha=alpha)
@@ -130,7 +141,7 @@ def update_eigenstates_iteration(
         )
         
         if plot:
-            if not axis is None:
+            if axis is not None:
                 alpha = 0.3 + 0.7 * ((i+1)/n_iterations) ** 3
                 axis.plot(
                         self.z,
@@ -191,7 +202,6 @@ def update_eigenstates_until_convergence(
         save_results=save_results,
         sig_digs=sig_digs,
     )
-
     r = root_mean_square((self.rho_array - previous_rho) / (1 + previous_rho))
 
     count = 1

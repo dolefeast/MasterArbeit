@@ -1,9 +1,27 @@
 from math_objects.unique_floats import float_in_array
-import scipy as sp
 from scipy import integrate
 import numpy as np
 
 import mpmath
+
+def normalize_eigenstates(self, true_eigenstate):
+    """Given a PPoly sol object, normalize it"""
+    true_eigenvalue = true_eigenstate.p[0]
+    rho_without_normalization = lambda z: (
+        (true_eigenvalue - self.e * self.A0_field(z))
+        * np.abs(true_eigenstate.sol(z)[0]) ** 2
+    )
+
+    norm_squared = mpmath.quad(rho_without_normalization, [0, 1])
+
+    norm = np.sqrt(np.abs(norm_squared))
+
+    eigenstate_normalized = true_eigenstate.sol(self.z)[0] / norm
+    eigenstate_gradient_normalized = true_eigenstate.sol(self.z)[1] / norm
+    rho_n_normalized = (
+        np.sign(true_eigenvalue) * rho_without_normalization(self.z) / norm_squared
+    )
+    return eigenstate_normalized, eigenstate_gradient_normalized, rho_n_normalized
 
 
 def calculate_eigenstates(
@@ -28,7 +46,9 @@ def calculate_eigenstates(
     repeated_eigenvalue_count = 0
 
     for eigenstate_guess, eigenstate_gradient_guess, eigenvalue_guess in zip(
-        self.eigenstate_array, self.eigenstate_gradient_array, self.eigenvalue_array
+        self.eigenstate_array,
+        self.eigenstate_gradient_array,
+        self.eigenvalue_array
     ):
         # This never converges, it is a non physical solution
         if eigenvalue_guess == 0.0:
@@ -55,31 +75,37 @@ def calculate_eigenstates(
             repeated_eigenvalue_count += 1
             self.broken = 1
             break
-        if not true_eigenstate.success and eigenvalue_guess != 0.0 and len(solution_array) < len(self.eigenstate_array)//2:
-            print(
-                f"Warning: Eigenvalue={eigenvalue_guess} did not converge.\n\tEscaping iteration... "
-            )
-            print("Status of the bvp solution:", true_eigenstate.message)
-            self.broken = 1
-            break
+        if not true_eigenstate.success and eigenvalue_guess != 0.0:
+            if abs(eigenvalue_guess) < 0.4:
+                print(
+                    f"Warning: eigenvalue_guess={eigenvalue_guess} did not converge.\n\tRemoving the following eigenvalues (and their respective eigenstates) and starting again"
+                        )
+
+                n = len(self.eigenstate_array) 
+                print("\t", self.eigenvalue_array.pop(n//2-1))
+                print("\t", self.eigenvalue_array.pop(n//2-1))
+                self.eigenstate_array.pop(n//2-1)
+                self.eigenstate_array.pop(n//2-1)
+                self.eigenstate_gradient_array.pop(n//2-1)
+                self.eigenstate_gradient_array.pop(n//2-1)
+                self.calculate_eigenstates()
+            else:
+                print(
+                    f"Warning: Eigenvalue={eigenvalue_guess} did not converge.\n\tEscaping iteration... "
+                )
+                print("Status of the bvp solution:", true_eigenstate.message)
+                self.broken = 1
+                break
         elif len(solution_array) >= len(self.eigenstate_array)//2:
             pass
 
 
-        rho_without_normalization = lambda z: (
-            (true_eigenvalue - self.e * self.A0_field(z))
-            * np.abs(true_eigenstate.sol(z)[0]) ** 2
-        )
+        (
+                eigenstate_normalized,
+                eigenstate_gradient_normalized,
+                rho_n_normalized
+                ) = normalize_eigenstates(self, true_eigenstate)
 
-        norm_squared = mpmath.quad(rho_without_normalization, [0, 1])
-
-        norm = np.sqrt(np.abs(norm_squared))
-
-        eigenstate_normalized = true_eigenstate.sol(self.z)[0] / norm
-        eigenstate_gradient_normalized = true_eigenstate.sol(self.z)[1] / norm
-        rho_n_normalized = (
-            np.sign(true_eigenvalue) * rho_without_normalization(self.z) / norm_squared
-        )
         solution_array.append(eigenstate_normalized)
         solution_gradient_array.append(eigenstate_gradient_normalized)
         true_eigenvalue_array.append(true_eigenvalue)

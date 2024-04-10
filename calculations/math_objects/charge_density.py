@@ -1,7 +1,5 @@
 
-from scripts.antisymmetry import antisymmetry
 
-import scipy as sp
 import numpy as np
 import mpmath
 
@@ -75,7 +73,7 @@ def calculate_total_rho(
                 renormalization_term = 0
 
             total_rho += 0.5 * rho_n + renormalization_term
-            potential_term = self.e**2 / np.pi * self.A0_field(z)
+        potential_term = self.e**2 / np.pi * self.A0_field(z)
 
         total_rho -= adding_sign * renormalization_closed_form
         total_rho *= self.e

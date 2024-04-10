@@ -10,12 +10,12 @@ def save_solutions(self):
 
     # Saving the eigenvalues
     to_csv = self.eigenvalue_array
-    np.savetxt(f"saved_solutions/{self.bcs}/eigenvalue/{file_id}", to_csv, delimiter=",")
+    np.savetxt(f"saved_solutions/{self.bcs}/eigenvalue_array/{file_id}", to_csv, delimiter=",")
 
     # Saving the eigenstates
     to_csv = self.eigenstate_array
     np.savetxt(
-        f"saved_solutions/{self.bcs}/normalized_eigenstate/{file_id}",
+        f"saved_solutions/{self.bcs}/eigenstate_array/{file_id}",
         to_csv,
         delimiter=",",
     )
@@ -23,15 +23,15 @@ def save_solutions(self):
     # Saving the eigenstates gradient
     to_csv = self.eigenstate_gradient_array
     np.savetxt(
-        f"saved_solutions/{self.bcs}/normalized_eigenstate_gradient/{file_id}",
+        f"saved_solutions/{self.bcs}/eigenstate_gradient_array/{file_id}",
         to_csv,
         delimiter=",",
     )
 
     # Saving the perturbation in the field
     to_csv = self.A0_field.value + self.lambda_value * (self.z - 1 / 2)
-    np.savetxt(f"saved_solutions/{self.bcs}/A0_field/{file_id}", to_csv, delimiter=",")
+    np.savetxt(f"saved_solutions/{self.bcs}/A0_induced/{file_id}", to_csv, delimiter=",")
 
     # Saving the resulting charge density
     to_csv = self.rho_array
-    np.savetxt(f"saved_solutions/{self.bcs}/rho/{file_id}", to_csv, delimiter=",")
+    np.savetxt(f"saved_solutions/{self.bcs}/rho_array/{file_id}", to_csv, delimiter=",")

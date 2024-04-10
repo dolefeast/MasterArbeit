@@ -8,7 +8,7 @@ def generate_eigenstates(self):
             try:
                 print(f"Trying to read from λ={self.lambda_value}, m={self.m}...")
                 self.read_solutions_from_file()
-                print(f"Found it!")
+                print("Found it!")
             except FileNotFoundError:
                 print(
                         f"Tried reading from λ={self.lambda_value}, m={self.m} but no file was found.",

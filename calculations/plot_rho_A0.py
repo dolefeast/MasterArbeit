@@ -1,42 +1,65 @@
 import numpy as np
+from scipy.optimize import curve_fit
 import matplotlib.pyplot as plt
-import regex as re
 
-from pathlib import Path
 from scripts.plotting import plot_from_0_to_1
-import regex as re
+from scripts.read_files import read_files
 
-from scripts.float_to_str import str_to_float
+def exp(x, a, b,c):
+    return a*np.exp(b*x)+c
 
-things = ['A0_field', 'rho']
-A0_list, rho_list = [
-        list(Path(f'saved_solutions/dirichlet/{thing}').glob('*lambda_*_mass_3_0*'))
-        for thing in things
-        ]
-
-lambda_re = re.compile("lambda_\d+_\d+")
-float_re = re.compile("\d+_\d+")
-lambda_list = [str_to_float(float_re.findall(str(filename))[0]) for filename in A0_list]
-#mass_list = [float_re.findall(str(filename))[0] for filename in A0_list]
+max_A0_array = []
+ 
+# Read from the saved solutions
+eigenvalue_list,eigenstate_list,  eigenstate_gradient_list, A0_list, rho_list, lambda_list = read_files(m=3.0).values()
 
 max_lambda = max(lambda_list)
+print(lambda_list[-2])
 fig, (ax_A0, ax_rho) = plt.subplots(2)
-for i, (rho_file, A0_perturbation_file, lambda_value) in enumerate(zip(A0_list, rho_list, lambda_list)):
+
+for i, (
+        A0_induced_file,
+        rho_file,
+        lambda_value
+        ) in enumerate(zip(
+                A0_list, 
+                rho_list, 
+                lambda_list
+                )
+            ):
     try:
-        A0_perturbation = np.fromfile(A0_perturbation_file, dtype=float, sep="\n")
+        A0_induced = np.fromfile(
+                A0_induced_file, 
+                dtype=float,
+                sep="\n"
+                )
     except Exception:
         continue
 
     try:
-        rho = np.fromfile(rho_file, dtype=float, sep="\n")
+        rho = np.fromfile(
+                rho_file, 
+                dtype=float, sep="\n"
+                )
     except Exception:
         continue
 
-    alpha = 1- 0.9 + 0.8 * ((lambda_value)/max_lambda)**20
-    ax_A0.plot(*plot_from_0_to_1(A0_perturbation/lambda_value), 'b', alpha=alpha)
-    ax_rho.plot(*plot_from_0_to_1(rho/lambda_value**1.4),'b',  alpha=alpha)
+    if i==0:
+        A0_min = np.copy(A0_induced)
+
+    alpha = 1- 0.95 + 0.7 * ((lambda_value)/max_lambda)**20
+    ax_A0.plot(
+            *plot_from_0_to_1(
+                A0_induced
+                /A0_min
+                ), 'b', alpha=alpha), ax_rho.plot(*plot_from_0_to_1(rho),'b',  alpha=alpha)
 
 
-ax_rho.set_title('$A_0(z)$')
-ax_A0.set_title(r'$\rho(z)/\lambda$')
+#ax_A0.plot([], [], 'bo', label="max($A_0(z)$)")
+
+ax_A0.set_title('$A_0^\lambda(z)/A_0^0(z)$')
+ax_rho.set_title(r'$\rho(z)$')
+
+
+ax_A0.legend(loc='best')
 plt.show()

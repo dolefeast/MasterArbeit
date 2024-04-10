@@ -1,12 +1,12 @@
+import numpy as np
 
-from scripts.plotting import (
-    scatter_omegas,
-    plot_from_0_to_1,
-)
 import scripts.filter_scripts as filter_scripts
 import scripts.filters as filters
+from math_objects import Vacuum_Solution
+from scripts.plotting import (
+    plot_from_0_to_1,
+)
 
-import numpy as np
 
 def init_main(
     N_mode_cutoff,
@@ -47,10 +47,6 @@ def init_main(
         ax_omegas.set_xlabel("$\lambda$")
         ax_omegas.set_ylabel(r"$max(A_0)$")
 
-#        ax_omegas.plot([],[], 'go', label='positive eigenvalue')
-#        ax_omegas.plot([],[], 'rx', label='negative eigenvalue')
-#        ax_fields.legend(loc='best')
-#        ax_omegas.legend(loc='best')
         plt.tight_layout()
     else:
         ax_fields = None
@@ -74,6 +70,9 @@ def main(
     read_solutions=True,
     bcs='dirichlet',
 ):
+    def exp_factor(lambda_value, a, b, c):
+        return a * np.exp(b * lambda_value )+ c
+
     system = init_main(
         N_mode_cutoff,
         lambda_min,
@@ -93,12 +92,14 @@ def main(
         9 / N_POINTS,
     )
 
-    initial_A0_perturbation = np.copy(
+
+    popt = [5.898865184657765e-14/5, 1.1505625662048406, 0.024847590124709263/1.4]
+    initial_A0_induced = np.copy(
             (
             system.A0_field.value 
             + system.lambda_value*(system.z-1/2)
             )
-            / (1.15e-13 * np.exp(1.3189 * lambda_min) + 2.42e-2)
+            / exp_factor(lambda_min, *popt)
             )
     for i, iterating_lambda in enumerate(
             np.linspace(
@@ -114,27 +115,26 @@ def main(
             break
         print(20 * "=")
         print(f"iterating_lambda = {iterating_lambda}")
-        print(iterating_lambda - system.lambda_value)
 
         ax_omegas.plot(
                 system.lambda_value,
                 max(
-                   initial_A0_perturbation  
-                   * (1.15e-13 * np.exp(1.3189 * iterating_lambda) + 2.42e-2)
+                   initial_A0_induced  
+                   * exp_factor(iterating_lambda, *popt) / 1.2
                 ), 
                 #label=f'$A_0$ ansatz $\lambda$ = {system.lambda_value}'
                 'ob'
                 )
 
-        A0_perturbation = (
+        A0_induced = (
                #(system.A0_field.value + system.lambda_value * (system.z - 1 / 2))
-               initial_A0_perturbation  
-               * (1.15e-13 * np.exp(1.3189 * iterating_lambda) + 2.42e-2)
+               initial_A0_induced  
+               * exp_factor(iterating_lambda, *popt)
                #* np.exp(1.28 * (iterating_lambda-system.lambda_value))
 #            * iterating_lambda
 #            / system.lambda_value
             )
-        #print(A0_perturbation)
+        #print(A0_induced)
         ax_omegas.plot(
                 system.lambda_value,
                 max(
@@ -146,8 +146,8 @@ def main(
                 )
         system = Vacuum_Solution(
             lambda_value=iterating_lambda,
-            A0_perturbation=(
-                A0_perturbation
+            A0_induced=(
+                A0_induced
             ),
             m=m,
             e=e,
@@ -155,7 +155,7 @@ def main(
             eigenvalue_array=system.eigenvalue_array,
             eigenstate_array=system.eigenstate_array,
             eigenstate_gradient_array=system.eigenstate_gradient_array,
-            float_tol=1e-2,
+            float_tol=1e-3,
             bcs=bcs,
         )
 
@@ -175,7 +175,7 @@ def main(
 
         x_field, y_field = plot_from_0_to_1(
             system.A0_field(system.z)
-            + system.lambda_value * (system.z - 1 / 2)  # minus the base value to see perturbation
+            + system.lambda_value * (system.z - 1 / 2)  # minus the base value to see induced
         )  
     
     ax_omegas.plot([], [], 'ob', label = 'Ansatz $max(A_0)$')
@@ -195,12 +195,12 @@ if __name__ == "__main__":
 
     TOL = 1e-2
     e = 1
-    n_iterations = None
+    n_iterations = 1
 
-    lambda_min = 0.01
+    lambda_min = 20.969
     lambda_max = 22
     lambda_div = 1
-    for m in np.linspace(5, 8, 1):
+    for m in np.linspace(3, 8, 1):
         system = main(
             N_mode_cutoff,
             lambda_min,
@@ -213,7 +213,7 @@ if __name__ == "__main__":
             n_iterations,
             bcs='dirichlet',
             smoothing=True,
-            save_results=True,
+            save_results=False,
             read_solutions=True,
             plot=True,
         )

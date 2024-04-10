@@ -1,5 +1,4 @@
 import numpy as np
-from scripts.iterable_output import iterable_output
 
 def antisymmetry2(array):
     n = len(array)

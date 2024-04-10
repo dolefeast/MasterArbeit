@@ -1,5 +1,4 @@
 import numpy as np
-from math_objects.generate_eigenstates import generate_eigenstates
 
 from math_objects.perturbative_solutions import (
     dirichlet_eigenstate,
@@ -10,12 +9,11 @@ from math_objects.perturbative_solutions import (
 from math_objects.Klein_Gordon import *
 from math_objects.fields import Vector_Potential
 
-from scripts.antisymmetry import antisymmetry
 
 def __init__(
     self,
     lambda_value: float,
-    A0_perturbation: [float]=None,
+    A0_induced: [float]=None,
     m: float=1,
     e: float=1,
     n_points=500,
@@ -48,17 +46,6 @@ def __init__(
     self.lambda_value = round(lambda_value, sig_digs)
     self.m = round(m, sig_digs)
 
-    if A0_perturbation is None:
-        self.A0_perturbation = np.zeros(self.n_points)
-    else:
-        self.A0_perturbation = A0_perturbation
-
-    self.A0_base_value = -self.lambda_value * (self.z - 1/2)
-    self.A0_field = Vector_Potential(
-    n_points=self.n_points,
-    value = -self.A0_base_value + self.A0_perturbation
-            )
-
     self.boundary_conditions = self.dirichlet_boundary_conditions
     self.bcs = bcs
     # Guesses for the boundary value problem solution.
@@ -71,6 +58,17 @@ def __init__(
     else:
         self.bcs = 'dirichlet'
         print('No boundary conditions were given, assuming dirichlet bcs')
+
+    if A0_induced is None:
+        self.A0_induced = np.zeros(self.n_points)
+    else:
+        self.A0_induced = A0_induced
+
+    self.A0_base_value = -self.lambda_value * (self.z - 1/2)
+    self.A0_field = Vector_Potential(
+    n_points=self.n_points,
+    value = -self.A0_base_value + self.A0_induced
+            )
 
     self.eigenstate_array = eigenstate_array
     self.eigenstate_gradient_array = eigenstate_gradient_array
