@@ -1,7 +1,6 @@
 import numpy as np
 
 from scripts.float_to_str import  float_to_str
-from scripts.antisymmetry import  antisymmetry
 
 
 def read_solutions_from_file(self):
@@ -20,21 +19,24 @@ def read_solutions_from_file(self):
         dtype=float,
         delimiter="\n",
     )
-
+            
     self.A0_field.value = -self.lambda_value * (self.z - 1/2) + self.A0_induced
 
-    self.eigenstate_array = list(
+    self.eigenstate_array =  list(
             np.genfromtxt(
                     f"saved_solutions/dirichlet/eigenstate_array/{file_id}", delimiter=","
-                )
             )
-
+)
     self.eigenstate_gradient_array = list(
             np.genfromtxt(
         f"saved_solutions/dirichlet/eigenstate_gradient_array/{file_id}",
         delimiter=",",
-    ))
+            )
+            )
+
     self.eigenvalue_array = list(
             np.genfromtxt(
         f"saved_solutions/dirichlet/eigenvalue_array/{file_id}", delimiter="\n"
-    ))
+            )
+            
+            )

@@ -27,8 +27,8 @@ def normalize_eigenstates(self, true_eigenstate):
 def calculate_eigenstates(
     self,
     float_tol: float = 1e-2,
-    bvp_tol: float = 5e-5,
-    max_nodes: int = 3000,
+    bvp_tol: float = 1e-5,
+    max_nodes: int=200000,
     verbose: int = 0,
 ):
     """Calculates KG eigenstate_array of len(eigenstate_guess) associated to a certain external classical field.
@@ -45,10 +45,12 @@ def calculate_eigenstates(
 
     repeated_eigenvalue_count = 0
 
-    for eigenstate_guess, eigenstate_gradient_guess, eigenvalue_guess in zip(
+    for i, (eigenstate_guess, eigenstate_gradient_guess, eigenvalue_guess) in enumerate(
+            zip(
         self.eigenstate_array,
         self.eigenstate_gradient_array,
         self.eigenvalue_array
+        )
     ):
         # This never converges, it is a non physical solution
         if eigenvalue_guess == 0.0:
@@ -72,30 +74,18 @@ def calculate_eigenstates(
             print(
                 f"Found repeated eigenvalue: {true_eigenstate.p[0]} with\neigenvalue_guess={eigenvalue_guess}. Escaping iteration... \n"
             )
+            print(true_eigenvalue_array)
             repeated_eigenvalue_count += 1
             self.broken = 1
             break
         if not true_eigenstate.success and eigenvalue_guess != 0.0:
-            if abs(eigenvalue_guess) < 0.4:
-                print(
-                    f"Warning: eigenvalue_guess={eigenvalue_guess} did not converge.\n\tRemoving the following eigenvalues (and their respective eigenstates) and starting again"
-                        )
-
-                n = len(self.eigenstate_array) 
-                print("\t", self.eigenvalue_array.pop(n//2-1))
-                print("\t", self.eigenvalue_array.pop(n//2-1))
-                self.eigenstate_array.pop(n//2-1)
-                self.eigenstate_array.pop(n//2-1)
-                self.eigenstate_gradient_array.pop(n//2-1)
-                self.eigenstate_gradient_array.pop(n//2-1)
-                self.calculate_eigenstates()
-            else:
-                print(
-                    f"Warning: Eigenvalue={eigenvalue_guess} did not converge.\n\tEscaping iteration... "
-                )
-                print("Status of the bvp solution:", true_eigenstate.message)
-                self.broken = 1
-                break
+            print(
+                f"Warning: Eigenvalue={eigenvalue_guess} did not converge.\n\tEscaping iteration... "
+            )
+            print("Message of the bvp solution:", true_eigenstate.message)
+            print("n of nodes", np.shape(true_eigenstate.x))
+            self.broken = 1
+            break
         elif len(solution_array) >= len(self.eigenstate_array)//2:
             pass
 

@@ -43,8 +43,10 @@ def __init__(
     self.z = np.linspace(0, 1, n_points)
     self.N_mode_cutoff = N_mode_cutoff
     self.sig_digs = sig_digs  # Significative digits
-    self.lambda_value = round(lambda_value, sig_digs)
+    self._lambda_value = round(lambda_value, sig_digs)
+    self._A0_induced = A0_induced
     self.m = round(m, sig_digs)
+
 
     self.boundary_conditions = self.dirichlet_boundary_conditions
     self.bcs = bcs
@@ -65,10 +67,15 @@ def __init__(
         self.A0_induced = A0_induced
 
     self.A0_base_value = -self.lambda_value * (self.z - 1/2)
+
     self.A0_field = Vector_Potential(
     n_points=self.n_points,
-    value = -self.A0_base_value + self.A0_induced
-            )
+    value = (
+        -self.lambda_value * (self.z - 1/2) 
+        + self.A0_induced
+        )
+    )
+
 
     self.eigenstate_array = eigenstate_array
     self.eigenstate_gradient_array = eigenstate_gradient_array
@@ -76,4 +83,36 @@ def __init__(
     self.read_solutions = read_solutions
 
     self.generate_eigenstates()
+
+
+@property
+def lambda_value(self):
+    return self._lambda_value
+
+@lambda_value.setter
+def lambda_value(self, new_lambda_value):
+    self._lambda_value = new_lambda_value
+    self.A0_field = Vector_Potential(
+        n_points=self.n_points,
+        value = (
+            -self.lambda_value * (self.z - 1/2) 
+            + self.A0_induced
+            )
+    )
+
+@property
+def A0_induced(self):
+    return self._A0_induced
+
+@A0_induced.setter
+def A0_induced(self, new_A0_induced):
+    print('A0_induced changed!')
+    self._A0_induced = new_A0_induced
+    self.A0_field = Vector_Potential(
+        n_points=self.n_points,
+        value = (
+            -self.lambda_value * (self.z - 1/2) 
+            + self.A0_induced
+            )
+    )
 

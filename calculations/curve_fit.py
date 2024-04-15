@@ -15,14 +15,21 @@ max_A0_array = []
 induced_charge_list = []
  
 # Read from the saved solutions
-eigenvalue_list, A0_list, rho_list, lambda_list = read_files(m=m)
+(
+        eigenvalue_list,
+        a,
+        b,
+        A0_list,
+        rho_list,
+        lambda_list
+) = read_files(m=m).values()
 
 max_lambda = max(lambda_list)
 fig, (ax_A0, ax_q) = plt.subplots(2)
 
 for i, (
-        A0_perturbation_file,
-        rho_file,
+        A0_perturbation,
+        rho,
         lambda_value
         ) in enumerate(
                 zip(
@@ -31,23 +38,6 @@ for i, (
                 lambda_list
                 )
             ):
-    try:
-        A0_perturbation = np.fromfile(
-                A0_perturbation_file, 
-                dtype=float,
-                sep="\n"
-                )
-    except Exception:
-        continue
-
-    try:
-        rho = np.fromfile(
-                rho_file, 
-                dtype=float, sep="\n"
-                )
-    except Exception:
-        continue
-
 
     max_A0_array.append(max(A0_perturbation))
 
@@ -88,4 +78,5 @@ ax_A0.set_xlabel('$\lambda$')
 ax_q.set_ylabel(r'$\lambda/e- \int_0^{1/2} \rho dz$')
 ax_q.set_xlabel('$\lambda$')
 ax_A0.legend(loc='best')
+fig.suptitle(r'$m={}$'.format(m))
 plt.show()

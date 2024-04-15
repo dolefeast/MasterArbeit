@@ -6,9 +6,8 @@ def generate_eigenstates(self):
         # Do we try read the solutions?
         if self.read_solutions:
             try:
-                print(f"Trying to read from λ={self.lambda_value}, m={self.m}...")
                 self.read_solutions_from_file()
-                print("Found it!")
+                print(f"Reading solutions from λ={self.lambda_value}, m={self.m}...")
             except FileNotFoundError:
                 print(
                         f"Tried reading from λ={self.lambda_value}, m={self.m} but no file was found.",
@@ -48,5 +47,5 @@ def generate_eigenstates(self):
                     for omega in self.eigenvalue_array
                     ]
     # For completeness. Really if self.eigenstate_array was given there is not much more to be done
-    elif not self.eigenstate_array is None:
+    elif self.eigenstate_array is not None:
         pass

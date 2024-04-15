@@ -37,8 +37,7 @@ class Field(object):
             try:
                 iter(self.value)
                 self.value = np.array(self.value)  # If value is an array, leave as is.
-                # Change into numpy array just in
-                # case.
+                # Change into numpy array just in case.
                 self.n_points = len(self.value)
             except TypeError:
                 self.value = self.value * np.ones(

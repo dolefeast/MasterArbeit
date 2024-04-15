@@ -138,8 +138,7 @@ def main(
         ax_omegas.plot(
                 system.lambda_value,
                 max(
-                    system.A0_field.value
-                    + system.lambda_value * (system.z - 1/2)
+                    system.A0_induced
                 ), 
                 #label=f'$A_0$ ansatz $\lambda$ = {system.lambda_value}'
                 'og'
@@ -195,9 +194,9 @@ if __name__ == "__main__":
 
     TOL = 1e-2
     e = 1
-    n_iterations = 1
+    n_iterations = None
 
-    lambda_min = 20.969
+    lambda_min = 19.147
     lambda_max = 22
     lambda_div = 1
     for m in np.linspace(3, 8, 1):

@@ -66,16 +66,30 @@ def read_files(
     # vacuum solution class. Its values are the different FILES (to be changed)
     # that contain this data. 
     data = {}
-    for thing in things:
-        data[thing] = sorted(
+    lambda_value_array = []
+    for i, thing in enumerate(things):
+        data_element = sorted(
                 list(
                     Path(f'saved_solutions/{bcs}/{thing}').glob(file_id)
                     ),
                 key = get_lambda_value
                 )
-    data["lambda_value"] = [
-            get_lambda_value(filename) for filename in data[things[0]]
+        # Since in every case the data corresponds to the same lambda value,
+        # suffices to save the lambda values only for the first "column"
+        if i==0:
+            lambda_value_array = [
+            get_lambda_value(filename) for filename in data_element
+            
             ]
+
+        data_element = [
+                np.genfromtxt(filename, delimiter=",") 
+                for filename in data_element
+                ]
+
+        data[thing] = data_element
+
+    data["lambda_value"] = lambda_value_array
 
     return data
 

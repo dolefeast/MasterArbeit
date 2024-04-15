@@ -1,6 +1,5 @@
 import numpy as np
 
-from math_objects.fields import Vector_Potential
 from math_objects.modify_A0 import modify_A0
 
 from scripts.bao_filtering import bao_filtering
@@ -71,30 +70,27 @@ def update_eigenstates(
     # The mid-step calculations are allowed to change the shape of the arrays
     # Calculate the A0 corresponding to the new charge distribution
     total_rho_array = (total_rho_array)
-    A0_perturbation = modify_A0(z, total_rho_array)
+    A0_induced = modify_A0(z, total_rho_array)
 
     self.rho_array = antisymmetry(total_rho_array)
 
-    #self.A0_perturbation = A0_perturbation.sol(self.z)[0] - A0_perturbation.sol(0.5)[0]# Back to original shape and shifted to go to 0 at z=1/2
-    self.A0_perturbation = antisymmetry(A0_perturbation.sol(self.z)[0] - A0_perturbation.sol(0.5)[0])# Back to original shape and shifted to go to 0 at z=1/2)
+    #self.A0_induced = A0_induced.sol(self.z)[0] - A0_induced.sol(0.5)[0]# Back to original shape and shifted to go to 0 at z=1/2
+    self.A0_induced = antisymmetry(A0_induced.sol(self.z)[0] - A0_induced.sol(0.5)[0])# Back to original shape and shifted to go to 0 at z=1/2)
 
-    self.A0_value = -self.lambda_value * (self.z - 1 / 2) + self.A0_perturbation
+    self.A0_value = -self.lambda_value * (self.z - 1 / 2) + self.A0_induced
 
-    self.A0_field = Vector_Potential(
-        value=(
+    self.A0_field.value = (
             -self.lambda_value * (self.z - 1 / 2)
             + 1
             * (
-                +A0_perturbation.sol(self.z)[
+                +A0_induced.sol(self.z)[
                     0
                 ]  # This adds nothing since both arrays point to the same memory allocation. Each change in A0 field will change the value at self.A0_field.value
-                - A0_perturbation.sol(0.5)[
+                - A0_induced.sol(0.5)[
                     0
                 ]  # To keep the problem antisymmetric wrt z=1/2
             )
-        ),
-        n_points=self.n_points,
-    )
+        )
 
 def update_eigenstates_iteration(
     self,
@@ -151,7 +147,7 @@ def update_eigenstates_iteration(
                         )
                 axis.plot(
                         self.z,
-                        self.A0_perturbation,
+                        self.A0_induced,
                         'r',
                         alpha=alpha
                         )
@@ -178,7 +174,7 @@ def update_eigenstates_until_convergence(
     filter_parameters: tuple=None, the filter parameters to pass to the filter_method
     save_results: bool=True, if the results are to be saved
     """
-    print('Iterating the solutions until convergence is reached')
+    print('Iterating the solutions until convergence')
     # update the rho to create rho_array
 
     self.update_eigenstates(
@@ -189,6 +185,23 @@ def update_eigenstates_until_convergence(
         save_results=save_results,
         sig_digs=sig_digs,
     )
+    
+    alpha=0.3
+
+    if plot and not self.broken:
+        if axis is not None:
+            axis.plot(
+                self.z,
+                self.rho_array,
+                "b",
+                alpha=alpha,
+            )
+            axis.plot(
+                self.z,
+                self.A0_induced,
+                "r",
+                alpha=alpha
+            )
 
     count = 0
     
@@ -204,13 +217,28 @@ def update_eigenstates_until_convergence(
     )
     r = root_mean_square((self.rho_array - previous_rho) / (1 + previous_rho))
 
+    if plot and not self.broken:
+        if axis is not None:
+            axis.plot(
+                self.z,
+                self.rho_array,
+                "b",
+                alpha=alpha,
+            )
+            axis.plot(
+                self.z,
+                self.A0_induced,
+                "r",
+                alpha=alpha
+            )
+
     count = 1
-    while r > tol:
+    while r > tol and not system.broken:
         previous_rho = np.copy(self.rho_array)
         if plot:
             if axis is not None:
                 axis.plot(self.z, self.rho_array, "b", alpha=0.3, label='intermediate step')
-                axis.plot(self.z, self.A0_perturbation, "r", alpha=0.3)
+                axis.plot(self.z, self.A0_induced, "r", alpha=0.3)
         self.update_eigenstates(
             renormalization,
             smoothing,
@@ -222,26 +250,31 @@ def update_eigenstates_until_convergence(
         count += 1
         r = root_mean_square((self.rho_array - previous_rho) / (1 + previous_rho))
 
-    if save_results and not self.broken:
-        self.save_solutions()
+    if not self.broken:
+        print(f"Convergence was reached after {count} iterations")
 
-    if plot and not self.broken:
-        if axis is not None:
-            axis.plot(
-                self.z,
-                self.rho_array,
-                "b",
-                #        alpha=alpha
-                label='final step'
-            )
-            axis.plot(
-                self.z,
-                self.A0_perturbation,
-                "r",
-                #        alpha=alpha
-            )
+        if save_results:
+            self.save_solutions()
 
-    print(f"Convergence was reached after {count} iterations")
+        if plot:
+            if axis is not None:
+                axis.plot(
+                    self.z,
+                    self.rho_array,
+                    "b",
+                    #        alpha=alpha
+                    label='final step'
+                )
+                axis.plot(
+                    self.z,
+                    self.A0_induced,
+                    "r",
+                    #        alpha=alpha
+                )
+    else:
+        print("Recalculation of the eigenstates broke")
+
+
 
 def update_eigenstates_script( 
     self,

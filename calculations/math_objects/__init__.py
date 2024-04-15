@@ -30,7 +30,8 @@ class Vacuum_Solution:
 
     """
 
-    from math_objects.init_function import __init__
+    from math_objects.init_function import __init__, lambda_value
+
 
     from math_objects.Klein_Gordon import (
         Klein_Gordon,
