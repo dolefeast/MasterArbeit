@@ -121,7 +121,8 @@ def main(
                     )
             #system.A0_induced = system.A0_induced * next_lambda_value/system.lambda_value
 
-            system.A0_induced *= 1.5*next_A0_factor/max(system.A0_induced)
+            # system.A0_induced *= next_A0_factor/max(system.A0_induced)
+            system.A0_induced *= 0
             ax_omegas.plot(
                     system.lambda_value,
                     max(
@@ -194,7 +195,7 @@ if __name__ == "__main__":
     main(
             m=3.,
         lambda_min=20.5,
-        lambda_step=0.7,
+        lambda_step=0.1,
         n_iterations=n_iterations,
         lambda_iterations=lambda_iterations,
         N_mode_cutoff=N_mode_cutoff, 
