@@ -1,0 +1,130 @@
+\chapter{Methodology}
+
+\section{The setup}
+
+For simplicity, we want to study the vacuum polarization of a 1+1 charged Klein-Gordon field under the influence of a uniform external classical electric field, and its dependence on the imposed boundary conditions. \note{Talk about renormalizability? }  
+
+ We thus consider the lagrangian of a minimally coupled Klein-Gordon field to a potential $A_\mu = (A_0, A_1)$,
+\begin{align}
+	\mathcal{L} = - \frac{1}{2} D_\mu \phi D^\mu \phi^* + m^2 \phi^* \phi
+	\label{eq:KG-lagrangian}
+\end{align}
+with $D_\mu =  \partial_\mu + ie A_\mu $ the covariant derivative and using the $(+, -)$ signature convention, following the conventions used in \cite{Ambjorn1983,Wernersson2020} .
+
+This lagrangian leads to the equations of motion
+\begin{align}
+	\left( D_\mu D^\mu + m^2 \right)\phi = 0,
+	\label{eq:TDKGE}
+\end{align}
+
+Since we are interested in the effect of considering different boundary conditions, we restrict the problem to a finite interval of size $a$ \note{Ambjorn \& Wolfram consider interval of length $a$ and then they normalize. Is it relevant?}, and then normalize to an interval of size 1. \cite{Schlemmer2015} we are not interested in (anti) periodic boundary conditions, as that leads to an infinitely accelerating particle.
+
+Under the Coulomb gauge $D_\mu A^{\mu} = 0$,
+\begin{align}
+	A_0 = -eEa^2\left(z - \frac{1}{2}\right) \,\,\,\, A_1 = 0,
+\end{align}
+where $e$ is the charge of the Klein-Gordon field.
+
+Assuming the separation ansatz 
+\begin{align}
+	\phi(t, z) = \phi_n(z) e^{-i\omega_n t}
+\end{align}
+equation \ref{eq:TDKGE} can be rewritten as the time independent Klein-Gordon equation
+\begin{align}
+	\partial_1^2 \phi_n &=
+	\left( - (\omega_n - e A_0(z))^2 + m^2 \right) \phi_n\\
+			    \label{eq:TIKGE}
+			    &=\left( - \left(\omega_n + e E \left( z - \frac{1}{2} \right) \right)^2 + m^2 \right) \phi_n.
+\end{align}
+One may notice that this equation is of the form of the Weber differential equation
+\begin{align}
+	\partial_1^2 \phi_n = - \left( \nu + \frac{1}{2}-\frac{1}{4}\tilde{z}^2 \right) \phi_n,
+\end{align}
+and can thus be solved by the parabolyc cylinder functions $D_\nu\left( \tilde{z} \right) $. \note{Add this to the appendix?}
+We then write the general solution to equation \ref{eq:TIKGE} as follows
+\begin{align}
+	\phi_n(z) = 
+	a_n D_{i \frac{m^2}{2\lambda} - \frac{1}{2}} \left( 
+		\frac{1+i}{\sqrt{\lambda} }
+		\left( \omega_n + \lambda \left( z-\frac{1}{2} \right)
+		\right) 
+	\right) 
+	+
+	b_n D_{-i \frac{m^2}{2\lambda} - \frac{1}{2}} \left( 
+		\frac{i - 1}{\sqrt{\lambda} }
+		\left( \omega_n + \lambda \left( z-\frac{1}{2} \right)
+		\right) 
+	\right). 
+\end{align}
+
+\note{Also talk about the 0 field solution that indeed lead to vanishing vacuum polarization.}
+We have thus far considered what in \cite{Ambjorn1983} is referred to as the `external field approximation'. This implies that one does not consider the fact that the vacuum polarization induces itself another electric field. This approximation fails \cite{Ambjorn1983} in the calculation of the energy of the modes, as it yields complex values for some external field values.
+
+\note{\cite{Schlemmer2015}: This seems to be the reason why in
+	\cite{Ambjorn1983}, where the mode sum formula is employed, it is claimed that the vacuum
+polarization vanishes for massless fermions in 1 + 1 spacetime dimension. As
+we will see, this is not correct.}
+
+We therefore use the ``back reaction'' approach, in which we solve the problem iteratively. Following the convention used in \cite{Ambjorn1983}, we label $\kappa$ each of the iterations. At each step we solve numerically the following set of integro-differential equations
+\begin{align}
+	\partial_1^2 \phi^{\kappa+1}_n &=
+	\left( - (\omega_n - e A^{\kappa}_0(z))^2 + m^2 \right) \phi^{\kappa+1}_n\\
+	A^{\kappa}(z) &= A_0^{0}(z) + \int_{0}^{z} \int_{0}^{z'} \rho^{\kappa}(z'')dz''dz'
+,
+\end{align}
+with $\rho(z)$ the associated charge density at each step.
+$A_0^{0}$ stands for the `base' electric potential, i.e. 
+\begin{align}
+	A_0^{0} = -\lambda \left(z-\frac{1}{2}  \right).
+\end{align} 
+
+\note{\cite{Schlemmer2015}:  The supplementary electromagnetic field produced by (36) via back-
+reaction is 
+\begin{align}
+	E_{br} = \frac{1}{2\pi}e^2 E \left[ z^2 - \left( \frac{L}{2} \right) ^2 \right] 
+\end{align}
+For the model to be physically viable, this should be small compared to the external electric field, or equivalently
+\begin{align}
+	eL \ll 1
+\end{align}
+}
+
+This method removes the appearance of complex eigenvalues, as the screening effects of the vacuum should be taken into account.
+
+One should take care when calculating the charge density, since 
+\begin{align}
+	\rho(z) = \vacuum{\hat{\rho}(z)} = ie\vacuum{\phi^* D_0 \phi - \phi \left( D_0 \phi \right) ^*}
+\end{align}
+is not well defined as it involves the product of two fields. We take care of this in the following section.
+
+\section{Point-split renormalization}
+
+Due to the linearity of \eqref{eq:TDKGE}, we write the quantum field as 
+\begin{align}
+	\phi(t, z) = 
+	\sum_{n>0}^{} a_n \phi_n(z) e^{-i\omega_n t}
+	+ \sum_{n<0}^{} b_n^\dagger \phi_n(z) e^{-i\omega_n t}
+\end{align}
+with the operators $a_n$, $b_n$ fulfilling 
+\begin{align}
+	\left[ a_n, a_m^\dagger \right]  = \delta_{nm} \,\,\,\,\,\,\,\,\,\,
+	\left[ b_n, b_m^\dagger \right]  = \delta_{nm}
+\end{align}
+and all other commutators vanishing.
+
+We define the vacuum state $\ket{0}$ as that fulfilling 
+\begin{align}
+	a_n\ket{0} = 0, \,b_n\ket{0} = 0.
+\end{align}
+
+To calculate the charge density $\rho(z)$ of the field, one would naïvely calculate 
+\begin{align}
+	\rho(z) = ie\vacuum{\phi^* D_0 \phi - \phi \left( D_0 \phi \right) ^*},
+\end{align}
+which is known to be ill-defined as it involves the product of two distributions.
+
+As any physically reasonable state is assumed to be Hadamard, 
+
+\section{}
+
+
