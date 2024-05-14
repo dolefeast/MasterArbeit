@@ -27,7 +27,7 @@ def __init__(
     # Computation 
     self.n_points = n_points
     self.N_mode_cutoff = N_mode_cutoff
-    self.broken = 0 # To track if the calculation broke down at any point
+    self.broken = 0 # Tracks whether the calculation broke down at any point
     self.float_tol = float_tol # To track if the calculation broke down at any point
 
     self.e = e
@@ -53,6 +53,8 @@ def __init__(
     else:
         self.A0_induced = np.array(A0_induced)
 
+    self._E_induced = None
+
     # Need to define Field because it needs to be callable
     self.A0_field = Field(
             n_points=self.n_points,
@@ -62,7 +64,8 @@ def __init__(
                 +self.A0_induced
                 )
             )
-    # May or may not be None
+
+    # These may or may not be None
     self.eigenstate_array = eigenstate_array
     self.eigenstate_gradient_array = eigenstate_gradient_array
     self.eigenvalue_array = eigenvalue_array
@@ -88,3 +91,13 @@ def lambda_value(
             + self.A0_induced
         )
     )
+
+@property
+def E_induced(
+        self,
+        ):
+    if self._E_induced is None:
+        return -np.diff(self.A0_induced)
+    return self._E_induced
+    
+

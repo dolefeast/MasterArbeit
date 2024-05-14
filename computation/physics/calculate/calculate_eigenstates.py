@@ -6,7 +6,7 @@ def calculate_eigenstates(
     self,
     float_tol:float=1e-2,
     bvp_tol:float=1e-5,
-    max_nodes:int=2e5,
+    max_nodes:int=5e6,
     verbose:int=0,
     ):
     """

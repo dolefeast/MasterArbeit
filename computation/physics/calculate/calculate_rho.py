@@ -28,4 +28,4 @@ def calculate_total_rho(
 
         total_rho = total_rho + rho_n
 
-    return 1/2 * total_rho + self.e / pi**2 * self.A0_field.value
+    self.rho = 1/2 * total_rho + self.e ** 2 / pi * self.A0_field.value

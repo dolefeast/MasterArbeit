@@ -7,8 +7,3 @@ def float_to_str(value, sig_digs):
             sig_digs
         )
     ).replace(".", "_")
-
-def str_to_float(value:str):
-    return float(
-        value.replace("_", ".")
-        )
