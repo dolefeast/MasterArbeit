@@ -23,6 +23,7 @@ def __init__(
         read_solutions: bool=False,
         sig_digs: int=3,
         float_tol: int=1e-2,
+        coupling: float=1,
         ):
     # Computation 
     self.n_points = n_points
@@ -31,6 +32,7 @@ def __init__(
     self.float_tol = float_tol # To track if the calculation broke down at any point
 
     self.e = e
+    self.coupling = coupling
     self._lambda_value = round(lambda_value, sig_digs)
     self.m = round(m, sig_digs)
     self.z = np.linspace(0, 1, n_points)
@@ -61,7 +63,7 @@ def __init__(
             value = (
                 -self.lambda_value 
                 *(self.z - 1/2)
-                +self.A0_induced
+                + self.coupling *  self.A0_induced
                 )
             )
 
@@ -88,7 +90,7 @@ def lambda_value(
             n_points=self.n_points,
             value = (
             - self.lambda_value * (self.z - 1/2)
-            + self.A0_induced
+            + self.coupling * self.A0_induced
         )
     )
 
