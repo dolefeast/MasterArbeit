@@ -1,18 +1,17 @@
-from tests.create_new_class import main
+from snippets.eigenvalue_evolution_wrt_a import main
 
 main(
-    m = 0,
-    lambda_min = 0.5,
-    lambda_step = 1,
-    n_iterations = 3,
-    verbose = 1,
-    tol = 5e-8,
+    m=0,
+    E_count=30,
+    a_min=0.001,
+    a_max=0,5,
+    a_count=5,
+    n_iterations=None,
+    verbose=0,
+    tol=5e-6,
     max_nodes=5e5,
-    plot=True,
-    # plot_rho=True,
-    # plot_A0_induced=True,
-    save_solutions=False,
-    read_solutions=True,
-    coupling = 5,
+    plot=False,
+    save_solutions=True,
+    read_solutions=False,
         )
 

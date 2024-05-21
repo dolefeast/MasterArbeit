@@ -1,22 +1,24 @@
 def main(
-        m,
-        lambda_min,
-        n_iterations,
-        verbose,
-        save_solutions,
-        read_solutions,
-        max_nodes=5e8,
-        inverse_lambda_step_min = 5,
-        inverse_lambda_step_max = 25,
-        inverse_lambda_step_count = 10,
-        tol=1e-4,
+    m = 0,
+    lambda_min = 16,
+    inverse_lambda_step_min = 80,
+    inverse_lambda_step_max = 120,
+    inverse_lambda_step_count = 10,
+    n_iterations = None,
+    verbose = 1,
+    tol = 5e-5,
+    max_nodes=5e8,
+    plot_rho=True,
+    plot_A0_induced=True,
+    save_solutions=False,
+    read_solutions=True,
         ):
 
     import matplotlib.pyplot as plt
     from numpy import linspace
 
     from physics import Vacuum_Polarization
-    from tests.create_new_class import main as create_new_class_main
+    from tests.increase_lambda import main as increase_lambda_main
 
     fig, ax = plt.subplots()
 
@@ -30,12 +32,12 @@ def main(
 
     try:
         for inverse_lambda_step in inverse_lambda_step_array:
-            lambda_critical = create_new_class_main(
-                m,
-                lambda_min,
-                inverse_lambda_step**-1,
-                n_iterations,
-                verbose,
+            lambda_critical = increase_lambda_main(
+                m=m,
+                lambda_min=lambda_min,
+                lambda_step=inverse_lambda_step**-1,
+                n_iterations=n_iterations,
+                verbose=verbose,
                 plot_rho=False,
                 plot_A0_induced=False,
                 save_solutions=False,
@@ -46,6 +48,7 @@ def main(
             lambda_critical_array.append(lambda_critical)
     except Exception as e:
         exception = e
+        print(exception)
         pass
     except KeyboardInterrupt:
         pass
