@@ -11,6 +11,7 @@ from physics.utils.perturbative_solutions import (
 def __init__(
         self,
         lambda_value: float,
+        a: float=1,
         m: float=0,
         e: float=1,
         eigenvalue_array: [float]=None,
@@ -23,6 +24,8 @@ def __init__(
         read_solutions: bool=False,
         sig_digs: int=3,
         float_tol: int=1e-2,
+        read_solutions_dir:str="",
+        save_solutions_dir:str="",
         ):
     # Computation 
     self.n_points = n_points
@@ -31,10 +34,14 @@ def __init__(
     self.float_tol = float_tol # To track if the calculation broke down at any point
 
     self.e = e
+    self.a = a
     self._lambda_value = round(lambda_value, sig_digs)
     self.m = round(m, sig_digs)
     self.z = np.linspace(0, 1, n_points)
     self.sig_digs = sig_digs
+
+    self.read_solutions_dir = read_solutions_dir 
+    self.save_solutions_dir = save_solutions_dir
 
     self.bcs = bcs
     if bcs == 'dirichlet':
@@ -56,12 +63,13 @@ def __init__(
     self._E_induced = None
 
     # Need to define Field because it needs to be callable
+    # for the klein gordon equation
     self.A0_field = Field(
             n_points=self.n_points,
             value = (
                 -self.lambda_value 
                 *(self.z - 1/2)
-                +self.A0_induced
+                + self.a * self.A0_induced
                 )
             )
 
@@ -88,7 +96,7 @@ def lambda_value(
             n_points=self.n_points,
             value = (
             - self.lambda_value * (self.z - 1/2)
-            + self.A0_induced
+            + self.a * self.A0_induced
         )
     )
 

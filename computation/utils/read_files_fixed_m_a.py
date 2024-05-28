@@ -4,11 +4,13 @@ from utils.get_lambda_value import get_lambda_value
 from utils.float_to_str import float_to_str 
 from utils.open_data_array import open_data_array 
 
-def read_files_fixed_m(
+def read_files_fixed_m_a(
         m,
+        a,
         bcs: str='dirichlet',
         sig_digs: int=3,
         read_things: [str]=[],
+        directory: float="",
         ):
     """
     For a certain given mass parameter m, read all the data files.
@@ -34,12 +36,19 @@ def read_files_fixed_m(
         'rho',
         ]
     m = float_to_str(m, sig_digs)
-    file_id = f'*mass_{m}_lambda_*'
+    a = float_to_str(a, sig_digs)
+    file_id = f'*mass_{m}_a_{a}_lambda_*'
 
+    if isinstance(read_things, str):
+        read_things = [read_things] 
     
     for i, thing in enumerate(read_things):
         if thing not in things:
             print(f"Warning: The requested item '{thing}' is not a valid input. It will not be read")
+
+    if directory != "":
+        directory = "/" + directory
+
 
     data = {}
     lambda_value_array = []
@@ -50,7 +59,7 @@ def read_files_fixed_m(
         # array.
         data_element = sorted(
                 list(
-                    Path(f'saved_solutions/{bcs}/{thing}').glob(file_id)
+                    Path(f'saved_solutions{directory}/{bcs}/{thing}').glob(file_id)
                     ),
                 key = get_lambda_value
                 )

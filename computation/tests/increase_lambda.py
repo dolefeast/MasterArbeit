@@ -1,51 +1,66 @@
 from itertools import count
 def main(
         m,
+        a,
         lambda_min,
         lambda_step,
         n_iterations,
         verbose,
-        plot_rho,
-        plot_A0_induced,
+        plot,
         save_solutions,
         read_solutions,
+        lambda_max=None,
+        directory="",
         tol=1e-4,
         ):
 
     from physics import Vacuum_Polarization
 
-    if plot_rho or plot_A0_induced:
+    if plot:
         import matplotlib.pyplot as plt
-        fig, (ax_rho, ax_A0_induced) = plt.subplots(2)
+        fig, (ax_rho, ax_A0_induced, ax_eigenvalue_array) = plt.subplots(3)
+        eigenvalue_array_array = []
+        lambda_value_array = []
     else:
         ax_rho = None
         ax_A0_induced = None
+        ax_eigenvalue_array = None
 
     system = Vacuum_Polarization(
             lambda_value=lambda_min,
+            a=a,
             m=m,
-            read_solutions=read_solutions
+            read_solutions=read_solutions,
+            read_solutions_dir=directory,
+            save_solutions_dir=directory,
             )
 
+    # Will be 0 if the file was not found
     if system.read_solutions:
-        lambda_min = lambda_min + lambda_step
-        system.lambda_value = lambda_min
+        lambda_min = lambda_min + 2 * lambda_step
+        system.lambda_value = lambda_min - lambda_step
+
     try:
-        system.A0_induced *= 0
         for lambda_value in count(lambda_min, lambda_step):
+            if isinstance(lambda_max, (int, float)):
+                if lambda_value>lambda_max:
+                    break
+            print('Calculating for lambda_value=', system.lambda_value)
             system.update_eigenstates_script(
                     n_iterations=n_iterations,
                     verbose=verbose,
-                    plot_rho=plot_rho,
+                    plot_rho=plot,
                     ax_rho=ax_rho,
-                    plot_A0_induced=plot_A0_induced,
+                    plot_A0_induced=plot,
                     ax_A0_induced=ax_A0_induced,
                     save_solutions=save_solutions,
                     tol=tol,
                     )
             if system.broken:
                 break
-            print('Increasing lambda_value to', lambda_value)
+            if plot:
+                eigenvalue_array_array.append(system.eigenvalue_array)
+                lambda_value_array.append(system.lambda_value)
             system.lambda_value = lambda_value
     # Whatever happens here, break the loop and plot whatever we have.
     except KeyboardInterrupt:
@@ -54,16 +69,22 @@ def main(
         exception = e
         pass
 
-    if plot_rho:
+    if plot:
+        ax_eigenvalue_array.plot(
+        lambda_value_array,
+        eigenvalue_array_array,
+        'b'
+        )
+
         ax_rho.set_ylabel(r"$\rho(z)$")
-
-    if plot_A0_induced:
         ax_A0_induced.set_ylabel(r"$A_0(z)$")
-
-    if  plot_rho or plot_A0_induced :
+        ax_eigenvalue_array.set_xlabel(r"$\lambda$")
+        ax_eigenvalue_array.set_ylabel(r"$\omega_n$")
         plt.show()
 
     try:
         raise exception
     except UnboundLocalError:
         pass
+
+    return system.lambda_value - lambda_step

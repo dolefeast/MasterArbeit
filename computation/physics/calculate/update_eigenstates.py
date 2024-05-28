@@ -12,7 +12,7 @@ def update_eigenstates(
             )
 
     # Normalizing the modes
-    if smoothing:
+    if smoothing: # ??
         self.normalize_eigenstates()
 
     # Calculate total charge density

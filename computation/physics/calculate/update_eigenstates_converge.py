@@ -33,7 +33,9 @@ def update_eigenstates_converge(
     if verbose == 2:
             print(f'Starting iteration nº 1')
 
-    self.update_eigenstates()
+    self.update_eigenstates(
+            max_nodes=max_nodes,
+            )
     previous_rho = self.rho.copy()
     if self.broken:
         return
@@ -55,7 +57,7 @@ def update_eigenstates_converge(
             max_nodes=max_nodes,
             )
 
-    alpha = 0.5
+    alpha = 0.4
     self.plot_rho_A0(
             plot_rho,
             ax_rho,
@@ -70,7 +72,7 @@ def update_eigenstates_converge(
             )
 
     for iteration in count(3):
-        alpha = 0.7
+        alpha = 0.5
         if r <= tol:
             print(f'Convergence was reached after {iteration-1} iteration{"s"*bool(iteration-1)}')
             break
@@ -79,7 +81,9 @@ def update_eigenstates_converge(
         if verbose==2:
             print(f'Starting iteration nº {iteration}')
 
-        self.update_eigenstates()
+        self.update_eigenstates(
+                max_nodes=max_nodes,
+                )
         if self.broken:
             print("The calculation broke")
             break
@@ -97,7 +101,8 @@ def update_eigenstates_converge(
             alpha,
             )
 
-    
+    # If the iteration stopped, but broken==False,
+    # plot the solutoin
     if not self.broken:
         alpha = 1
         self.plot_rho_A0(
