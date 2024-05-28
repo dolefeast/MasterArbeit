@@ -1,4 +1,5 @@
 from itertools import count
+
 def main(
         m,
         a,
@@ -12,9 +13,13 @@ def main(
         lambda_max=None,
         directory="",
         tol=1e-4,
+        max_nodes=5e6,
+        sig_digs=4,
+        coupling=1,
         ):
 
     from physics import Vacuum_Polarization
+    import numpy as np
 
     if plot:
         import matplotlib.pyplot as plt
@@ -55,6 +60,7 @@ def main(
                     ax_A0_induced=ax_A0_induced,
                     save_solutions=save_solutions,
                     tol=tol,
+                    max_nodes=max_nodes,
                     )
             if system.broken:
                 break

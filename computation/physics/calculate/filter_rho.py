@@ -4,6 +4,6 @@ def filter_rho(self):
     if self.bcs == 'dirichlet':
         self.z, self.rho = self.total_filtering_dirichlet(self.z, self.rho)
     elif self.bcs == 'neumann':
-        raise AttributeError("neumann boundary conditions have not yet been implemented")
+        raise AttributeError("Neumann boundary conditions have not yet been implemented")
     else:
         raise AttributeError(f"{self.bcs} are not defined")

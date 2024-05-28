@@ -10,14 +10,19 @@ def read_files_fixed_m_a(
         bcs: str='dirichlet',
         sig_digs: int=3,
         read_things: [str]=[],
-        directory: float="",
+        directory: str="",
         ):
     """
     For a certain given mass parameter m, read all the data files.
     Parameters:
         m, the mass to read
         sig_digs: float=None, the maximum lambda_value to read from
-    Returns:
+        bcs: the boundary conditions from which to read from 
+        read_things: The 'things' to read. The read things are
+                    opened using np.genfromtxt. Otherwise they 
+                    are left as a Path file.
+        directory: inside of the saved_solutions dir, which directory to read from
+    Returns: 
         data_dict, a dictionary with 
             data_dict.keys() = [
                 'lambda_value', # The corresponding lambda_value for each item in the arrays
@@ -57,6 +62,8 @@ def read_files_fixed_m_a(
         # is always the same. A more optimal approach would be to 
         # figure out what the 'sorting permutation' is, an apply it to every
         # array.
+        thing_dir = f'saved_solutions{directory}/{bcs}/{thing}'
+
         data_element = sorted(
                 list(
                     Path(f'saved_solutions{directory}/{bcs}/{thing}').glob(file_id)
@@ -65,7 +72,8 @@ def read_files_fixed_m_a(
                 )
 
         # Defines the lambda_value_array
-        # Only need to do it in one iteration
+        # Only need to do it in only one iteration. No need
+        # for more iterations
         if i==0:
             lambda_value_array = [
             get_lambda_value(filename) for filename in data_element 

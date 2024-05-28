@@ -28,11 +28,15 @@ def __init__(
         save_solutions_dir:str="",
         ):
     # Computation 
+
     self.n_points = n_points
     self.N_mode_cutoff = N_mode_cutoff
     self.broken = 0 # Tracks whether the calculation broke down at any point
     self.float_tol = float_tol # To track if the calculation broke down at any point
+    self.read_solutions_dir = 'saved_solutions'
+    self.save_solutions_dir = 'saved_solutions'
 
+    # Physics
     self.e = e
     self.a = a
     self._lambda_value = round(lambda_value, sig_digs)
@@ -67,8 +71,8 @@ def __init__(
     self.A0_field = Field(
             n_points=self.n_points,
             value = (
-                -self.lambda_value 
-                *(self.z - 1/2)
+                - self.a**2 * self.E 
+                * (self.z - 1/2)
                 + self.a * self.A0_induced
                 )
             )
@@ -83,15 +87,15 @@ def __init__(
     self.define_eigenstates()
 
 @property
-def lambda_value(self):
-    return self._lambda_value
+def E(self):
+    return self._E
 
-@lambda_value.setter
-def lambda_value(
+@E.setter
+def E(
         self, 
-        new_lambda_value
+        new_E,
         ):
-    self._lambda_value = new_lambda_value
+    self._E = new_E
     self.A0_field = Field(
             n_points=self.n_points,
             value = (
@@ -107,5 +111,3 @@ def E_induced(
     if self._E_induced is None:
         return -np.diff(self.A0_induced)
     return self._E_induced
-    
-

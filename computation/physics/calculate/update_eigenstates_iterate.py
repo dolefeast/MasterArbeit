@@ -37,10 +37,10 @@ def update_eigenstates_iterate(
 
         # To distinguish between different solutions
         alpha = (
-                0.3 
-                + 0.7*(
+                0.2 
+                + 0.8*(
                     (iteration+1) / n_iterations 
-                    ) **3
+                    ) ** 4
                 )
 
         self.plot_rho_A0(

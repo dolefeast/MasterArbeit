@@ -9,7 +9,7 @@ def calculate_A0_induced(self):
     assert self.rho.ndim == 1, "self.rho.dim should be 1-dimensional array"
     rho = CubicSpline(
             self.z,
-            self.rho
+            self.coupling * self.rho
             )
 
     E_induced = rho.antiderivative(1)

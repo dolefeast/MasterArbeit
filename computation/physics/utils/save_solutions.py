@@ -13,8 +13,7 @@ def save_solutions(self):
 
     main_directory = f"saved_solutions{save_solutions_dir}/{self.bcs}"
 
-    print(f"Saving results under {main_directory}/.../{file_id}")
-
+    print(f"Saving results under {directory + '/.../' + file_id}")
     # Saving the eigenvalues
     to_csv = self.eigenvalue_array
     savetxt(

@@ -19,7 +19,7 @@ def main(
     from numpy import linspace
 
     from physics import Vacuum_Polarization
-    from tests.create_new_class import main as create_new_class_main
+    from tests.increase_lambda import main as increase_lambda_main
 
     fig, ax = plt.subplots()
 
@@ -33,12 +33,12 @@ def main(
 
     try:
         for inverse_lambda_step in inverse_lambda_step_array:
-            lambda_critical = create_new_class_main(
-                m,
-                lambda_min,
-                inverse_lambda_step**-1,
-                n_iterations,
-                verbose,
+            lambda_critical = increase_lambda_main(
+                m=m,
+                lambda_min=lambda_min,
+                lambda_step=inverse_lambda_step**-1,
+                n_iterations=n_iterations,
+                verbose=verbose,
                 plot_rho=False,
                 plot_A0_induced=False,
                 save_solutions=False,
@@ -49,6 +49,7 @@ def main(
             lambda_critical_array.append(lambda_critical)
     except Exception as e:
         exception = e
+        print(exception)
         pass
     except KeyboardInterrupt:
         pass
@@ -71,4 +72,3 @@ def main(
 
     return inverse_lambda_step_array, lambda_critical_array
 
-    
