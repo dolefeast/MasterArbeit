@@ -8,12 +8,14 @@ def save_solutions(self):
 
     file_id = f"mass_{m_string}_a_{a_string}_lambda_{lambda_string}.txt"
 
+    save_solutions_dir = ""
     if self.save_solutions_dir != "" and self.save_solutions_dir[0]!="/": 
         save_solutions_dir = "/" + self.save_solutions_dir 
 
     main_directory = f"saved_solutions{save_solutions_dir}/{self.bcs}"
 
-    print(f"Saving results under {directory + '/.../' + file_id}")
+    print(f"Saving results under {main_directory}/.../{file_id}")
+
     # Saving the eigenvalues
     to_csv = self.eigenvalue_array
     savetxt(

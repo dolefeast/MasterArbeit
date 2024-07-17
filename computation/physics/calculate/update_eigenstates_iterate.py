@@ -7,6 +7,9 @@ def update_eigenstates_iterate(
         plot_A0_induced: bool=False,
         ax_A0_induced=None,
         max_nodes=5e6,
+        smoothing: bool=True,
+        color_rho: str='b',
+        color_A0_induced: str='r',
         ):
     """
     Performs the update_eigenstates method n_iterations times
@@ -21,6 +24,7 @@ def update_eigenstates_iterate(
         plot_A0: bool=False, whether the A0_induced is to be plotted at each iteration
         ax_A0_induced: None, The maptlotlib.pyplot.ax for A0_induced to be plotted to
     """
+
     if verbose:
         print(f"Calculating {n_iterations} iteration{'s'*bool(n_iterations-1)}")
 
@@ -29,6 +33,7 @@ def update_eigenstates_iterate(
             print(f'Starting iteration nº {iteration+1}')
         self.update_eigenstates(
                 max_nodes=max_nodes,
+                smoothing=smoothing,
                 )
 
         if self.broken:
@@ -37,16 +42,17 @@ def update_eigenstates_iterate(
 
         # To distinguish between different solutions
         alpha = (
-                0.2 
-                + 0.8*(
+                0.3 
+                + 0.7*(
                     (iteration+1) / n_iterations 
-                    ) ** 4
+                    ) **3
                 )
 
         self.plot_rho_A0(
-                plot_rho,
-                ax_rho,
-                plot_A0_induced,
-                ax_A0_induced,
-                alpha,
+            plot_rho or plot_A0_induced,
+            ax_rho,
+            color_rho,
+            ax_A0_induced,
+            color_A0_induced,
+            alpha,
                 )

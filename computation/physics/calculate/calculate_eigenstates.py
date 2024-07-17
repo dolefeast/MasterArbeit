@@ -4,11 +4,10 @@ from utils.float_in_array import float_in_array
 
 def calculate_eigenstates(
     self,
-    float_tol:float=1e-1,
+    float_tol:float=1e-2,
     bvp_tol:float=1e-5,
     max_nodes:int=5e6,
     verbose:int=0,
-    freeze_fundamental_modes:bool=False,
     ):
     """
     Calculates the eigenstate family 
@@ -17,7 +16,6 @@ def calculate_eigenstates(
         float_tol:float=1e-5, the tolerance to which to floats are said to be different
         max_nodes:int=2e5, max_nodes for solve_bvp
         verbose:int=False,	controls verbosity of solve_bvp
-        freeze_fundamental_modes:bool=False, Weird approximation that surely doesn't work, but was worth a try
     """
 
     # true_ distinction means they are solutions
@@ -38,41 +36,25 @@ def calculate_eigenstates(
                 )
                     ):
 
-
         # Non physical
         if eigenvalue_guess == 0:
             continue
 
-        # if abs(eigenvalue_guess)>0.3 and not freeze_fundamental_modes:
-        if True:
-            true_eigenstate = integrate.solve_bvp(
-                self.Klein_Gordon,
-                self.boundary_conditions,
-                self.z,
-                (eigenstate_guess, eigenstate_gradient_guess),
-                p=(eigenvalue_guess,),
-                verbose=0,
-                max_nodes=max_nodes,
-                tol=bvp_tol,
-            )
-            true_eigenvalue = true_eigenstate.p[0]
-            true_eigenstate_gradient = true_eigenstate.sol(self.z)[1]
-            # If the calculation broke down stop
-            if not true_eigenstate.success:
-                print(
-                f"Warning: Eigenvalue={eigenvalue_guess} did not converge. Escaping iteration... "
-                )
+        true_eigenstate = integrate.solve_bvp(
+            self.Klein_Gordon,
+            self.boundary_conditions,
+            self.z,
+            (eigenstate_guess, eigenstate_gradient_guess),
+            p=(eigenvalue_guess,),
+            verbose=0,
+            max_nodes=max_nodes,
+            tol=bvp_tol,
+        )
 
-                self.broken = 1
-                break
-        elif abs(eigenvalue_guess)<=0.3 and freeze_fundamental_modes:
-            true_eigenvalue = eigenvalue_guess
-            true_eigenstate = eigenstate_guess
-            true_eigenstate_gradient = eigenstate_gradient_guess
+        true_eigenvalue = true_eigenstate.p[0]
 
         # First check if this eigenvalue has already been solved for
-        if float_in_array(
-                true_eigenvalue,
+        if float_in_array(true_eigenvalue,
                 true_eigenvalue_array,
                 tol=self.float_tol
                 ): 
@@ -81,15 +63,23 @@ def calculate_eigenstates(
                 )
             self.broken = 1
             break
-
         
+        # If the calculation broke down stop
+        if not true_eigenstate.success:
+            print(
+            f"Warning: Eigenvalue={eigenvalue_guess} did not converge.\n\tEscaping iteration... "
+            )
+
+            self.broken = 1
+            break
+
         # If it did not, save the solution
         true_eigenvalue_array.append(true_eigenvalue)
         # Be careful here. In the true eigenstate_array it saves the solve_bvp
         # object, but in the true_eigenstate_gradient_array it saves the array.
         # The true_eigenstate_array MUST be later modified.
         true_eigenstate_array.append(true_eigenstate) 
-        true_eigenstate_gradient_array.append(true_eigenstate_gradient)
+        true_eigenstate_gradient_array.append(true_eigenstate.sol(self.z)[1])
 
     self.eigenvalue_array = true_eigenvalue_array
     self.eigenstate_array = true_eigenstate_array

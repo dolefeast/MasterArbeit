@@ -5,7 +5,8 @@ def eigenstate_rho(
         eigenvalue,
         eigenstate,
         ):
-    return (
+    sign = abs(eigenvalue)/eigenvalue
+    return self.e * (
             (eigenvalue - self.e * self.A0_field.value) 
             * abs(eigenstate)**2
             )

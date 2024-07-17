@@ -26,7 +26,7 @@ def calculate_perturbative_eigenstates(self):
             self.perturbative_eigenstate_gradient(
             self.z,
             omega,
-            self.m,
+           self.m,
             self.lambda_value
             )
             for omega in self.eigenvalue_array

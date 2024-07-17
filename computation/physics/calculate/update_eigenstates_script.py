@@ -9,6 +9,9 @@ def update_eigenstates_script(
         plot_A0_induced: bool=False,
         ax_A0_induced=None,
         max_nodes=5e6,
+        smoothing: bool=False,
+        color_rho: str='b',
+        color_A0_induced: str='r',
         ):
     """
     Parameters:
@@ -28,6 +31,9 @@ def update_eigenstates_script(
                 ax_A0_induced=ax_A0_induced,
                 tol=tol,
                 max_nodes=max_nodes,
+                smoothing=smoothing,
+                color_rho=color_rho,
+                color_A0_induced=color_A0_induced,
                 )
 
     elif isinstance(n_iterations, int):
@@ -39,6 +45,9 @@ def update_eigenstates_script(
                 plot_A0_induced=plot_A0_induced,
                 ax_A0_induced=ax_A0_induced,
                 max_nodes=max_nodes,
+                smoothing=smoothing,
+                color_rho=color_rho,
+                color_A0_induced=color_A0_induced,
                 )
 
     if save_solutions and not self.broken:

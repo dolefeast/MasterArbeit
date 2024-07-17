@@ -1,4 +1,5 @@
 import numpy as np
+from itertools import cycle
 
 from physics.utils.Fields import Field
 from physics.utils.perturbative_solutions import (
@@ -26,23 +27,23 @@ def __init__(
         float_tol: int=1e-2,
         read_solutions_dir:str="",
         save_solutions_dir:str="",
+        ambjorn: bool=False,
         ):
     # Computation 
-
     self.n_points = n_points
     self.N_mode_cutoff = N_mode_cutoff
     self.broken = 0 # Tracks whether the calculation broke down at any point
     self.float_tol = float_tol # To track if the calculation broke down at any point
-    self.read_solutions_dir = 'saved_solutions'
-    self.save_solutions_dir = 'saved_solutions'
 
-    # Physics
     self.e = e
     self.a = a
+
     self._lambda_value = round(lambda_value, sig_digs)
     self.m = round(m, sig_digs)
     self.z = np.linspace(0, 1, n_points)
     self.sig_digs = sig_digs
+    # If True, calculates the charge density as Ambjorn and Wolfram do
+    self.ambjorn = ambjorn
 
     self.read_solutions_dir = read_solutions_dir 
     self.save_solutions_dir = save_solutions_dir
@@ -71,7 +72,7 @@ def __init__(
     self.A0_field = Field(
             n_points=self.n_points,
             value = (
-                - self.a**2 * self.E 
+                - self.lambda_value 
                 * (self.z - 1/2)
                 + self.a * self.A0_induced
                 )
@@ -87,19 +88,20 @@ def __init__(
     self.define_eigenstates()
 
 @property
-def E(self):
-    return self._E
+def lambda_value(self):
+    return self._lambda_value
 
-@E.setter
-def E(
+@lambda_value.setter
+def lambda_value(
         self, 
-        new_E,
+        new_lambda_value
         ):
-    self._E = new_E
+    self._lambda_value = new_lambda_value
     self.A0_field = Field(
             n_points=self.n_points,
             value = (
-            - self.lambda_value * (self.z - 1/2)
+            - self.lambda_value 
+            * (self.z - 1/2)
             + self.a * self.A0_induced
         )
     )
@@ -111,3 +113,5 @@ def E_induced(
     if self._E_induced is None:
         return -np.diff(self.A0_induced)
     return self._E_induced
+    
+

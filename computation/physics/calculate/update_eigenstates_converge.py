@@ -1,5 +1,5 @@
 from itertools import count
-from numpy import sqrt, mean
+from numpy import sqrt, mean, array
 
 def root_mean_square(x):
     return sqrt(mean(x**2))
@@ -13,6 +13,9 @@ def update_eigenstates_converge(
         ax_A0_induced=None,
         tol=1e-2,
         max_nodes=5e6,
+        smoothing=True,
+        color_rho: str='b',
+        color_A0_induced: str='r',
         ):
     """
     Performs the update_eigenstates until convergence to some tolerance tol
@@ -26,6 +29,7 @@ def update_eigenstates_converge(
         plot_A0: bool=False, whether the A0_induced is to be plotted at each iteration.
         ax_A0_induced: None, The maptlotlib.pyplot.ax for A0_induced to be plotted to.
     """
+
     if verbose:
         print(f"Iterating until convergence")
 
@@ -35,6 +39,7 @@ def update_eigenstates_converge(
 
     self.update_eigenstates(
             max_nodes=max_nodes,
+            smoothing=smoothing,
             )
     previous_rho = self.rho.copy()
     if self.broken:
@@ -42,10 +47,11 @@ def update_eigenstates_converge(
 
     alpha = 0.3
     self.plot_rho_A0(
-            plot_rho,
+            plot_rho or plot_A0_induced,
             ax_rho,
-            plot_A0_induced,
+            color_rho,
             ax_A0_induced,
+            color_A0_induced,
             alpha,
             )
 
@@ -55,20 +61,22 @@ def update_eigenstates_converge(
         print(f'Starting iteration nº 2')
     self.update_eigenstates(
             max_nodes=max_nodes,
+            smoothing=smoothing,
             )
 
     alpha = 0.4
     self.plot_rho_A0(
-            plot_rho,
+            plot_rho or plot_A0_induced,
             ax_rho,
-            plot_A0_induced,
+            color_rho,
             ax_A0_induced,
+            color_A0_induced,
             alpha,
             )
 
     r = root_mean_square(
             (self.rho - previous_rho)
-            / ( previous_rho  )
+            / ( array(previous_rho) )
             )
 
     for iteration in count(3):
@@ -94,10 +102,11 @@ def update_eigenstates_converge(
                 )
 
         self.plot_rho_A0(
-            plot_rho,
+            plot_rho or plot_A0_induced,
             ax_rho,
-            plot_A0_induced,
+            color_rho,
             ax_A0_induced,
+            color_A0_induced,
             alpha,
             )
 
@@ -106,9 +115,10 @@ def update_eigenstates_converge(
     if not self.broken:
         alpha = 1
         self.plot_rho_A0(
-            plot_rho,
+            plot_rho or plot_A0_induced,
             ax_rho,
-            plot_A0_induced,
+            color_rho,
             ax_A0_induced,
+            color_A0_induced,
             alpha,
             )

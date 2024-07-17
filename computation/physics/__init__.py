@@ -8,7 +8,7 @@ class Vacuum_Polarization:
 
     from physics.init.init_method import (
             __init__,
-            E,
+            lambda_value,
             E_induced,
             )
 
