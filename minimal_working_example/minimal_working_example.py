@@ -1,9 +1,11 @@
 import matplotlib.pyplot as plt
 from mpmath import quad
+from itertools import count
 import numpy as np
 from numpy import savetxt
 from scipy.integrate import solve_bvp
 from scipy.interpolate import CubicSpline
+import os
 
 from itertools import cycle
 
@@ -22,6 +24,8 @@ def float_in_array(x, array, tol=1e-3):
     return False
 
 def float_to_str(value, sig_digs=3):
+    if isinstance(value, str):
+        return value
     return str(
         round(
             float(
@@ -35,16 +39,6 @@ def str_to_float(value:str):
     return float(
         value.replace("_", ".")
         )
-
-def float_to_str(value, sig_digs=3):
-    return str(
-        round(
-            float(
-                value
-            ),
-            sig_digs
-        )
-    ).replace(".", "_")
 
 def root_mean_square(y):
     return np.sqrt(np.mean(y**2))
@@ -127,6 +121,25 @@ def Dirichlet_bcs(ya, yb, p):
     bcs = np.array((ya[0], yb[0], yb[1] - 1))
     return bcs
 
+def fun_jac(z_array, y, p):
+    omega = p[0]
+    u, v = y # u = phi, v = phi'
+    
+    df_dy = np.zeros((len(y), len(y), len(z_array)))
+
+    # Calculated by hand
+    df_dy[0, 0, :] = np.zeros_like(z_array)
+    df_dy[0, 1, :] = -(omega - A0(z_array))**2 + m**2
+    df_dy[1, 0, :] = np.ones_like(z_array)
+    df_dy[1, 1, :] = np.zeros_like(z_array)
+
+    df_dp = np.zeros((len(y), len(p), len(z_array)))
+    df_dp[0, 0, :] = np.zeros_like(z_array)
+    df_dp[1, 0, :] = - 2 * omega * ( omega - e * A0(z_array) ) * u
+
+    return df_dy, df_dp
+
+
 def calculate_eigenstates(max_N,
         max_nodes=1e20,
         tol=1e-2,
@@ -167,6 +180,7 @@ def calculate_eigenstates(max_N,
                 y,
                 p=(eigenvalue_guess,),
                 max_nodes=max_nodes,
+                fun_jac=fun_jac,
                 tol=tol,
                 )
         omega_n = eigenstate.p[0]
@@ -176,7 +190,7 @@ def calculate_eigenstates(max_N,
             #raise Exception(f"Solution associated with omega_n={omega_n} did not converge")
             raise Exception(eigenstate.message)
 
-        if float_in_array(omega_n, eigenvalues):
+        if float_in_array(omega_n, eigenvalues) or abs(omega_n - eigenvalue_guess ) > 2*abs(eigenvalue_guess):
             # Sometimes an eigenvalue converges to another possible solution
             raise Exception(f"Found repeated eigenvalue {omega_n}")
 
@@ -249,10 +263,117 @@ def calculate_rho(solution_family:dict):
         # eigenstate is np array. A0 is a callable. 
         # A0(z) is of the same shape as eigenstate
         rho_n = (eigenvalue - A0(z)) * abs(eigenstate) ** 2
-        rho += rho_n
+        rho += 1/2*rho_n
 
     return rho
 
+
+def extend_signal(
+        x,
+        y,
+        padding_size=None
+        ):
+    assert len(x) == len(y)
+
+    # if padding_size is not specified,
+    # then the padding is y itself
+    if padding_size is None:
+        padding_size = len(y)
+    # wrap gives periodization of the function
+    y_padded = np.pad(y, padding_size, mode="wrap")
+
+    # need to extend x, too
+    dx = x[1] - x[0]
+
+    x_padded = np.linspace(-dx * padding_size, 1 + dx * padding_size, len(y_padded))
+
+    return x_padded, y_padded
+
+def remove_neighbourhood(
+    x,
+    y,
+    points: (float)=(0,1),
+    neighbourhood_size: float=None,
+    force_zero: bool=True,
+):
+    """
+    Given curve (x, y) with problematic neighbourhoods around points=(x1, x2, ...), take their neighbourhood with neighbourhood_size=neighbourhood_size away and interpolate around it, thus smoothing the curve.
+    """
+
+    if neighbourhood_size is None:
+        # Take out the points corresponding to the convolution array
+        neighbourhood_size = (
+        1 / ( max_N + 1 ) 
+        + 1 / n_points # Without this, the algorithm takes away
+                            # an "open" neighbourhood (can't be open since it's discrete), 
+                            # and adding it converts it into a closed one.
+                            # Corresponds to adding a dz.
+            )
+
+    x_list = list(x)
+    y_list = list(y)
+    
+    x_array = np.array(x)
+    
+    # A python array to use its addition properties
+    idx = []
+
+    # The points to take out of the array
+    for p in points:
+        
+        window = np.where(abs(x_array - p) <= neighbourhood_size)[0].tolist()
+        idx += window
+
+    idx = np.reshape(
+        np.array(idx),
+        -1,  # 1-d array
+    )
+    x_list = [x for i, x in enumerate(x_list) if i not in idx]
+    y_list = [y for i, y in enumerate(y_list) if i not in idx]
+
+    if force_zero:  # Force the removed values to go through 0
+        for p in points:
+            for x_index, x_value in enumerate(x_list):
+                if x_value > p:
+                    x_list = x_list[:x_index] + [p] + x_list[x_index:]
+                    y_list = y_list[:x_index] + [0] + y_list[x_index:]
+                    break
+
+    return np.array(x_list), np.array(y_list)
+
+def remove_and_interpolate(
+    x: [float],
+    y: [float],
+    points=(0, 1),
+    neighbourhood_size:float=None,
+    force_zero: bool=True,
+):
+    x_removed, y_removed = remove_neighbourhood(
+        x,
+        y,
+        points=points,
+        neighbourhood_size=neighbourhood_size,
+        force_zero=True
+    )
+
+    interpolated_curve = CubicSpline(
+            x_removed,
+            y_removed,
+            )
+
+    return x, interpolated_curve(x)  # So that both are arrays
+
+def return_to_0_1(
+        x, 
+        y):
+
+    idx = np.where(
+        np.logical_and(
+            x >= 0,
+            x <= 1,
+        )
+    )
+    return x[idx], y[idx]
 
 def filter_rho(rho):
     """
@@ -304,6 +425,53 @@ def filter_rho(rho):
  
     return rho_filtered # This will stield yield some noise as 
                       # this is not the full smoothing algorithm.
+def extend_and_filter(
+    x,
+    y,
+    neighbourhood_size=None,
+    padding_size=None,
+    points=(0, 1),
+    force_zero=True,
+):
+    """
+    Parameters:
+    x: [float], the x-array of the signal. increasing and goes from 0 to 1
+    y: [float], the y-array of the signal
+    filter_method: callable, the method to be used for filtering
+    neighbourhood_size: float, the 'diameter' of the neighbourhood to be removed around points
+    padding_size=None, the size of the padding i.e. the extension of the signal. if none, padding_size = len(y) and therefore the signal is copied both ways
+    points=(0, 1), the points around which the neighbourhood is to be removed
+    force_zero:bool=True, whether after removing a certain neighbourhood, we force y(points) to go through 0
+    filter_parameters=(, ),	 filter parameters that the filtering script may need
+
+    1. Extends signal by padding_size
+    2. Filters the extended signal
+    3. Removes the points on a neighbourhood of the boundaries (0, 1)
+     3a. If force_values=True, force the signal to go through the forced values (initially 0)
+    4. Interpolates over the void area
+    5. Returns the signal only in the interval (0, 1)
+
+    """
+    # First extend the signal
+    x_extended, y_extended = extend_signal(x, y, padding_size=padding_size)
+
+    # Second filter it
+    y_extended_filtered = filter_rho(y_extended)
+    y_extended_filtered = filter_rho(y_extended_filtered)
+
+    # Third and fourth remove the boundaries and interpolate
+    x_extended_removed, y_extended_filtered_removed = remove_and_interpolate(
+        x_extended,
+        y_extended_filtered,
+        points=points,
+        neighbourhood_size=neighbourhood_size,
+        force_zero=force_zero,
+    )
+
+    # Fifth return the signal only in the interval 0 to 1
+    x_0_to_1, y_0_to_1 = return_to_0_1(x_extended_removed, y_extended_filtered_removed)
+
+    return x_0_to_1, y_0_to_1
 
 def calculate_A0_induced(rho):
     rho_interpolated = CubicSpline(z, rho)
@@ -379,14 +547,28 @@ def save_solutions(
         directory = "/" + directory
 
     root_directory = f"saved_solutions{directory}/{bcs}"
-    print(f"Saving results under {root_directory}/{converged_dictionary.keys()}/{file_id}...\n")
+    print(f"Saving results under {root_directory}/.../{file_id}...")
     
-    for key, value in converged_dictionary.items():
-        savetxt(
-                f"{root_directory}/{key}/{file_id}",
-            value,
-            delimiter=",",
-        )
+    try:
+        for key, value in converged_dictionary.items():
+            savetxt(
+                    f"{root_directory}/{key}/{file_id}",
+                value,
+                delimiter=",",
+            )
+    except FileNotFoundError as e:
+        print(e)
+        create = input(f"\nCreate directory {directory[1:]}?[y/n]... ")
+        if create == "y":
+            for key in converged_dictionary.keys():
+                os.makedirs(root_directory + "/" + key)
+            save_solutions(converged_dictionary, directory=directory, sig_digs=sig_digs)
+        elif create == "n": 
+            rename = input(f"If {directory} was a typo, enter the correct name...")
+            if rename != "":
+                save_solutions(converged_dictionary, directory=directory, sig_digs=sig_digs)
+
+
 
 def read_solutions_from_file(
         directory="",
@@ -419,35 +601,94 @@ def read_solutions_from_file(
 
     return solution_family
 
+def single_system_iteration():
+    global rho, solution_family, A0_induced, A0
+    solution_family = calculate_eigenstates(
+            max_N,
+            max_nodes=max_nodes,
+            tol=tol,
+            )
+
+    solution_family = normalize_eigenstate_family(solution_family)
+
+    rho = calculate_rho(solution_family)
+    if smoothing:
+        # rho = filter_rho(rho)
+        rho += e/np.pi * A0(z)
+        _, rho = extend_and_filter(z, rho, )
+
+    A0_induced = calculate_A0_induced(rho)
+    A0 = calculate_A0_total(A0_induced)
+
+def update_system_iterate(n_iterations, plot, r=1):
+    for n in count(0):
+        if isinstance(n_iterations, int):
+            if n >= n_iterations: break
+        elif n_iterations is None:
+            if r < iterate_tol: break
+        else: 
+            raise ValueError("n_iterations must be either int or None")
+
+        single_system_iteration()
+
+        if plot and not i%3:
+            plot_rho_A0_induced(rho, A0_induced(z), '--', color=color, alpha=0.5)
+        if not n: # For the first iteration
+            print('n=0, max(A0_induced) =', max(A0_induced(z)))
+        
+        if n_iterations is None:
+            try:
+                r = abs(max(rho) - max_prev_rho) / abs(max_prev_rho)
+                max_prev_rho = max(rho)
+            except NameError:
+                max_prev_rho = max(rho)
+    return n
+
 if __name__ == "__main__":
-    plot = False
+    # When wanting to calculate with n_points = 100, max_N = 12
+    # it is the return_to_0_1 what gives troubles. I don't see why
+     
+    plot = True
+    save = False
+    read = False
+
     if plot:
         fig, (ax_rho, ax_A0_induced, ax_eigenvalues) = plt.subplots(3)
         eigenvalues_array = []
         lambda_array = []
 
     # Number of modes
-    n_points = 200
+    n_points = 88
     # x-axis
     z = np.linspace(0, 1, n_points)
 
-    a = 1
+    e = 1
+    a = 5
     m = 0
-    max_N = 1 #24 # Cutoff for the mode solutions
+    max_N = 10 # Cutoff for the mode solutions
                # Note that there will be 2 * max_N - 1 solutions
-    lambda_min = 7 # Strength of the external electric field
-    lambda_max = 25 # Strength of the external electric field
-    lambda_step=0.1
+    lambda_min = 7 # Min strength of the external electric field
+    lambda_max = 25 # Max strength of the external electric field
+    lambda_step= 0.25
 
-    tol = 1e-3
-    max_nodes = 5e15
-    smoothing = False
-    directory = "ambjorn"
+    tol = 1e-10 # Tolerance for solve_bvp
+    iterate_tol = 1e-7 # Tolerance for convergence of selfconsistent solutions
+
+    max_nodes = 5e23
+    smoothing = True
+    ambjorn = False
     bcs = "dirichlet"
-    save = True
-    read = False
+    n_iterations = 2 # Number of iterations for each value of lambda
+    directory = "n_iterations_2_hadamard_maxN_10"
 
-    n_iterations = 15 # Number of iterations for each value of lambda
+    print(f"max_N = {max_N}")
+    print(f"smoothing = {smoothing}")
+    print(f"ambjorn = {ambjorn}")
+    print(f"n_iterations = {n_iterations}")
+    if save:
+        print(f"Saving to directory {directory}")
+    else:
+        print("Not saving the solutions")
 
     # Need to initialize the A0_induced
     A0_induced = CubicSpline(z, np.zeros_like(z))
@@ -471,36 +712,19 @@ if __name__ == "__main__":
         A0_induced = CubicSpline(z, np.zeros_like(z))
 
     for i, lambda_value in enumerate(np.arange(lambda_min, lambda_max, lambda_step)):
+        r = 1 # In case n_iterations is None
+        print(15*"#")
         print('λ= ', lambda_value)
         color = next(color_cycle) # To distinguish between different lambda values
-        if lambda_value == 17.0:
-            print('We got here, increasing n_iterations')
-            n_iterations *= 2
         try:
-            for n in range(n_iterations):
-                solution_family = calculate_eigenstates(max_N,
-                        max_nodes=max_nodes,
-                        tol=tol,)
-
-                normalized_solution_family = normalize_eigenstate_family(solution_family)
-
-                rho = calculate_rho(normalized_solution_family)
-                if smoothing:
-                    rho = filter_rho(rho)
-                A0_induced = calculate_A0_induced(rho)
-
-                A0 = calculate_A0_total(A0_induced)
-                if plot and not i%3:
-                    plot_rho_A0_induced(rho, A0_induced(z), '--', color=color, alpha=0.5)
-                if not n: # For the first iteration
-                    print('n=0, max(A0_induced) =', max(A0_induced(z)))
-                
+            n = update_system_iterate(n_iterations, plot) # The number of iterations needed to converge
             if plot:
                 eigenvalues_array.append(solution_family["eigenvalues"])
                 lambda_array.append(lambda_value)
                 if not i%3:
                     plot_rho_A0_induced(rho, A0_induced(z), '', color=color, alpha=1)
 
+            print(f'n={n}, max(A0_induced) =', max(A0_induced(z)))
             if save:
                 solution_family["rho"] = rho
                 solution_family["A0_induced"] = A0_induced(z)
@@ -509,18 +733,17 @@ if __name__ == "__main__":
                     directory=directory,
                     )
 
-            print(f'n={n_iterations}, max(A0_induced) =', max(A0_induced(z)))
             A0 = calculate_A0_total(lambda z: (lambda_value + lambda_step)/lambda_value * A0_induced(z))
 
         except Exception as exception:
-            e = exception
+            ex = exception
             break
         except KeyboardInterrupt as exception:
-            e = exception
+            ex = exception
             break
 
     if plot:
         ax_eigenvalues.plot(lambda_array, eigenvalues_array, 'b')
         plt.show()
     
-    raise e
+    raise ex

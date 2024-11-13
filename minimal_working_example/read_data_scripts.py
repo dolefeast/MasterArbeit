@@ -2,6 +2,7 @@ import numpy as np
 from minimal_working_example import float_to_str, str_to_float
 import re
 from pathlib import Path
+from math import ceil
 
 float_re = re.compile("\d+_\d+")
 
@@ -26,7 +27,7 @@ def open_data_array(
 
 def get_lambda_value(filename):
     # Each filename has only the mass and lambda_value parameter
-    return str_to_float(float_re.findall(str(filename))[2])
+    return str_to_float(float_re.findall(str(filename.name))[2])
 
 def read_solutions_from_file(
         m,
@@ -62,12 +63,38 @@ def read_solutions_from_file(
 
     return solution_family
 
+def downsize_unread_solution_family(
+        posix_dict,
+        max_lambda_density,
+        ):
+
+    if max_lambda_density is None:
+        return posix_dict
+    lambda_value_array = posix_dict["lambda_value"]
+    lambda_density =   len(lambda_value_array) / (lambda_value_array[-1] - lambda_value_array[0])
+
+    if lambda_density < max_lambda_density:
+        # Do nothing if lambda_density is not too big,
+        # or max_lambda_density was None
+        return posix_dict
+    
+    # Now lambda_density > max_lambda_density
+    density_factor = lambda_density / max_lambda_density
+    # I want the len() of the arrays to be len(posix_dict) / density_factor
+    new_dict = {}
+    for key, value_array in posix_dict.items():
+        new_dict[key] = value_array[::ceil(density_factor)]
+    
+    return new_dict
+
+
 def get_Posix_for_quantities(
         m,
         a,
         directory="",
         sig_digs=3,
         bcs="dirichlet",
+        max_lambda_density=None,
         ):
 
     if directory != "":
@@ -101,6 +128,11 @@ def get_Posix_for_quantities(
             ]
 
     solution_family_dict["lambda_value"] = lambda_value_array
+
+    solution_family_dict = downsize_unread_solution_family(
+            solution_family_dict, 
+            max_lambda_density,
+            )
 
     return solution_family_dict
 
