@@ -1,0 +1,493 @@
+\chapter{Preliminaries}
+
+
+%\paragraph{Why this chapter?}
+%This chapter appears because in the following chapter I calculate the expression of the expectation value of the charge density through Hadamard point-split renormalization
+%
+%\paragraph{What is this chapter's end goal?}
+%Derive an expression for Hadamard point split renormalization.
+%
+%\paragraph{Why is Hadamard point split renormalization needed?}
+%Because we want to solve 
+%\begin{align}
+%	\partial_\nu F^{\mu\nu} = \left<j^\mu \right>_\omega
+%\end{align}
+%w.r.t. some state $\omega$, and the RHS of this equation is ill-defined due to the appearance of products of fields. Hadamard point splitting renormalization defines the expectation value of these terms in mathematically precise way, yielding finite values and assuring gauge invariance of the calculated expectation values.
+%
+%\paragraph{What do we need for this?}
+%\begin{enumerate}
+%	\item The phase space
+%		\begin{enumerate}
+%			\item Symplectic space and time evolution in the space.
+%			\item Isomorphism between phase space $\mathcal{M}$ and solution space  $\mathcal{S}$ .
+%			\item Classical observables $f\mathcal{C}^{\infty}_0 (S)$ form a vector space. Can be given algebraic structure via $ \{f, g\} = \Omega^{ab}\nabla_af\nabla_bg$
+%			\item Quantization of the phase space. Quantum observables are self-adjoint operators on $\mathcal{S}$. Quantization map $\,\hat{}:\mathcal{O}\to \hat{\mathcal{O}}$, such that for any pair of classical observables we have
+%			\begin{align}
+%				[\hat{f}, \hat{g}] = i \hat{\{f, g\} },
+%			\end{align}
+%			with $[\,,]$ the commutator and $\{\,,\} $ the Poisson bracket.
+%		\item Define observables through points in the manifold: $\forall y \in \mathcal{M}, \Omega(y, \cdot ) $ defines a (classical) observable on $\mathcal{M}$. Quantize by requiring 
+%		\begin{align}
+%		[\hat{\Omega}(y_1,\cdot ), \hat{\Omega}(y_2, \cdot )] = -i \Omega(y_1, y_2) I,
+%		\end{align}
+%		which is the usual quantization.
+%	\item Quantum theory of harmonic oscillators. Annihilation operator 
+%	\begin{align}
+%		a = \sqrt{\frac{\omega}{2}} q + \sqrt{\frac{1}{2\omega}} p
+%	\end{align}
+%		Its Heisenberg representation 
+%		\begin{align}
+%			a_H(t) = U_t^{-1}aU_t = e^{-i\omega t} a,
+%		\end{align} 
+%		leads to the Heisenberg representation of the position operator 
+%		\begin{align}
+%			q_H = \sqrt{\frac{1}{2\omega}}  (a_H + a_H^{\dagger}) = \sqrt{\frac{1}{2\omega}}  \left( e^{-i\omega t} a + e^{i\omega t} a^\dagger \right) .
+%		\end{align}
+%		The annihilation operator is the positive frequency part of the position operator.
+%		\end{enumerate}
+%	\item Define One-particle Hilbert spaces $\mathcal{H}\subset \mathcal{S}$ as the space of positive frequency solutions 
+%	\begin{align}
+%		q_i = \alpha_i e^{-i\omega_i t}.
+%	\end{align}
+%	 $\mathcal{H}$ is a Hilbert space (can define an inner product given by the symplectic form $(y_1, y_2) = -i \Omega(\overline{y_1}, y_2)$. Construct its (symmetric) Fock space $\mathcal{F}_s(\mathcal{H})$. Choose  the (normalized w.r.t. ( , )) solution to the classical EOM $\xi_i\in\mathcal{H}$ s.t. only the $i$-th oscillator is excited. Therefore define the q, p observables to be 
+%	 \begin{align}
+%	 	q_{iH}(t) =  \xi_i(t) a_i + \overline{\xi_i}(t) a^\dagger, p_{iH}  = \dot q_{iH}
+%	 \end{align}
+% \item Construct the negative frequency solution space as $\mathcal{\overline{H}}$. Define $K$ as the projector $K:\mathcal{S}\to \mathcal{H}$ (and consequently $\overline{K}:\mathcal{S}\to \mathcal{\overline{H}}$). 
+% \begin{align}
+% 	\forall y \in \mathcal{S}, \hat{\Omega}_H (y,\cdot ) := ia (\overline{Ky}) - ia^\dagger (Ky)
+% \end{align}
+%	\item Klein-Gordon in flat spacetime. Linearity of KG equation allows to study the system as infinite harmonic oscillators, decoupled. Define momentum through the lagrangian $\pi = \frac{\delta S}{\delta \dot\phi} = \dot \phi$. KG is initial value problem, define  $\mathcal{M}$ as the (compact) Cauchy data defined over a Cauchy surface $\Sigma_0$
+%	\begin{align}
+%		\mathcal{M} := \{ [\phi, \pi]  \in C_0^{\infty}(\Sigma)\times  C_0^\infty(\Sigma)  \} 
+%	\end{align}
+%	Every point in $\mathcal{M}$ defines a single solution to the KG equation. There is therefore a direct identification with the solution space  $\mathcal{S}$.
+%	The symplectic structure on  $\mathcal{S}$ 
+%	\begin{align}
+%		\Omega([\phi_1, \pi_1],[\phi_2, \pi_2]) = \int_{\Sigma}^{}  d^3x (\pi_1\phi_2 - \pi_2\phi_1).
+%	\end{align}
+%	\item Test functions. 
+%	Given any element $f\in C_0^{\infty} (M) = \mathcal{T}$ (in flat spacetime case, $M=\mathbb{R}^{4}$,) define its advanced and retarded propagators as 
+%	\begin{align}
+%		(\partial_a\partial^{a}-m^2) (Af) = f, \,
+%		(\partial_a\partial^{a}-m^2) (Rf) = f,
+%	\end{align}
+%	such that  $\text{supp}(Af) = J^{-}(\text{supp}(f))$, $\text{supp}(Rf) = J^{+}(\text{supp}(f))$. Define the causal propagator $Ef = Af-Rf$. $E:\mathcal{T}\to \mathcal{S}$ defines an onto, non degenerate map. Also verifies that 
+%	\begin{align}
+%		\int \psi f d^{4}x = \Omega(Ef, \psi), \forall \psi \in \mathcal{S}, f \in \mathcal{T}.
+%	\end{align}
+%	This allows one to define, for each $f\in \mathcal{T}$ the field as an averaging of the solution to KG weighted by $f$. 
+%	\begin{align}
+%		\hat{\phi}(f) = \hat{\Omega}(Ef, \cdot ) = ia(\overline{K(Ef)} - ia^\dagger (K(Ef))
+%	\end{align}
+%	is then to be understood as the weighted spacetime average of the field operator representing the field at spacetime point $x$.
+%	$ \overline{\phi}$ is an operator-valued distribution, and solves the KG equation in the distributional sense ,
+%	\begin{align}
+%	KG \hat{\phi}(f) = 	\hat{\phi}(KG(f)) = \hat{\Omega}(E(KG(f)), \cdot  ) = 0
+%	\end{align}
+%Choosing the vacuum state as that which verifies $a_{\textbf{k}}\ket{0}=0$  for all $\textbf{k}$, then the vacuum two point function is defined as 
+%\begin{align}
+%	w(f, g) = \vacuum{\hat{\phi}(f) \hat{\phi}(g) }.
+%\end{align}
+%With the definition of the field being averaged weighted by $f$, then 
+%\begin{align}
+%	w(f, g) &= \vacuum{\int_{M}^{} \phi(x) f(x) d^{4}x  \int_{M}^{}  \phi(y)g(y)d^4y  } \\
+%		&= \int_{M\times M}^{}  \vacuum{\phi(x) \phi(y)} f(x)f(y) d^{4} xd^{4} y.
+%\end{align}
+%This expression defines the distributional notation 
+%\begin{align}
+%	w(x, y)  = \vacuum{\phi(x) \phi(y)},
+%\end{align}
+%so that two point functions can be understood as a bi-solution to the Klein-Gordon equation.
+%	\item We are interested in calculating the charge current density  of the Klein-Gordon field
+%	\begin{align}
+%		j^{\mu} = ie \left( (D^\mu \phi)^* \phi - \phi^* D^{\mu}\phi \right) .
+%	\end{align}
+%	This observable contains products of fields, whose distributional nature automatically makes its expectation value ill-defined. To calculate this quantity, it needs to be redefined.
+%
+%	In attempting to directly calculate this expectation value, one finds that the terms containing $a a^{\dagger}$ in the mode expansion of the 'field' $\phi^2$ yield a diverging expectation value, with all other terms vanishing (in a real field. In a complex field the $b b^\dagger$ will also contribute to an infinite expectation value.) In QFT in flat spacetime one proceeds by 'normal ordering' i.e. by moving the creation operators to the right and the annihilation operators to the left, or more precisely by defining $ \left< :a a^\dagger: \right>_\omega = \left< a^\dagger a \right>_\omega$. Notice how this prescription implies (in the abscence of external electric fields)
+%	\begin{align}
+%		\vacuum{:j^{\mu}:} = 0,	
+%	\end{align}
+%	as one would expect.
+%
+%	Evaluating $ \left<\phi(x)^2 \right>_\omega$ for a state $\omega$ is problematic, but the two point function is well defined as a bi-solution to the Klein-Gordon equation. This distribution will not be smooth in the limit $x'\to x$, but with suitably chosen states the difference
+%	\begin{align}
+%		F(x, y) = \left<\phi(x)\phi(y) \right>_\omega - \vacuum{\phi(x)\phi(y)}
+%	\end{align}
+%	is.
+%	We therefore define the expectation value of terms quadratic in the field through a point-splitting procedure 
+%	\begin{align}
+%\left<\phi^*(x)\phi(x) \right> = \lim_{x' \to x} F(x, x').
+%	\end{align}
+%
+%	This definition can be extended through linearity to our quantity of interest 
+%	\begin{align}
+%		\left<j^\mu \right>_\omega := \frac{ie}{2}\lim_{x' \to x}  \left( D^*_\mu F(x, x') - D'_\mu F(x, x') \right) ,
+%	\end{align}
+%	with $D_\mu^* = \partial_\mu - ieA_\mu$ and $D'$ the derivative over primed variables. $j^{\mu}$ should be parallely transported with respect to the gauge covariant derivative.
+%
+%	This prescription coincides with the normal ordering prescription on flat spacetimes with no background electromagnetic field, but considering curved spacetimes or background electromagnetic fields (i.e. connections over $U(1)$ with curvature) takes away having a preferred choice of a vacuum state, and therefore defining these expectation values through the vacuum state as above becomes problematic. Even when the vacuum state can be defined, we do not expect  
+%	\begin{align}
+%		\vacuum{j_\mu} = 0
+%	\end{align}
+%	with a non zero background electromagnetic background.
+%
+%	The prescription above, however, defines the difference of these expectation values between states. In this sense, the difference 
+%	\begin{align}
+%		\left<j_\mu \right>_1 -
+%		\left<j_\mu \right>_2 
+%	\end{align} is smooth for two states $\omega_1, \omega_2$.
+%
+%	We can develop this idea to come up with a formal definition of the difference between expectation values on different states. To this end, we list some the properties that we expect from $ \left<j_\mu \right>$. The full list can be found in \cite{Wald1994}. 
+%	\begin{enumerate}
+%		\item The difference between states $ \left<j_\mu \right>_1 - \left<j_\mu \right>_2$ to be smooth whenever the difference $\left<\phi(x)\phi(x') \right>_1- \left<\phi(x)\phi(x') \right>_2$ is a smooth function.
+%		\item  $D_\mu\left<j^\mu \right>_\omega=0$ for any state $\omega$,
+%		\item $\vacuum{j_\mu}  = 0$ in flat spacetime with no background electromagnetic field.
+%	\end{enumerate}
+%
+%From property (a), two different definitions of the expectation value $\left<j_\mu \right>_\omega$, $\left<\overline{j}_\mu \right>_\omega$ must obey 
+%\begin{align}
+%	\left<j_\mu \right>_1-
+%	\left<j_\mu \right>_2 = 
+%	\left<\overline{j}_\mu \right>_1-
+%	\left<\overline{j}_\mu \right>_2,
+%\end{align}
+%and therefore the quantity  $\mathcal{J}_\mu = \left<j_\mu \right>_1-\left<\overline{j}_\mu \right>_1$ is independent of the state considered. This, with a certain additional property of the expectation value $\left<j_\mu \right>_\omega$ implies that $\mathcal{J}_\mu(x)$ is only dependent locally. Finally, (b) imply that  $\mathcal{J}_\mu$  is conserved and (c) that for no background electromagnetic field, $\mathcal{J}_\mu=0$. 
+%
+%The prescription for $\left<j_\mu \right>_\omega$ can be shown to be unique up to local background field terms, but not necessarily existent. The prescription can be built from "point-splitting" so that for any $\left<\phi(x)\phi(x') \right>$ a bi-solution to the Klein-Gordon equation $H(x, x')$ is subtracted. Through this prescription, $\left<j_\mu \right>_\omega$ obeys the required properties, as long as $H(x, x')$ exists. A proof of the uniqueness of the definition of non linear observables can be found in \cite{1977Wald}.
+%
+%We choose an ansatz for $H(x, x')$ such that it shares a singularity structurure with vacuum two point function of the scalar field on flat (even) $n$ dimensional spacetime with no background electromagnetic field, up to smooth coefficients $V_k$
+%\begin{align}
+%	H(x, x') = \sum_{k}^{\infty} V_kT_k + W(x, x'),
+%\end{align}
+%with 
+%\begin{align}
+%	T_k = 
+%	\begin{cases}
+%		\frac{( \frac{n}{2} - 2 - k)!}{2 (2\pi)^{n/2} }\sigma_\varepsilon ^{- (\frac{n}{2}-1-k)} & k \leq \frac{n}{2}-2 \\
+%	-\frac{1}{2 (2\pi)^{n/2} ( k-\frac{n}{2}+1) }(-\sigma) ^{-k - \frac{n}{2} + 1}\log\left(\sigma_\varepsilon  \right)  & k > \frac{n}{2} - 2,
+%	\end{cases}
+%\end{align}
+%where $\sigma(x, x')$ is the geodesic distance from $x$ to $x'$ (which in Minkowski spacetime corresponds to  
+%$
+%	\sigma(x, x') = (x - x')^2,
+%	$
+%	and 
+%	\begin{align}
+%		\sigma_\varepsilon = \sigma + 2i\varepsilon(t-t') + \varepsilon ^2.
+%	\end{align}
+%	$t, t'$ are the time coordinates of $x, x'$ given by an appropiate choice of a time coordinate function. It is also understood that the limit $\varepsilon \to 0^+$ should be taken after applying this to test functions.
+%	The coefficients $V_k$ and the function $W$ are to be obtained by solving $\mathcal{K} H(x, x)=0$. This equation gives an ordinary differential equations for each of the $V_k$ that should be solved with the initial condition $V_0(x, x')=1$, and integrated along the geodesics (straight lines) joining $x$ and $x'$.
+%
+%	With a working prescription of the expectation value of non-linear terms on the field, we can finally formally define 
+%	\begin{align}
+%		\left<D_\alpha D^*_\beta \phi(x) \phi^*(x) \right> :=  \lim_{x' \to x} D_\alpha D'^*_\beta \left( \left<\phi(x) \phi^*(x')  \right> - H(x,x') \right),
+%	\end{align}
+%	with $\alpha, \beta$ symmetrized multiindices.
+%
+%
+%
+%\end{enumerate}
+
+
+%The back-reaction of a field generally appears in the context of the semiclassical approach to quantum field theory. This considers a classical background, and the coupling of a quantum field to said background through the expectation value of the charge current defined by the dynamical law considered. The typical case of study of the back-reaction problem is semiclassical gravity, i.e. the coupling of a scalar field $\phi$ to a classical background spacetime metric. This is mediated by semiclassical Einstein equations
+%\begin{align}
+%	\begin{split}
+%		G_{\mu\nu}&= 8 \pi \left<T_{\mu\nu} \right>,\\
+%		%R_{\mu\nu} - \frac{1}{2}R g_{\mu\nu} - \Lambda g_{\mu\nu} &= 8 \pi T_{\mu\nu} ,\\
+%		T_{\mu \nu } &=  \nabla _{\mu} \phi ^* \nabla _{\nu}\phi - \frac{1}{2}g_{\mu\nu} \left( \nabla _{\beta}\phi^*\nabla ^{\beta}\phi + m^2 \phi^*\phi\right).
+%	\end{split}
+%	\label{eq:semiclassical-gravity}
+%\end{align}
+%In this thesis we study however semiclassical electrodynamics, i.e. the coupling of the scalar field to a background classical electromagnetic field, mediated by the semiclassical Maxwell equations
+%\begin{align}
+%	\begin{split}
+%		\partial_\nu F^{ \mu\nu}&=   \left<j ^ \mu \right>,\\
+%		j^\mu &=ie \left( ( D^{\mu} \phi)^{*} \phi- \phi^{*}D^\mu \phi \right) .
+%	\end{split}
+%	\label{eq:semiclassical-electrodynamics}
+%\end{align}
+%The fields are to be seen as distributions smeared over test functions. This implies that these expectation values are ill-defined, as they involve evaluating a pointwise product of distributions. The expectation values of these operator fields need to be therefore redefined.
+%
+%The following chapter presents basic theory, context and techniques from QFTCS that are going to be used in following chapters to calculate the quantities defined above, and it is not meant as an instructive text. A more detailed introduction to these topics can be found in \cite{QFTCS, Wald1994}. Eventhough the techniques developed in the mentioned texts present a very different physical context to the one of interest for this thesis (semiclassical gravity is a QFT on a curved spacetime, where as semiclassical electrodynamics studies QFT under a curved connection in the $U(1)$ bundle over flat spacetime,) the mathematical framework developed can still be used under the substitution of the metric covariant derivative $ \nabla _\mu$ with the gauge covariant derivative $D_\mu$.
+%
+%AQFT differs from the usual construction of QFTCS in that instead of constructing an operator algebra from the Hilbert space, one begins from an observable algebra $\mathcal{A}$ and a state $\omega: \mathcal{A}\to \mathbb{C}$, and constructs a Hilbert space from these two objects. These approach presents the advantages of taking a more general perspective, which allows one to circumvent certain problems QFTCS presents, such as unitary inequivalence of representations of the same quantum field theory (with some techni
+
+%Eventhough the physical contexts for semiclassical gravity and semiclassical electrodynamics are mediated by very different physical laws, the mathematical framework for these two problems allows for the utilisation of the results from \cite{QFTCS, Wald1994} to our study of the Klein-Gordon-Maxwell equations. The similarities lie in the substitution of the metric covariant derivative $\nabla_\mu$ with the gauge covariant derivative $D_\mu$, and its consequences, such as parallel transport being defined through its corresponding covariant derivative.
+
+%\section{The quantization of the phase space}
+%
+%The configuration space $\mathcal{Q}$ of a classical system with $n$ degrees of freedom is an $n$ dimensional manifold which as the name implies, collects all possible configurations of the system. Given $\mathcal{Q}$, its phase space $\mathcal{P}$ will be a $2n$ dimensional manifold, and it can be constructed as the cotangent bundle $T^*\mathcal{Q}$, i.e. each $q \in\mathcal{Q}$ and its attached cotangent space $T^*_q \mathcal{Q}$. 
+%
+%With the definition of a Hamiltonian function $H$ over the phase space $\mathcal{P}$, dynamical evolution is given by Hamilton's equations (assuming coordinates $q_i$ for $q\in\mathcal{Q}$ and $p_i$ for  $p\in T^*_q \mathcal{Q}$)
+%\begin{align}
+%	\dot q_i &= \frac{\partial H}{\partial p_i} \\
+%	\dot p_i &= -\frac{\partial H}{\partial q_i}
+%\end{align}
+%where a dot denotes time derivative. This can be written more succintly as 
+%\begin{align}
+%	\dot y = \Omega^{} \frac{\partial H}{\partial y},
+%\end{align}
+%with \note{canonical coordinates} $y=(q_1, \ldots, q_n, p_1,  \ldots p_n) \in \mathcal{P}$ and
+%\begin{align}
+%	\Omega^{ji}  = \begin{pmatrix} 0 & I_n \\ -I_n& 0  \end{pmatrix}.
+%\end{align} 
+%
+%This can be formulated in the more general language of Hamiltonian mechanics, in which the essential mathematical structure needed is given by the phase space $\mathcal{P}$ and a symplectic form $\Omega_{ab}$, i.e. nondegenerate, closed, 2-form on $\mathcal{P}$. The symplectic form $\Omega_{ab}$ presents an inverse symplectic form $\Omega^{ab}$,  which satisfies $\Omega_{ab}\Omega^{bc} = \delta_a^c$. The Hamiltonian function $H: \mathcal{P} \to \mathbb{R}$ dictates the dynamical evolution of the system, as the integral curves of the vector field 
+%\begin{align}
+%	h^{a} = \Omega^{ab}\nabla_b H.
+%\end{align}
+%This allows us to identify the solution space $\mathcal{S}$ of the equations of motion, i.e. each point $y \in \mathcal{P}$  gives rise to a solution $y(t)\in \mathcal{S}$ of the dynamical equations of motion such that $y(0) = y$.
+%
+%Classical observables  are defined as real valued functions over the phase space. The set of observables presents an (infinite dimensional) vector space structure, and it can be given an algebraic structure through the Poisson bracket 
+%\begin{align}
+%	\{f, g\} = \Omega^{ab}\nabla_a f \nabla_b g.
+%\end{align}
+%The Poisson bracket presents the usual results 
+%\begin{align}
+%	\{q_{\mu}, q_{\nu}\}   =
+%	\{p_{\mu}, p_{\nu}\}   = 0 \\
+%	\{q_{\mu}, p_{\nu}\}   = \delta_{\mu\nu} 
+%\end{align} 
+
+
+
+%By assuming the ansatz 
+%equation \eqref{eq:TDKGE} turns into 
+%\begin{align}
+%	\left( -(\omega_n - eA_0)^2 + D_iD^i + m^2 \right) \phi_n(\textbf{x}) =   0
+%\end{align}
+%
+%\begin{align}
+%	 \mathcal{F}(\mathcal{H}) = \oplus_{n=0}^\infty \mathcal{H}^{\otimes n}
+%\end{align}
+
+\section{Constructing the quantum field theory}
+
+The free Klein-Gordon equation for a complex field $\phi$ in two spacetime dimensions is
+\begin{align}
+	(D_\mu D^{\mu} + m^2)\phi = 0,
+	\label{eq:Klein-Gordon}
+	%\partial_\nu F^{\nu\mu} &= \left<j^{\mu} \right>.
+\end{align}
+with $D_\mu = \partial_\mu +i e A_\mu$ the gauge covariant derivative, and $D^\mu = \eta^{\mu\nu}D_\nu$, with $\eta$ the 2-dimensional Minkowski metric.
+
+The general solution to equation \eqref{eq:Klein-Gordon} is 
+\begin{align}
+	\phi(t, x) = \sum_{n>0}^{} a_n \phi_n (x) e^{-i\Omega_n t}
++\sum_{n<0}^{} b^*_n \phi_n (x) e^{-i\Omega_n t},
+\end{align}
+with $a_n, b_n$ complex coefficients depending on $n $, and $\phi_n$ solutions to
+\begin{align}
+	\left[ \left( \Omega_n - eA_0 \right)^2 - \partial_1^2 + m^2  \right] \phi_n = 0,
+\end{align}
+where the $\Omega_n$ are gauge dependent energy parameters that are calculated when applying the boundary conditions $\phi$ is subjected to.
+
+The associated canonical momentum is calculated as
+\begin{align}
+	\pi(x) = D_0^*\phi^*= i\sum_{n>0}^{} a^*_n(\Omega_n - eA_0)\phi^*(x) e^{i\Omega_n t}
++ i\sum_{n<0}^{} b_n(\Omega_n - eA_0)\phi^*(x) e^{i\Omega_n t},
+\end{align}
+and the results are equivalent to the field $\phi^*$.
+
+We quantize the field $\phi(x)$ by imposing the same time commutation relation  
+\begin{align}
+	[\phi(t, x), \pi(t, y)] = 
+	[\phi^*(t, x), \pi^*(t, y)] = i \delta(x-y)
+\end{align}
+The quantization of the fields implies the promotion of the $a_n$, $b_n$ numbers into operators, and $a_n^*\to a_n^\dagger$. Due to the canonical commutation relations,
+\begin{align}
+	[a_n, a_m^\dagger] = [b_n, b_m^\dagger]= \delta_{nm},
+\end{align}
+and the annihiliation operators $a_n$, $b_n$ can be written as 
+\begin{align}
+	a_n = e^{-i\Omega_n t}\sum_{n>0}^{} a_n z^n
+\end{align}
+
+
+When solved with compactly supported Cauchy data $\left(\left. \phi\right|_\Sigma, \left. n^{\mu}D_\mu\phi \right|_\Sigma\right)$, with $\Sigma$ a space-like hypersurface (typically a constant-$t$ surface) and $n$ a unit vector orthogonal to $\Sigma$, the global hyperbolicity of Minkowski spacetime ensures that this problem is well posed.
+		The collection of all possible smooth $\phi$ with compactly supported Cauchy data forms the configuration space $\mathcal{C}$. From $\mathcal{C}$ one constructs the phase space $\mathcal{P} = T^*\mathcal{C}$, as its cotangent space. The elements of $\mathcal{P}$ are the points $(\phi, \pi)$, with $\pi=D_0^*\phi^*$ the canonical conjugate of the field $\phi$. Points in the phase space correspond to initial conditions for the Klein-Gordon equation on the Cauchy surface $\Sigma.$
+		$\mathcal{P}$ can be endowed with symplectic structure with the symplectic\footnote{Bilinear, antisymmetric} form
+		\begin{align}
+			\sigma((\phi_1, \pi_1), (\phi_2, \pi_2)) = i \int_\Sigma \left( \pi_1^* \phi_2^*- \pi_2\phi_1 \right) d\Sigma.
+		\end{align}
+		It is not difficult to prove that $\sigma$ is a time evolution invariant if $\phi_1$, $\phi_2$ are solutions to the Klein-Gordon equation, as long as they are compactly supprted. \note{Prove this? In appendix?}
+	
+The solution space  $\mathcal{S}$ is the space of all smooth solutions to the Klein-Gordon equation. As the initial data fully determines a solution to the Klein-Gordon equation, each solution corresponds to a point in phase space and therefore $\mathcal{S}$ can be identified with $\mathcal{P}$.
+$\mathcal{S}$ can be given Hilbert space structure as follows: 
+\begin{enumerate}
+	\item Define the subspace $\mathcal{S}_+$ of positive frequency solutions. In this subspace the symplectic product can be made positive definite.
+	\item Define a Hermitian inner product in this subspace 
+	\begin{align}
+		(\phi_1, \phi_2) = i\sigma(\phi_1^*, \phi_2), \,\,\, \phi_1, \phi_2 \in S_{+}
+	\end{align}
+\item Complete $\mathcal{S}_+$ with respect to this norm. \note{How to go from this to the whole $\mathcal{S}$?}
+\end{enumerate}
+	
+
+In classical mechanics, observables are the compactly supported functions \linebreak $f: \mathcal{S}\rightarrow \mathbb{C}$. They can be equipped with an algebra structure via the Poisson brackets, 
+\begin{align}
+\{f, g\}  := \int_{\Sigma}^{}  \left( \frac{\delta f}{\delta \phi} \frac{\delta g}{\delta \pi} - \frac{\delta g}{\delta \phi} \frac{\delta f}{\delta \pi}  \right) d\Sigma.
+\end{align}
+
+First quantisation is done by the\, $\hat{}$\, operator, which elevates classical observables $f$ to operators $\hat{f}$ on the $\mathcal{S}$ obeying the algebraic rule 
+\begin{align}
+	[ \hat{f}, \hat{g} ] = i \hat{\{f, g\} },
+\end{align}
+with $ \hat{\{f, g\} }$ the quantized version of the Poisson bracket.
+
+The field observables are defined with respect to smooth compactly supported test functions $f$
+\begin{align}
+	\phi(f) = a(f)e^{-i\omega t} + a^\dagger(\overline{f}) e^{i\omega t},
+\end{align}
+where the $a$ and $a^\dagger$ operators are defined the same way the are constructed in the quantum harmonic oscillator problem. 
+
+The measured observables of the field in a state $\Omega \in \mathcal{F}(\mathcal{S)}$ are therefore the expectation value $ \bra{\Omega} \phi(f) \ket{\Omega}$.
+Through $\phi(f)$ one can define the field as the weighted average by the test function $f$ of the spacetime distribution $\phi(x)$ through 
+\begin{align}
+	\phi (f) = \int_{\mathbb{R}^{n}}^{} \phi(x) f(x) d^{n}x,
+\end{align}
+with $\phi(x)$ an operator valued distribution.
+This also formally defines the two-point function as the distributional kernel of
+\begin{align}
+	w^{\phi\phi^*}_\Omega(f, h) 
+	= \bra{\Omega} \phi(f)\phi^*(g) \ket{\Omega}  
+	= \int_{\mathcal{M}\times \mathcal{M}}  f(x) g(x') w^{\phi\phi^*}_\Omega(x, x') dx dx'.
+	\label{eq:two-point-function-formal-definition}
+\end{align}
+
+
+\section{Hadamard two point functions and point-split renormalization}
+\label{sec:Hadamard}
+The above mentioned construction of QFT is incomplete in the sense that it fails to describe the product of fields at same spacetime points. In particular, we are interested in calculating the following expression
+\begin{align}
+	\rho(x) = \left<\hat{\rho}(x) \right>_\Omega= ie\bra{\Omega} \phi(x)^* D_0\phi(x) - \phi(x) D_0^* \phi(x)^* \ket{\Omega},
+	\label{eq:rho-expectation-value}
+\end{align}
+wich is a priori ill-defined and needs to be renormalized.
+
+The direct evaluation of \eqref{eq:rho-expectation-value} is divergent, even for the vacuum, due to the terms $a_n a^\dagger_n$, $b_n b_n^\dagger$ found in the mode expansion of the product of the fields \note{Mention the mode expansion here?}. The usual procedure in Relativistic Quantum Field Theory is to define $\left<\rho(x) \right>_\Omega$ through normal ordering,
+\begin{align}
+	\left<:\hat{\rho}(x) :\right>_\Omega:= \bra{\Omega} \hat{\rho}(x) \ket{\Omega} - \bra{0} \hat{\rho}(x) \ket{0},
+\end{align}
+which defines the expectation values with respect to the vacuum state, or the zero-point value.
+
+The normal ordering of an observable $\mathcal{O}(\phi) \rightarrow :\mathcal{O}(\phi):$ is a crucial tool in Quantum Field Theory in the absence of background electromagnetic fields, when defining products of field operators at coinciding points. This prescription presents the key property $ \left< :\mathcal{O}(\phi): \right>_0 = 0$, which is not an expected behaviour for the vacuum in the pressence of background electric fields. This prescription also presents the flaw of defining the expectation values using the vacuum as a reference point. In the pressence of more general electromagnetic fields, the definition of a vacuum state lacks uniqueness, rendering the normal ordering prescription for more general backgrounds invalid. Using this prescription also fails at correctly describing the Casimir effect, as it appears purely due to the boundaries, which are not seen in the normal ordering.
+
+In the context of Quantum Field Theory on Curved Spacetimes, these difficulties are circumvented by the following observations
+\begin{enumerate}
+	\item Even though the expectation value $ \bra{\Omega} \phi(x)\phi^*(x) \ket{\Omega} $ is ill-defined, the two point function \eqref{eq:two-point-function-formal-definition} 
+	is a well defined bi-distribution, bi-solution to the field equation, divergent as $x' \to x$.
+	\item In the normal ordering prescription, the divergences that appear when evaluating expectation values are defined through difference of expectation values between different states. There exists a class of states for which their difference in the expectation values is also well-defined.
+\end{enumerate}
+
+These results, appearing in the study of QFTCS, will still be useful to our case. There is some parallelism to be drawn between electromagnetism and gravitation. In General Relativity, the Levi-Civita connection gives rise to the Christoffel symbols that make the covariant derivative $\nabla_\mu = \partial_\mu + \Gamma^\nu_{\mu\rho}$ covariant. The dynamical equation is an equation on the curvature of the connection, $R_{\mu\nu}$. Similarly, in the case of electrodynamics, the connection over the $U(1)$ fiber bundle gives rise to the covariant derivative $D_\mu + ie A_\mu $, and the dynamical question of interest is Maxwell's equations, $\partial_\mu F^{\mu\nu}=j^{\nu}$, with $F^{\mu\nu}$ the curvature of the connection. For our specific case, we are mostly interested in the parallelism in between $\nabla_\mu$ and $D_\mu$.
+
+We are particularly interested in the class of Hadamard states, states which have the same divergence \note{Not actually the same divergence structure, since the parallel transport is what gives the very relevant gauge invariance} structure as the vacuum state of the Klein-Gordon field in the absence of background electromagnetic fields,
+\begin{align}
+	w_\Omega^{\phi \phi^*}(x, x') = H^{\phi\phi^*}(x, x') + R_\Omega^{\phi^\phi^*}(x, x'),
+\end{align}
+with $H^{\phi \phi^*}$ the Hadamard parametrix, a divergent bi-distribution independent of the state $\Omega$, resembling the behaviour of the vacuum two-point function in absence of external fields, up to smooth coefficients, and $R_\Omega^{\phi\phi^*}$ a smooth function which does depend on the state.
+
+The Hadamard parametrix in general takes the form
+\begin{align}
+H^{\phi\phi^*} = \sum_{k=0}^{N} V_k(x, x') T_k(x, x')
+\end{align}
+with $V_k(x, x')$ smooth coefficients, and in $n=2$ dimensions,
+\begin{align}
+	T_k(x,x') = 
+	-\frac{1}{ 4\pi k!} \left( -\sigma \right) ^{  -k} \log \frac{\sigma_\varepsilon}{\Lambda^2}  
+\end{align}
+with  
+\begin{align}
+	\sigma(x, x') = \frac{1}{2}(x-x')^2, \, \sigma_\varepsilon = \sigma + i\varepsilon \text{sign} (x_{0}'-x_0).
+\end{align}
+It is important to note that the Hadamard parametrix is constructed entirely by geometrical means and is independent of the state. 
+
+To find the $V_k( x, x')$ and $W(x, x')$  functions, one imposes that $w(x, x')$ is a bi-solution to the Klein-Gordon equation, i.e. 
+\begin{align}
+	(D_\mu D^\mu  + m^2)w^{\phi \phi^*}_\Omega(x, x') = ( D^*'_\mu D^*'^{\mu} + m^2)w(x, x') = 0,
+\end{align}
+with $D'^*_\mu = \partial'_\mu - ieA_\mu(x')$ acting on  $x'$.
+With this imposition, one finds a sequence of differential equations, which together with the initial conditions $\lim_{x' \to x} V_0(x, x') = 1$ leads to the family $V_k$ of solutions.
+
+Once $H^{\phi \phi^*}$ is known, one can define the expectation value of fields at coinciding points through point-splitting with respect to the Hadamard parametrix, 
+\begin{align}
+	\left<D_\alpha \phi(x)D^*_\beta \phi^*(x) \right>_\Omega = \lim_{x' \to x} D_\alpha D_\beta^* ' \left( w^{\phi\phi^*}_\Omega(x, x') - H^{\phi \phi^*}(x, x') \right) .
+	\label{eq:point-splitting-wrt-a-Hadamard-parametrix}
+\end{align}
+Due to the Hadamard form of the two-point function, in the limit of coinciding points, the divergences cancel out, resulting in a well-defined expectation value.
+%\textbf{Requirements}: The GNS construction, the definition of state.
+%
+%Given an algebra of observables $\mathcal{A}$, an algebraic state $\omega$ is defined as the linear map $\omega: \mathcal{A} \to \mathbb{C}$ which obeys (certain properties: unitarity, positive definite, some more).  Given two elements $f, h$ of the phase space, the two point function of a state is defined as 
+%\begin{align}
+%	w(f, h) = \omega(\sigma_f \sigma_h).
+%\end{align} 
+%One can also define the kernel $w(x, x')$ of the two point function (which will also be called the two point function) through 
+%\begin{align}
+%w(f, h) = \int_{\mathcal{M} \times \mathcal{M}}^{} w(x, x') f(x) g(x') dx dx'
+%\end{align}
+%
+%\newpage
+%\section{The basic idea}
+%
+%\note{This is the basic idea. A lot of concepts need to be introduced before this.}
+%
+%\ldots therefore fields are to be understood as smeared operators over some test function, as
+%\begin{align}
+%	\phi(f) = \int_{\mathcal{M} }^{}  \phi(x) f(x) dx.
+%\end{align} 
+%
+%\newpage
+% 
+%\section{Things that might be useful in this chapter}
+%
+%The quantities involved in the currents $T_{\mu \nu}$ or $j^\mu$ are all of the form 
+%\begin{align}
+%	\left(
+%	D_\alpha \phi
+%	\right) ^* D_\beta \phi,
+%\end{align}
+%with $\alpha, \beta$ two symmetrized multiindices. Terms with more derivatives are `more singular'.
+%
+%To calculate the expectation value of this operator, we begin by assuming as Dirac did \cite{Dirac1934}, that all physically relevant states are Hadamard. Namely that their two point functions with respect to a state $\Omega$
+%\begin{align}
+%	w^{\phi \phi^*}_\Omega(x, x') = \bra{\Omega}\phi(x) \phi^*(x')\ket{\Omega}
+%\end{align}
+%have the same singularity structure with $x' \to x$ as it would on a flat background.  More precisely, this two point function can be written in the form
+%\begin{align}
+%	w^{\phi \phi^*}_\Omega(x, x') = H^{\phi \phi^*}(x, x')+ R_\Omega^{\phi \phi^*}(x, x'),
+%\end{align}
+%with $H^{\phi \phi ^*}$ the Hadamard parametrix, and $R_\Omega ^{\phi\phi^*}$ a smooth function as $x' \to x$.  The Hadamard parametrix is singular as $x' \to x$, and it is state independent
+%\footnote{Conversation with Rishabh (19/7/24): An incorrect renormalization scheme induces gauge dependent results, as what we are interested in is the $R_\Omega^{\phi\phi^*}$. Note that assuming Hadamard states, the gauge dependence of both $\omega_\Omega$ and $H$ cancels out when substracted.}.
+%
+%The assumption of the state being Hadamard allows us to define the expectation value of the quadratic expression of interest following a point-splitting scheme, i.e. splitting the point at which we want to evaluate the expectation value, and taking the limit of coinciding points,
+%\begin{align}
+%	\bra{\Omega} D_\alpha\phi(x)(D_\beta\phi)^*(x)\ket{\Omega} :=
+%	\lim_{x'\to x }\left[ D_\alpha D'_\beta^*\left( 
+%	w^{\phi \phi^*}_\Omega(x, x') - H^{\phi \phi^*}(x, x')
+%	\right)  \right].
+%	\label{eq:point-split}
+%\end{align}
+% $\alpha, \beta$ are symmetrized multiindices and $D'_\mu^* = \partial'_\mu - ieA_\mu$ the application of the covariant derivative on $x'$.
+%Substracting the state independent singular part of the Hadamard parametrix from the two point function yields the evaluation of the regular function $R_\Omega^{\phi \phi^*}$.
+%
+%For the massless case \note{Still need to calculate the leading order expansion for the massive case}, the Hadamard parametrix is
+%\begin{align}
+%	H^{\phi \phi^*}(x, x') = U(x, x') \log \left( - (x - x')^2 + i\epsilon (x - x')^{0} \right) ,
+%\end{align}
+%with $U(x, x')$ a smooth function given by the parallel transport with respect to the gauge covariant derivative 
+%\begin{align}
+%	U(x, x') = \exp(-ie  \int_{0}^{1} A_\mu (x' + s(x -x')) (x-x')^{\mu}ds).
+%\end{align}
+%\note{check definitions}
+%\section{The algebra of observables}
+%
+%\section{The GNS theorem}
+%
+%\section{Operator valued distributions and two point functions}
+%
+%\section{Hadamard states}
+%
+%\section{Point-Split renormalization}

@@ -1,0 +1,71 @@
+\begin{frame}{The external field approximation -- Perturbation theory}
+\uncover<1->{
+	We want to turn the problem into a Schrödinger-like equation
+	\begin{align}
+		i\partial_t \ket{\Psi} = H\ket{\Psi}, 
+		\text{with} \ket{\Psi} = \begin{pmatrix} \phi \\ \pi^* \end{pmatrix}, \,\text{and}\, \pi^* = D_0\phi
+	\end{align}
+}
+
+\uncover<2->{
+	The corresponding Hamiltonian would be 
+	\begin{align}
+		H = \underbrace{i \begin{pmatrix} 0 & 1 \\
+		D_1^2 -m^2 & 0 
+	\end{pmatrix}}_{H_0}+
+	\underbrace{			\begin{pmatrix} eA_0 & 0 \\
+				0 & eA_0
+		\end{pmatrix}}_{H_1}.
+	\end{align}
+}
+\uncover<3->{
+Which is hermitean w.r.t. 
+\begin{align}
+	\bra{\Psi_1}\ket{\Psi_2} = i \int_{0}^{1} dz \left( \phi_1^{*}\pi_2^* -  \pi_{1} \phi_2 \right)  
+\end{align}
+}
+\end{frame}
+
+\begin{frame}{The external field approximation -- Perturbation theory}
+	\uncover<1->{
+		Eigenstates for $H_0$ given by 
+		\begin{align}
+			\omega_n = \text{sgn}(n) \sqrt{m^2 + n^2 \pi^2} , \hspace{0.5cm} \phi_n(z) = \frac{1}{\sqrt{\omega_n} } \sin(n\pi z)
+		\end{align}
+	}
+	\uncover<2->{
+		Calculate the first order corrections 
+	    \begin{align}
+	    	\omega_n ^{(1)} &= \frac{\bra{\Psi_n^{(0)}}\ket{H_1\Psi_n^{(0)}}}{\bra{\Psi_n^{(0)}}\ket{\Psi_n^{(0)}}} \\
+	    	\ket{\Psi_n ^{(1)}} &= \sum_{k\neq n}^{} 
+	    	\frac{
+	    		1
+	    	}
+	    	{
+	    	\bra{\Psi_n^{(0)}}\ket{\Psi_n^{(0)}}
+	    	}
+	    	\frac{
+	    	\bra{\Psi_k^{(0)}}\ket{H_1\Psi_n^{(0)}}
+	    	}{
+	    	\omega_n ^{0} - \omega_k^{(0)}
+	    	} \ket{\Psi_k^{(0)}}
+	    \end{align}
+	}
+	
+\end{frame}
+\begin{frame}{The external field approximation -- Perturbation theory}
+	\uncover<1->{
+		Corrections to first order in $\lambda$
+	\begin{align}
+		\omega_n &= \text{sgn(n)}\sqrt{m^2 + n^2\pi^2}  \\
+		\begin{split}
+			\phi_n^{D} &= \left( m^2 + \pi^2  n^2 \right)^{-\frac{1}{2}} \left[ \sin\pi n z \right.\\
+				   &\left.+ \lambda \frac{\sqrt{m^2 + \pi^2 n^2} }{2 \pi \lvert n \rvert} 
+				\left( 
+				\frac{1}{\pi n}\left( \frac{1}{2} - z \right) \sin \pi n z - z(1-z) \cos \pi n z \right) 
+			\right] 
+		\end{split}
+	\end{align}
+	}
+
+\end{frame}

@@ -1,0 +1,68 @@
+\chapter{Calculating vacuum polarization using Hadamard point-splitting renormalization}
+
+The expression for the vacuum polarization comes from the zeroth component of the charge current density 
+\begin{align}
+	\rho(z) = \vacuum{ \phi^* D_0 \phi - \phi D_0^* \phi^*},
+\end{align}
+with the field given by its energy mode expansion 
+\begin{align}
+	\phi(t, z) = \sum_{n>0}^{} a_n \phi_n(z) e ^{-i\omega t} 
+	i+ \sum_{n<0}^{} b_n^\dagger \phi_n(z) e ^{-i\omega t} .
+\end{align}
+
+Using the Hadamard point-splitting renormalization of the products of (derivaatives of fields) \eqref{eq:point-splitting-wrt-a-Hadamard-parametrix}, from equation \eqref{eq:vacuum-polarization} we need to calculate the two two-point functions $w^{\phi \phi^*}$, $w^{\phi^* \phi}$ and their corresponding Hadamard paramatrices $H^{\phi \phi^*}$, $H^{\phi^* \phi}$.
+
+We are performing the point-splitting in the time direction, $x'= (t + \tau, z)$.
+We start by calculating the second term in \eqref{eq:vacuum-polarization}. The relevant two-point function is 
+\begin{align}
+	w^{\phi\phi^*}(x, x') = \vacuum{  \phi(x)\phi^* (x') } = \sum_{n>0}^{} \abs{\phi_n(z)}^2 e^{i\omega_\tau},
+\end{align}
+and therefore 
+\begin{align}
+	D_0^*'
+	w^{\phi\phi^*}(x, x') = i\sum_{n>0}^{} (\omega_n - eA_0)\abs{\phi_n(z)}^2 e^{i\omega_\tau}.
+\end{align}
+
+The Hadamard parametrix of the two-point function $w^{\phi\phi^*}$ is (up to order relevang for the charge density operator) 
+\begin{align}
+	H^{\phi \phi^*}= -\frac{1}{4 \pi} U(x, x') \log(\tau^2 + i\varepsilon \tau),
+\end{align}
+again, with $U(x,x') = \exp\left(ieA_0\tau \right) $. We calculate 
+\begin{align}
+	\begin{split}
+			D_0^*'H^{\phi \phi^*}(x, x')&= -\frac{1}{4\pi} (\partial_0- ieA_0)e^{ieA0\tau} \log\left( \tau^2 + i\varepsilon \tau \right) \\
+			&= -\frac{1}{4\pi} ieA_0 e^{ieA_0 \tau} \log(\tau^2+i\varepsilon \tau) 
+		-\frac{1}{4\pi} e^{ieA_0 \tau} \frac{2\tau +i \varepsilon }{\tau^2+i\varepsilon\tau} + \frac{1}{4\pi} ieA_0e^{ieA_0\tau} \log(\tau^2+i\varepsilon \tau)\\
+		&= -\frac{1}{2\pi}(1+ieA_0\tau) \frac{1}{\tau + i\varepsilon} 
+	\end{split}.
+\end{align}
+Thus, 
+\begin{align}
+	\vacuum{\phi D_0^*'\phi^*} = \lim_{\tau \to 0} i\sum_{n>0}^{} (\omega_n - eA_0)\abs{\phi_n(z)}^2 e^{i\omega_n (\tau + i \varepsilon)} + \frac{1}{2\pi}(1+ieA_0\tau) \frac{1}{\tau + i\varepsilon} 
+\end{align}
+
+In a similar fashion, 
+\begin{align}
+	D_0'w^{\phi^* \phi}(x, x') = -i \sum_{n<0}^{} \left( \omeega_n  -eA_0 \right) \abs{\phi_n}^2 e^{i\omega_n \tau}-\frac{1}{2\pi}(1+ieA_0\tau) \frac{1}{\tau + i\varepsilon},
+\end{align}
+and 
+\begin{align}
+	\begin{split}
+			D_0'H^{\phi^* \phi}(x, x')&= -\frac{1}{4\pi} (\partial_0+ ieA_0)e^{-ieA0\tau} \log\left( \tau^2 + i\varepsilon \tau \right) \\
+			&= \frac{1}{4\pi} ieA_0 e^{-ieA_0 \tau} \log(\tau^2+i\varepsilon \tau) 
+		-\frac{1}{4\pi} e^{-ieA_0 \tau} \frac{2\tau +i \varepsilon }{\tau^2+i\varepsilon\tau} - \frac{1}{4\pi} ieA_0e^{-ieA_0\tau} \log(\tau^2+i\varepsilon \tau)\\
+		&= -\frac{1}{2\pi}(1-ieA_0\tau) \frac{1}{\tau + i\varepsilon} 
+	\end{split}.
+\end{align}
+The vacuum expectation value of the first term in \eqref{eq:vacuum-polarization} is 
+\begin{align}
+	\vacuum{\phi^* D_0'\phi} = \lim_{\tau \to 0} -i\sum_{n>0}^{} (\omega_n - eA_0)\abs{\phi_n(z)}^2 e^{i\omega_n (\tau+ i \varepsilon)} + \frac{1}{2\pi}(1-ieA_0\tau) \frac{1}{\tau + i\varepsilon} 
+\end{align}
+
+Following equation \eqref{eq:vacuum-polarization}, we subtract these two and multiply by $ie$. The diverging parts cancel out resulting in the following expression for the vacuum polarization
+\begin{align}
+	\begin{split}
+		\rho(z)	 = e\lim_{\varepsilon \to 0^+} \lim_{\tau \to 0}  &\left[  \sum_{n>0}^{} (\omega_n - eA_0)\abs{\phi_n(z)}^2 e^{i\omega_n (\tau+ i \varepsilon)} \right. \\
+			   +& \left.  \sum_{n<0}^{} (\omega_n - eA_0)\abs{\phi_n(z)}^2 e^{-i\omega_n (\tau+ i \varepsilon)} \right]  + \frac{e^2}{\pi}A_0(z)\\
+	\end{split}
+\end{align}

@@ -1,0 +1,11 @@
+\boolfalse {citerequest}\boolfalse {citetracker}\boolfalse {pagetracker}\boolfalse {backtracker}\relax 
+\defcounter {refsection}{0}\relax 
+\beamer@sectionintoc {1}{Preliminaries}{3}{0}{1}
+\defcounter {refsection}{0}\relax 
+\beamer@sectionintoc {5}{Results}{40}{0}{2}
+\defcounter {refsection}{0}\relax 
+\beamer@sectionintoc {8}{Upshot}{59}{0}{3}
+\defcounter {refsection}{0}\relax 
+\beamer@sectionintoc {9}{Outlook}{61}{0}{4}
+\defcounter {refsection}{0}\relax 
+\beamer@sectionintoc {10}{Bibliography}{63}{0}{5}
