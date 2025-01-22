@@ -1,0 +1,70 @@
+\chapter{Calculating vacuum polarization at first perturbative order}
+In the perturbative approximation, for the massless case
+\begin{align}
+	\begin{split}
+		\omega_n &= n \pi \\
+	\phi_n^{D} &= \left( m^2 + \pi^2  n^2 \right)^{-\frac{1}{4}} \Biggl[ \sin\pi n z \\
+		   &\left.+ \lambda \frac{\sqrt{m^2 + \pi^2 n^2} }{2 \pi \lvert n \rvert} 
+		\left( 
+		\frac{1}{\pi n}\left( \frac{1}{2} - z \right) \sin \pi n z - z(1-z) \cos \pi n z \right) 
+	\right]  \\
+	\phi_n^{D} &= \frac{1}{\sqrt{\pi \lvert n \rvert}}  \Biggl[ \sin\pi n z 
+		   \left.+ \frac{\lambda}{2}		\left( 
+		\frac{1}{\pi n}\left( \frac{1}{2} - z \right) \sin \pi n z - z(1-z) \cos \pi n z \right) 
+	\right] 
+	\end{split} 
+\end{align}
+
+At first order in $\lambda$, 
+\begin{align}
+	\lvert \phi_n^{D}\rvert^2 &= \frac{1}{\pi \abs{n}} \Biggl[ \sin^2\pi n z 
+		   \left.- \lambda \sin \pi n z		\left( 
+		\frac{1}{\pi n}\left( z - \frac{1}{2} \right) \sin \pi n z + z(1-z) \cos \pi n z \right) 
+	\right] 
+\end{align}
+
+The charge density for the nth mode
+\begin{align*}
+	(\pi n - \varepsilon A_0)	\lvert \phi_n^{D}\rvert^2 &= (\pi n + \lambda (z-\frac{1}{2}) )\frac{1}{\pi \abs{n}}  \Biggl[ \sin^2\pi n z  \\
+									  & \left.+ \lambda \sin \pi n z		\left( 
+			\frac{1}{\pi n}\left( \frac{1}{2} - z \right) \sin \pi n z - z(1-z) \cos \pi n z \right) 
+		\right]  \\
+&= \text{sign}(n)\Biggl[ \sin^2\pi n z  \\
+									  & \left.+ \lambda \sin \pi n z		\left( 
+			\frac{1}{\pi n}\left( \frac{1}{2} - z \right) \sin \pi n z - z(1-z) \cos \pi n z \right) 
+		\right] \\
+									  &+\frac{ \lambda \left( z-\frac{1}{2} \right) }{\pi \abs{n} }
+\Biggl[ \sin^2\pi n z  \\
+									  & \left.+ \lambda \sin \pi n z		\left( 
+			\frac{1}{\pi n}\left( \frac{1}{2} - z \right) \sin \pi n z - z(1-z) \cos \pi n z \right) 
+		\right] \\
+&= \text{sign}(n)\Biggl[ \sin^2\pi n z  \\
+									  & \left.+ \lambda \sin \pi n z		\left( 
+			\frac{1}{\pi n}\left( \frac{1}{2} - z \right) \sin \pi n z - z(1-z) \cos \pi n z \right) 
+		\right] \\
+									  &+ \frac{\lambda \left( z-\frac{1}{2} \right)}{\pi \abs{n}}
+\sin^2\pi n z  
+\end{align*}
+
+And for the -nth mode
+\begin{align*}
+-(\pi n + \varepsilon A_0)	\lvert \phi_{-n}^{D}\rvert^2
+&= -\text{sign}(n)\Biggl[ \sin^2\pi n z  \\
+									  & \left.- \lambda \sin \pi n z		\left( 
+			\frac{1}{\pi n}\left( \frac{1}{2} - z \right) \sin \pi n z - z(1-z) \cos \pi n z \right) 
+		\right] \\
+									  &+ \frac{\lambda \left( z-\frac{1}{2} \right)}{\pi \abs{n}}
+\sin^2\pi n z  
+\end{align*}
+
+So the contribution to the charge density of the $n$th mode is given by 
+\begin{align*}
+	(\pi n - \varepsilon A_0)	\lvert \phi_{n}^{D}\rvert^2 
+	&-(\pi n + \varepsilon A_0)	\lvert \phi_{-n}^{D}\rvert^2 = \\
+	& \frac{2 \lambda \sin^2 \pi n z }{\pi n}\left( \frac{1}{2}-z \right)  - 2\lambda z (1-z )\sin \pi n z  \cos \pi n z  \\&+ 2 \frac{\lambda \left( z-\frac{1}{2} \right) }{\pi \abs{n}}\sin ^2 \pi n z
+\end{align*}
+
+\begin{align}
+\rho(z) = \varepsilon \lim_{\tau\to 0} \sum_{n=1}^{\infty} \left( \lvert \phi_n\rvert ^2 (\pi n - \varepsilon A_0) - \lvert \phi_{-n}\rvert ^2 (\pi n + \varepsilon A_0) \right)  e^{i \pi n (\tau + i \epsilon)} + \frac{e^2}{\pi}A_0.
+\end{align}
+

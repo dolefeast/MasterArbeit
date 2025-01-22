@@ -1,0 +1,27 @@
+\BOOKMARK [0][-]{chapter.1}{Introduction}{}% 1
+\BOOKMARK [0][-]{chapter.2}{Preliminaries}{}% 2
+\BOOKMARK [1][-]{section.2.1}{Constructing the quantum field theory}{chapter.2}% 3
+\BOOKMARK [1][-]{section.2.2}{Hadamard two point functions and point-split renormalization}{chapter.2}% 4
+\BOOKMARK [0][-]{chapter.3}{Vacuum polarization}{}% 5
+\BOOKMARK [1][-]{section.3.1}{The setup}{chapter.3}% 6
+\BOOKMARK [2][-]{subsection.3.1.1}{Gauge fixing}{section.3.1}% 7
+\BOOKMARK [1][-]{section.3.2}{The external field approximation}{chapter.3}% 8
+\BOOKMARK [1][-]{section.3.3}{Quantization and vacuum polarization}{chapter.3}% 9
+\BOOKMARK [2][-]{subsection.3.3.1}{Perturbation theory}{section.3.3}% 10
+\BOOKMARK [2][-]{subsection.3.3.2}{Vacuum polarization at first order in perturbation theory}{section.3.3}% 11
+\BOOKMARK [1][-]{section.3.4}{The iterative procedure}{chapter.3}% 12
+\BOOKMARK [2][-]{subsection.3.4.1}{Numerical instabilities}{section.3.4}% 13
+\BOOKMARK [1][-]{section.3.5}{Computational details}{chapter.3}% 14
+\BOOKMARK [2][-]{subsection.3.5.1}{Noise filtering}{section.3.5}% 15
+\BOOKMARK [0][-]{chapter.4}{Results}{}% 16
+\BOOKMARK [1][-]{section.4.1}{Comparing the charge density from different renormalization schemes}{chapter.4}% 17
+\BOOKMARK [1][-]{section.4.2}{Attempting to retrieve Ambj\370rn and Wolfram's results}{chapter.4}% 18
+\BOOKMARK [1][-]{section.4.3}{Impact of having different mode cutoffs}{chapter.4}% 19
+\BOOKMARK [1][-]{section.4.4}{Evolution of the induced field as a function of }{chapter.4}% 20
+\BOOKMARK [1][-]{section.4.5}{Dirichlet and Neumann boundary conditions for big should behave the same}{chapter.4}% 21
+\BOOKMARK [0][-]{appendix.A}{Computation details}{}% 22
+\BOOKMARK [1][-]{section.A.1}{Numerical methods}{appendix.A}% 23
+\BOOKMARK [1][-]{section.A.2}{Calculating series and limits}{appendix.A}% 24
+\BOOKMARK [0][-]{appendix.B}{Calculating vacuum polarization at first perturbative order}{}% 25
+\BOOKMARK [0][-]{appendix.C}{Calculating vacuum polarization using Hadamard point-splitting renormalization}{}% 26
+\BOOKMARK [0][-]{appendix*.9}{Bibliography}{}% 27

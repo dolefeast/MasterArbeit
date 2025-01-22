@@ -1,0 +1,19 @@
+\begin{thebibliography}{3}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+
+\bibitem[Ambj{\o}rn and Wolfram(1983)]{Ambjorn1983}
+J.~Ambj{\o}rn and S.~Wolfram.
+\newblock Properties of the vacuum. 2. electrodynamic.
+\newblock \emph{Annals of Physics}, 147\penalty0 (1):\penalty0 33--56, 1983.
+
+\bibitem[Heisenberg and Euler(1936)]{Heis1936}
+W.K. Heisenberg and H.~Euler.
+\newblock {Folgerungen aus der Diracschen Theorie des Positrons}.
+\newblock \emph{Z. Phys.}, 98:\penalty0 714--732, 1936.
+
+\bibitem[Wernersson and Zahn()]{Wernersson2020}
+J.~Wernersson and J.~Zahn.
+\newblock Vacuum polarization near boundaries.
+
+\end{thebibliography}

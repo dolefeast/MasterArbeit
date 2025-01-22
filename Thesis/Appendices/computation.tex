@@ -1,0 +1,30 @@
+\chapter{Computation details}
+
+\section{Numerical methods}
+We solve equation \eqref{eq:TIKGE} computationally, using fourth order Runge-Kutta method, and the $\omega_n$ are sought after by using the bisection method, 
+
+\section{Calculating series and limits}
+
+The vacuum polarization \eqref{eq:Hadamard-vacuum-polarization} should be calculated by summing over all modes of the Klein-Gordon field, and then taking the limits $\tau\to 0, \text{and } \epsilon \to 0^+$. To do this compuptationally, first we note that due to the chosen gauge we can state $\omega_n =-\omega_{n}$. This allows us to write equation \eqref{eq:Hadamard-vacuum-polarization} as a single sum, 
+\begin{align}
+	\begin{split}
+			&\rho(z) =  \\
+			&\lim_{\tau \to 0}\left(
+			\sum_{n> 0}^{}\left[ (\omega_n - A_0) \|\phi_n\|^2   -
+		(\omega_{n} + A_0) \|\phi_{-n}\|^2 \right]e^{i \omega_n (\tau + i\varepsilon)}  \right)
+			+ \frac{e^2}{\pi} A_0(z).
+	\end{split}
+\end{align}
+Note that this expression is no longer gauge independent.
+
+If the coefficients of the exponential functions decay fast enough as $n$ grows, we can commute the limit and the sum so that 
+\begin{align}
+	\begin{split}
+			\rho(z) =  
+			\sum_{n> 0}^{}\left[ (\omega_n - A_0) \|\phi_n\|^2   -
+		(\omega_{n} + A_0) \|\phi_{-n}\|^2 \right]
+			+ \frac{e^2}{\pi} A_0(z).
+	\end{split}
+\end{align}
+
+However, we can only calculate a finite amount of mode solutions, so the sum is to be taken only until a certain mode cutoff $N$. This finite cutoff induces oscillations on the calculated vacuum polarization, of period $\Delta z = \frac{1}{N+1}$. These should be averaged out by convoluting the resulting vacuum polarization with a suitable array.
