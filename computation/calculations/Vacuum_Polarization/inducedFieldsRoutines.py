@@ -76,6 +76,7 @@ def calculateA0Induced(self, rho):
     It is just integrating the vacuum polarization twice
     """
 
+    print(np.shape(self.z), np.shape(self.rho))
     rhoInterpolated = CubicSpline(self.z, self.rho)
     A0InducedShifted = rhoInterpolated.antiderivative(2)
     offset = A0InducedShifted(1/2)

@@ -107,17 +107,13 @@ def downsizeUnreadSolutionFamily(
 def getPosixForQuantities(
         m,
         a,
-        directory="",
+        directory,
         sigDigs=3,
-        bcs="dirichlet",
         maxLambdaDensity=None,
         ):
 
-    if directory != "":
-        directory = "/" + directory
 
-
-    dictKeys = ['eigenvalues', 'eigenstates', 'eigenstateGradients', 'rho', 'A0Induced']
+    dictKeys = ['eigenvalues', 'eigenstates',  'rho', 'A0Induced']
     # Not to fill the dictionary with crap that we don't need
     
     m = floatToStr(m, sigDigs=3)
@@ -131,12 +127,11 @@ def getPosixForQuantities(
     for i, quantity in enumerate(dictKeys):
         dataElement = sorted(
                 list(
-                    Path(f'savedSolutions{directory}/{bcs}/{quantity}').glob(fileRegex)
+                    Path(f'{directory}/{quantity}').glob(fileRegex)
                     ),
                 key = getLambdaValue
                 )
         
-
         solutionFamilyDict[quantity] = dataElement
 
         # Enough with doing it once

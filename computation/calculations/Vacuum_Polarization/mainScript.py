@@ -106,10 +106,10 @@ def walkback(self):
 
     self.lambdaValue -= self.lambdaStep 
     self.lambdaStep *= self.walkbackFactor
-    self.relaxParameter *= self.walkbackFactor
     self.lambdaValue += self.lambdaStep
-    print(f"New relaxParameter={self.relaxParameter}")
-
+    if self.a==0:
+        self.relaxParameter *= self.walkbackFactor
+        print(f"New relaxParameter={self.relaxParameter}")
 def fullScript(self):
 
     while self.lambdaValue < self.lambdaMax:

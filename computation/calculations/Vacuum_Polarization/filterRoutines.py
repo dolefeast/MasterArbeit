@@ -174,6 +174,8 @@ def extendAndFilter(
     # Second filter it
     y = self.filterRho(y)
     y = self.filterRho(y)
+    # if self.bcs == "neumann" and False:
+    #     y = self.filterRho(y)
 
     # Third and fourth remove the boundaries and interpolate
     if self.bcs == "dirichlet":

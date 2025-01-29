@@ -42,6 +42,10 @@ class Vacuum_Polarization:
             self.eigenvalueGuess(n) for n in range(-maxN, maxN+1) if n!=0
             ]
 
+        if bcs == "neumann":
+            self.eigenvalues = self.eigenvalues[:self.maxN] + [-self.m, self.m] + self.eigenvalues[self.maxN:]
+
+
         self.colorCycle = cycle(
     "#C52E19FF, #AC9765FF, #54D8B1FF, #B67C3BFF, #175149FF, #AF4E24FF".split(", ")
         )
@@ -70,9 +74,10 @@ class Vacuum_Polarization:
             self.smoothing = False
         else:
             self.nPoints = 8 * ( maxN + 1 )
-            self.ambjorn = ambjorn # This can be changed depending on the results we want
-            self.smoothing = smoothing # This can be changed depending on the results we want
+            self.ambjorn = ambjorn      # This can be changed depending on the results we are looking for
+            self.smoothing = smoothing  # This can be changed depending on the results we are looking for
 
+        # The mesh points
         self.z = np.linspace(0, 1, self.nPoints)
         
         self.lambdaMin = lambdaMin
