@@ -1,28 +1,30 @@
 from scipy.integrate import solve_ivp
 import numpy as np
 import matplotlib.pyplot as plt
+from mpmath import quad
 
 import scienceplots
-plt.style.use(["science"])
+# plt.style.use(["science"])
 
 from Vacuum_Polarization import Vacuum_Polarization
 
-def KleinGordonEquation(z, y, omega, lambdaValue):
-    A0 = -lambdaValue*(z-1/2)
-
-    kleinGordon = np.array(
-        (y[1], -((omega - backgroundField) ** 2 + self.m ** 2) * y[0])
-    )
-
 def firstModeOmegaAsFunctionOfMass(massMin:float, massMax:float, massNPoints:int, lambdaValue:float, bcs:str)-> list:
     massRange = np.linspace(massMin, massMax, massNPoints)
-    omegaRange = [main(m, lambdaValue, bcs)[0] for m in massRange]
+    omegaRange = [calculateEigens(m, lambdaValue, bcs)[0] for m in massRange]
 
     return massRange, omegaRange
 
 def plotOmegaVsMass(*args)->None:
     plt.plot(*firstModeOmegaAsFunctionOfMass(*args)
             )
+
+def calculateNorm(eigenvalue, eigenstate, lambdaValue):
+    try:
+        normSquared = abs(float(quad(lambda z: (eigenvalue + lambdaValue * (z - 1/2)) * eigenstate.sol(z)[0]**2, [0, 1] ))) 
+    except AttributeError:
+        normSquared = abs(float(quad(lambda z: (eigenvalue + lambdaValue * (z - 1/2)) * eigenstate(z)**2, [0, 1] ))) 
+
+    return normSquared
 
 def perturbativePhi(n:int, lambdaValue:float, m:float, bcs:str) -> callable:
     """
@@ -55,8 +57,7 @@ def perturbativePhi(n:int, lambdaValue:float, m:float, bcs:str) -> callable:
                         )
                 )
 
-def main(m:float, lambdaValue:float, bcs:str)->float:
-    compute = Vacuum_Polarization(m=m, lambdaMin=lambdaValue, bcs=bcs)
+def calculateEigens(compute:object, n:int, window=np.pi/2)->float:
 
     if compute.bcs == "neumann":
         initialValues = (1, 0)
@@ -71,26 +72,73 @@ def main(m:float, lambdaValue:float, bcs:str)->float:
             dense_output=True)
 
     try:
-        omega = compute.findRootBisection(lambda omega: parameterizedODE(omega).sol(1)[bcsIndex], 0, m+0.1)
+        omega = compute.findRootBisection(lambda omega: parameterizedODE(omega).sol(1)[bcsIndex], compute.perturbativeEigenvalue(n)-window/2, compute.perturbativeEigenvalue(n)+window/2)
     except RuntimeError:
         return None, None
+    
+    normCalc = calculateNorm(omega, parameterizedODE(omega), compute.lambdaValue)
 
-    return omega, parameterizedODE
+    return omega, parameterizedODE, normCalc
 
+def vacuumPolarizationComparison(fig1, ax1, compute, n):
+    # Non perturbative vacuum polarizations
+    nonPertOmegaPositive, parameterizedODEPositive, norm = calculateEigens(compute, n)
+    nonPertRhoPositive = lambda z: (nonPertOmegaPositive + compute.lambdaValue * (z-1/2)) * (parameterizedODEPositive(nonPertOmegaPositive).sol(z)[0])**2/norm
+
+    nonPertOmegaNegative, parameterizedODENegative, norm = calculateEigens(compute, -n)
+    nonPertRhoNegative = lambda z: (nonPertOmegaNegative + compute.lambdaValue * (z-1/2)) * (parameterizedODENegative(nonPertOmegaNegative).sol(z)[0])**2/norm
+
+    totalnonPertRho = lambda z: nonPertRhoPositive(z) + nonPertRhoNegative(z)
+
+    # Perturbative vacuum polarizations
+    pertRho = lambda z: (omega + lambdaValue * (z-1/2)) * (perturbativeMode(z))**2
+    oppositePertRho = lambda z: -pertRho(1-z)
+    totalPertRho = lambda z: pertRho(z) + oppositePertRho(z)
+
+    # Free field vacuum polarizations
+    freeRho = lambda z: (omega ) * (freePhi(z))**2
+    oppositeFreeRho = lambda z: -freeRho(1-z)
+    totalFreeRho = lambda z: freeRho(z) + oppositeFreeRho(z)
+
+    # ax1.plot(z, totalnonPertRho(z)/max(totalnonPertRho(z)), label=r"Numerical $\rho"+"_{"+str(n)+"}$")
+    # ax1.plot(z, totalPertRho(z)/max(totalPertRho(z)), label=r"Perturbative $\rho"+"_{"+str(n)+"}$")
+    # ax1.plot(z, totalFreeRho(z)/max(totalFreeRho(z)), label=r"Free $\rho"+"_{"+str(n)+"}$")
+    ax1.plot(z, totalnonPertRho(z)/max(totalnonPertRho(z)), label=r"Numerical $\rho"+"_{"+str(n)+"}$")
+    ax1.plot(z, totalPertRho(z)/max(totalPertRho(z)), label=r"Perturbative $\rho"+"_{"+str(n)+"}$")
+    ax1.plot(z, totalFreeRho(z), label=r"Free $\rho"+"_{"+str(n)+"}$")
+    # ax1.plot(z, freePhi(z)/max1(freePhi(z)), label="Free solution")
+
+    fig.suptitle("$\phi$ comparison")
+def fieldSolutionComparisons(fig, ax, omega:float, parameterizedOde:callable):
+    ax.plot(z, parameterizedODE(omega).sol(z)[0]/max(parameterizedODE(omega).sol(z)[0]), label="Numerical solution")
+    ax.plot(z, perturbativeMode(z)/max(perturbativeMode(z)), label="Perturbative solution")
+    ax.plot(z, freePhi(z)/max(freePhi(z)), label="Free solution")
+
+    fig.suptitle("$\phi$ comparison")
 
 
 fig, ax = plt.subplots(figsize=(10,8))
+fig1, ax1 = plt.subplots(figsize=(10,8))
 
-z = np.linspace(0, 1, 200)
+n=50
+z = np.linspace(0, 1, 100*(n+1))
 m = 6
-lambdaValue = 0.1
-bcs = "neumann"
+lambdaValue = 4
 
-omega, parameterizedODE = main(m, lambdaValue, bcs)
-secondMode = perturbativePhi(0, lambdaValue, m, bcs=bcs)
+bcs = "dirichlet"
 
-plt.plot(z, parameterizedODE(omega).sol(z)[0]/max(parameterizedODE(omega).sol(z)[0]), label="Numerical solution")
-plt.plot(z, secondMode(z)/max(secondMode(z)), label="Perturbative solution")
+compute = Vacuum_Polarization(m=m, lambdaMin=lambdaValue, bcs=bcs)
+
+omega, parameterizedODE, norm = calculateEigens(compute, n )
+perturbativeMode = compute.perturbativePhi(n)
+freePhi = compute.freePhi(n)
+
+fieldSolutionComparisons(fig, ax, omega, parameterizedODE)
+vacuumPolarizationComparison(fig1, ax1, compute, n)
+
+# ax1.plot(z, parameterizedODE(omega).sol(z)[0]/max(parameterizedODE(omega).sol(z)[0]), label="Numerical solution")
+# ax1.plot(z, perturbativeMode(z)/max(perturbativeMode(z)), label="Perturbative solution")
+# ax1.plot(z, freePhi(z)/max(freePhi(z)), label="Free solution")
 
 plt.legend(loc="best")
 # plt.suptitle(f"m = {m}, $\lambda = {lambdaValue}$, $\omega = {round(omega, 2)}$")

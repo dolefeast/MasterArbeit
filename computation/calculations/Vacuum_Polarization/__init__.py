@@ -39,7 +39,7 @@ class Vacuum_Polarization:
         self.maxN = maxN
         self.m = m
         self.eigenvalues = [ 
-            self.eigenvalueGuess(n) for n in range(-maxN, maxN+1) if n!=0
+            self.perturbativeEigenvalue(n) for n in range(-maxN, maxN+1) if n!=0
             ]
 
         if bcs == "neumann":
@@ -73,7 +73,7 @@ class Vacuum_Polarization:
             self.ambjorn = True # This can't be changed
             self.smoothing = False
         else:
-            self.nPoints = 8 * ( maxN + 1 )
+            self.nPoints = 17 * ( maxN + 1 )
             self.ambjorn = ambjorn      # This can be changed depending on the results we are looking for
             self.smoothing = smoothing  # This can be changed depending on the results we are looking for
 
@@ -144,7 +144,9 @@ class Vacuum_Polarization:
             bisectionMethodLowerBound,
             )
     from Vacuum_Polarization.physics import (
-            eigenvalueGuess,
+            perturbativeEigenvalue,
+            perturbativePhi,
+            freePhi,
             KleinGordonEquation
             )
     from Vacuum_Polarization.calculateEigenstatesRoutines import (

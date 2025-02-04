@@ -128,7 +128,8 @@ def filterRho( self,rho):
         middle = 6
         edges = 3
 
-    convolutingArray = [edges, 0.0, peaks, 0.0, middle, 0.0, peaks, 0.0, edges]
+    convolutingArray = [edges, 0.0,0.0,  0.0, peaks, 0.0,0.0,  0.0, middle, 0.0,0.0,  0.0, peaks, 0.0,0.0,  0.0, edges]
+    # convolutingArray = [edges, 0.0, peaks, 0.0, middle, 0.0, peaks, 0.0, edges]
 
     # Array has to be normalized
     convolutingArray = np.array(convolutingArray) / sum(convolutingArray)
