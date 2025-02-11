@@ -1,8 +1,67 @@
 from scipy.integrate import solve_ivp
+from functools import partial
+# from multiprocessing import Pool
+# from concurrent.futures import ProcessPoolExecutor
+
+
 from scipy.interpolate import CubicSpline
 from mpmath import quad
 import numpy as np
 
+
+def calculateNormSquared(self, omega, eigenstate):
+    normSquared = abs(float(
+        quad(lambda z: 2 * ( omega - self.e * self.A0(z) ) * eigenstate.sol(z)[0] ** 2, [0, 1])
+        ))
+
+    return normSquared
+
+def calculateSingleEigenstate(self, omegaUpperLower):
+    if self.bcs == "dirichlet":
+        # To solve the ODE
+        initialValues = (0, 1)
+        # To find the zeros when looking for the energies
+        # bcsIndex = 0 corresponds to looking for 0 at f(1), 
+        # bcsIndex = 1 corresponds to looking for 0 at f'(1), 
+        bcsIndex = 0 
+    elif self.bcs == "neumann":
+        initialValues = (1, 0)
+        bcsIndex = 1 
+
+    # This IVP solution propagates the initial conditions at the left boundary to the right
+    # without knowing where it is going to land
+    parameterizedODE = lambda omega: solve_ivp(
+            lambda z, y: self.KleinGordonEquation(z, y, omega), 
+            t_span=(0, 1),
+            y0=initialValues,
+            dense_output=True,
+            ) 
+
+    # bcsIndex indicates with respect to which derivative of the field is the omega found
+    # If bcs=dirichlet we want the zeroth derivative to be zero at the right boundary (z=1)
+    # If bcs=neumann we want the first derivative to be zero at the right boundary (z=1)
+    omega = self.findRootBisection(lambda omega:parameterizedODE(omega).sol(1)[bcsIndex], *omegaUpperLower)
+
+    normCalc = self.calculateNormSquared(omega, parameterizedODE(omega))
+    return omega, parameterizedODE(omega).sol(self.z)[0]/np.sqrt(abs(normCalc))
+
+def calculateEigenstatesParallel(self):
+    from pathos.multiprocessing import ProcessingPool as Pool
+
+    p = Pool(4)
+
+    def _calculateSingleEigenstate(omegaUpperLower):
+        return calculateSingleEigenstate(self, omegaUpperLower)
+
+    omegaUpperArray = self.bisectionMethodUpperBound(self.eigenvalues)
+    omegaLowerArray = self.bisectionMethodLowerBound(self.eigenvalues)
+
+    eigenValuesEigenStates = p.map(_calculateSingleEigenstate, zip(omegaUpperArray, omegaLowerArray))
+    # with Pool() as pool:
+    #     eigenValuesEigenStates = pool.map(_calculateSingleEigenstate, zip(omegaLowerArray, omegaUpperArray))
+
+    self.eigenvalues = [ element[0] for element in eigenValuesEigenStates ]
+    self.eigenstates = [ element[1] for element in eigenValuesEigenStates ]
 
 def calculateEigenstates(self):
     """
@@ -25,7 +84,7 @@ def calculateEigenstates(self):
     eigenvalueLowerBound = self.bisectionMethodLowerBound(self.eigenvalues)
     eigenvalueUpperBound = self.bisectionMethodUpperBound(self.eigenvalues)
 
-    parametrizedODE = lambda omega: solve_ivp(
+    parameterizedODE = lambda omega: solve_ivp(
             lambda z, y: self.KleinGordonEquation(z, y, omega), 
             t_span=(0, 1),
             y0=initialValues,
@@ -34,7 +93,7 @@ def calculateEigenstates(self):
 
     eigenvalues = [
             self.findRootBisection(
-                lambda omega: parametrizedODE(omega).sol(1)[bcsIndex], *omegaUpperLower
+                lambda omega: parameterizedODE(omega).sol(1)[bcsIndex], *omegaUpperLower
                 ) 
             for omegaUpperLower in zip(
                 eigenvalueLowerBound,
@@ -44,7 +103,7 @@ def calculateEigenstates(self):
 
     # the eigenvalues should be antisymmetric i.e. omegaN = -omega_{-n}
     self.eigenvalues = [ (i-j) / 2 for i, j in zip(eigenvalues, eigenvalues[::-1]) ]
-    self.eigenstates = [ parametrizedODE(omega).sol(self.z)[0] for omega in eigenvalues ]
+    self.eigenstates = [ parameterizedODE(omega).sol(self.z)[0] for omega in eigenvalues ]
 
 def normalizeEigenstates(self):
     """

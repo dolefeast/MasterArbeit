@@ -4,11 +4,10 @@ import matplotlib.pyplot as plt
 import sys
 import numpy as np
 
-
 m= 0
 
 for bcs in ["dirichlet"]:
-    for maxN in [75]:
+    for maxN in [50, 75]:
         directory = f"HadamardModeSubtractionMaxN{maxN}"
         computation = Vacuum_Polarization(
                 maxN=int(maxN),

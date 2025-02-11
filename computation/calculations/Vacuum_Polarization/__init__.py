@@ -33,6 +33,7 @@ class Vacuum_Polarization:
             extrapolateA0=False,
             dynamicRelaxParameter=False,
             subtractMasslessPertVacuumPolarization=False,
+            parallelization=True,
             ):
 
         self.e = e
@@ -43,8 +44,12 @@ class Vacuum_Polarization:
             self.perturbativeEigenvalue(n) for n in range(-maxN, maxN+1) if n!=0
             ]
 
+        if bcs != "neumann" and bcs != "dirichlet":
+            raise NameError(f"{self.bcs} is not a valid boundary conditions identifier")
+
         if bcs == "neumann":
             self.eigenvalues = self.eigenvalues[:self.maxN] + [-self.m, self.m] + self.eigenvalues[self.maxN:]
+
 
 
         self.colorCycle = cycle(
@@ -59,6 +64,7 @@ class Vacuum_Polarization:
         self.savePlots = savePlots
         self.showPlots = showPlots
         self.read = read
+        self.parallelization = parallelization
 
         if self.plot:
             import matplotlib.pyplot as plt
@@ -161,6 +167,8 @@ class Vacuum_Polarization:
 
     from Vacuum_Polarization.calculateEigenstatesRoutines import (
             calculateEigenstates,
+            calculateEigenstatesParallel,
+            calculateNormSquared,
             normalizeEigenstates,
             )
 

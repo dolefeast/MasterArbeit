@@ -7,8 +7,11 @@ def coreIteration(self):
     Calculates the vacuum polarization corresponding to this solution family, 
     filters it if necessary, and finally calculates the corresponding induced potential to this A0Induced.
     """
-    self.calculateEigenstates()
-    self.normalizeEigenstates()
+    if self.parallelization:
+        self.calculateEigenstatesParallel()
+    else:
+        self.calculateEigenstates()
+        self.normalizeEigenstates()
 
     rhoNew = self.calculateRho()
 

@@ -1,4 +1,4 @@
-def findRootBisection(self, fun, x1, x2, tol=1e-6, maxiter=500):
+def findRootBisection(self, fun, x1, x2, tol=1e-7, maxiter=500):
     """Uses the bisection method to find the root of a function. Works recursively
     Parameters:
         fun: the callable of which to find the roots
