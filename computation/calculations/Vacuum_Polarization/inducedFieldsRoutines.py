@@ -20,7 +20,12 @@ def calculateRho(self, ):
         # eigenstate is np array. A0 is a callable. 
         # A0(z) is of the same shape as eigenstate
         rhoN = (eigenvalue - self.A0(self.z)) * abs(eigenstate) ** 2
-        rho += 1/2*rhoN
+        if self.subtractMasslessPertVacuumPolarization and n>0:
+            rhoN -=  self.perturbativeVacuumPolarizationNModeMassless(n, self.z) 
+        rho += rhoN
+
+    if self.subtractMasslessPertVacuumPolarization:
+        rho +=  self.perturbativeVacuumPolarizationMasslessInf(self.z)
 
     return rho
 
@@ -76,7 +81,6 @@ def calculateA0Induced(self, rho):
     It is just integrating the vacuum polarization twice
     """
 
-    print(np.shape(self.z), np.shape(self.rho))
     rhoInterpolated = CubicSpline(self.z, self.rho)
     A0InducedShifted = rhoInterpolated.antiderivative(2)
     offset = A0InducedShifted(1/2)

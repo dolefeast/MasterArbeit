@@ -5,33 +5,34 @@ import sys
 import numpy as np
 
 
-m= 1
+m= 0
 
 for bcs in ["dirichlet"]:
-    for maxN in [33]:
-        directory = f"NoFilterMaxN{maxN}lambda10"
+    for maxN in [75]:
+        directory = f"HadamardModeSubtractionMaxN{maxN}"
         computation = Vacuum_Polarization(
                 maxN=int(maxN),
                 m=m,
-                lambdaMin = 0.1,
-                lambdaMax =10.1,
-                lambdaStep = 10000000,
-                lambdaStepMin=1e-6,
+                lambdaMin = 10,
+                lambdaMax =26,
+                lambdaStep = 2,
+                lambdaStepMin=1e-8,
                 relaxParameter=1,
-                nIterations=1,
+                nIterations=None,
                 walkbackFactor=0.2,
                 iterateTol=1e-2,
                 maxNIterations=300,
                 a = 1, 
                 smoothing=True,
-                showPlots=True,
-                plotForEachLambda=True,
+                showPlots=False,
+                plotForEachLambda=False,
                 savePlots=False,
-                saveData=False,
+                saveData=True,
                 directory=directory,
                 extrapolateA0=True,
                 bcs=bcs,
                 dynamicRelaxParameter=False,
+                subtractMasslessPertVacuumPolarization=True
                 )
 
         try:

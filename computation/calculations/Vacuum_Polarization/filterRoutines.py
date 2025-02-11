@@ -15,7 +15,6 @@ def extendSignal(self, x, y, paddingSize=None):
     dx = x[1] - x[0]
 
     xPadded = np.linspace(-dx * paddingSize, 1 + dx * paddingSize, len(yPadded))
-
     return xPadded, yPadded
 
 def removeNeighbourhood(
@@ -34,7 +33,7 @@ def removeNeighbourhood(
         # Take out the points corresponding to the convolution array
         neighbourhoodSize = (
         1 / ( self.maxN + 1 ) 
-        + 1 / self.nPoints # Without this, the algorithm takes away
+        + 2 / self.nPoints # Without this, the algorithm takes away
                             # an "open" neighbourhood (can't be open since it's discrete), 
                             # and adding it converts it into a closed one.
                             # Corresponds to adding a dz.
@@ -120,15 +119,15 @@ def filterRho( self,rho):
 
     # Some fine tuned parameters
     if self.bcs == "dirichlet":
-        peaks = 0.4
-        middle = 5.95
-        edges = 3.
+        edges = 2.8
+        peaks = 5.7
+        middle = 6
     elif self.bcs == "neumann":
+        edges = 3
         peaks = 0.4
         middle = 6
-        edges = 3
 
-    convolutingArray = [edges, 0.0,0.0,  0.0, peaks, 0.0,0.0,  0.0, middle, 0.0,0.0,  0.0, peaks, 0.0,0.0,  0.0, edges]
+    convolutingArray = [edges,  0.0, peaks,  0.0, middle,  0.0, peaks,  0.0, edges]
     # convolutingArray = [edges, 0.0, peaks, 0.0, middle, 0.0, peaks, 0.0, edges]
 
     # Array has to be normalized
@@ -172,13 +171,13 @@ def extendAndFilter(
     elif self.bcs == "neumann":
         x = self.z
 
-    # Second filter it
+    # Second, filter it
     y = self.filterRho(y)
     y = self.filterRho(y)
     # if self.bcs == "neumann" and False:
     #     y = self.filterRho(y)
 
-    # Third and fourth remove the boundaries and interpolate
+    # Third and fourth, remove the boundaries and interpolate
     if self.bcs == "dirichlet":
         x, y = self.removeAndInterpolate(
             x,

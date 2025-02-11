@@ -10,12 +10,12 @@ def getDirectoryMA(readMode='str', filterRegex=""):
     else:
         filterRegex = "*"
 
-    [print(f"[{i+1}]", dirName.name) for i, dirName in enumerate(dirs.glob(filterRegex))]
+    [print(f"[{i+1}]", dirName.name) for i, dirName in enumerate(sorted(list(dirs.glob(filterRegex))))]
 
     while True:
         try:
             index = int(input("Choose the desired directory... "))
-            directory = list(dirs.glob(filterRegex))[index-1]
+            directory = sorted(list(dirs.glob(filterRegex)))[index-1]
             break
         except ValueError:
             print("Input must be a natural number, try again")

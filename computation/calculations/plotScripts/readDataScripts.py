@@ -3,6 +3,8 @@ import re
 from pathlib import Path
 from math import ceil
 
+from plotScripts.readFiles import getDirectoryMA
+
 floatRe = re.compile("\d+_\d+")
 
 def floatToStr(value, sigDigs=3):
@@ -189,8 +191,18 @@ def openPosixDict(
 
     return solutionFamilyArray
 
+def openSolutionFamilyArray(filterRegex) -> dict:
+    """
+    Selects and returns the solution family array, which is actually a dictionary, whose entries are arrays corresponding to each converged solution for each lambdaValue
+    """
 
-if __name__ == "_Main__":
+    directory, m, a = getDirectoryMA( filterRegex=filterRegex)
+    posixDict = getPosixForQuantities(m, a, directory=directory)
+    solutionFamilyArray = openPosixDict(posixDict)
+
+    return directory, solutionFamilyArray
+
+if __name__ == "__main__":
     m = 0
     a = 1
     lambdaValue = 7

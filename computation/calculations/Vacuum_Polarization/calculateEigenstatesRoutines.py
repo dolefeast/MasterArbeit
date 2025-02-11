@@ -64,7 +64,7 @@ def normalizeEigenstates(self):
         def rhoNWithoutNormalizing(z):
             # Normalizing wrt the symplectic norm
             # the solutions need not be real.
-            return (eigenvalue - self.A0(z)) * abs(eigenstate(z))**2
+            return 2 * (eigenvalue - self.A0(z)) * abs(eigenstate(z))**2
 
         # Calculate the norm
         normSquared = abs(float(quad(rhoNWithoutNormalizing, [0, 1])))

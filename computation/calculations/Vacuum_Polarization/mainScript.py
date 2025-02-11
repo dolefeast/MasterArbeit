@@ -88,6 +88,8 @@ def constantLambdaIterations(self):
         self.constantLambdaA0List.append(self.A0)
         self.constantLambdaA0InducedList.append(self.A0Induced)
         self.n += 1
+
+        print(self.n, end = "\r")
     else:
         if self.savePlots:
             self.fig4.savefig(
@@ -107,7 +109,7 @@ def walkback(self):
     self.lambdaValue -= self.lambdaStep 
     self.lambdaStep *= self.walkbackFactor
     self.lambdaValue += self.lambdaStep
-    if self.a==0:
+    if self.a!=0:
         self.relaxParameter *= self.walkbackFactor
         print(f"New relaxParameter={self.relaxParameter}")
 def fullScript(self):
@@ -146,9 +148,7 @@ def fullScript(self):
 
             print(exception) # To know if it didn't converge or if no solution was found
             print(f'Error found at n={self.n}, A0Induced(1) =', self.A0Induced(1))
-
             continue
-
         except ValueError as exception:
             e = exception
             break
@@ -170,4 +170,7 @@ def fullScript(self):
     if self.showPlots:
         self.axEigenvalues.plot(self.lambdaArray, self.eigenvaluesArray, 'b')
         self.plt.show()
-    raise e 
+    try:
+        raise e 
+    except UnboundLocalError:
+        print("Routine reached lambdaMax succesfully")

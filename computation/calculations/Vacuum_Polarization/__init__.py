@@ -29,9 +29,10 @@ class Vacuum_Polarization:
             showPlots = False, 
             read = False, 
             directory = "",
-            bcs = "dirichlet",
+            bcs="dirichlet",
             extrapolateA0=False,
             dynamicRelaxParameter=False,
+            subtractMasslessPertVacuumPolarization=False,
             ):
 
         self.e = e
@@ -73,9 +74,13 @@ class Vacuum_Polarization:
             self.ambjorn = True # This can't be changed
             self.smoothing = False
         else:
-            self.nPoints = 17 * ( maxN + 1 )
+            self.nPoints = 8 * ( maxN + 1 )
             self.ambjorn = ambjorn      # This can be changed depending on the results we are looking for
             self.smoothing = smoothing  # This can be changed depending on the results we are looking for
+        
+
+        # Part of the vacuum polarization filtering routine
+        self.subtractMasslessPertVacuumPolarization = self.smoothing and subtractMasslessPertVacuumPolarization
 
         # The mesh points
         self.z = np.linspace(0, 1, self.nPoints)
@@ -144,16 +149,23 @@ class Vacuum_Polarization:
             bisectionMethodLowerBound,
             )
     from Vacuum_Polarization.physics import (
+            KleinGordonEquation
+            )
+    from Vacuum_Polarization.perturbativeSolutions import(
             perturbativeEigenvalue,
             perturbativePhi,
             freePhi,
-            KleinGordonEquation
+            perturbativeVacuumPolarizationMasslessInf,
+            perturbativeVacuumPolarizationNModeMassless,
             )
+
     from Vacuum_Polarization.calculateEigenstatesRoutines import (
             calculateEigenstates,
             normalizeEigenstates,
             )
+
     from Vacuum_Polarization.saveSolutionsRoutine import saveSolutions
+
     from Vacuum_Polarization.inducedFieldsRoutines import (
             calculateRho,
             calculateRelaxParameter,
