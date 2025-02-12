@@ -38,11 +38,11 @@ lambdaValueArray = solutionFamilyArray["lambdaValue"]
 
 print("The maximum lambda value obtained is", lambdaValueArray[-1]) #, ", with a minimum lambda step of", lambdaValueArray[-1]-lambdaValueArray[-2])
 
-fig1 = plt.figure(f'{directory}, m={strToFloat(m)}, a={strToFloat(a)} vacuum polarization')
-fig2 = plt.figure(f'{directory}, m={strToFloat(m)}, a={strToFloat(a)} induced potential')
-fig3 = plt.figure(f'{directory}, m={strToFloat(m)}, a={strToFloat(a)} mode energy')
-fig4 = plt.figure(f'{directory}, m={strToFloat(m)}, a={strToFloat(a)} L2 polarization')
-fig5 = plt.figure(f'{directory}, m={strToFloat(m)}, a={strToFloat(a)} L2 potential')
+fig1 = plt.figure(f'{directory}, m={strToFloat(m)}, a={strToFloat(a)} vacuum polarization', figsize=(10, 10))
+fig2 = plt.figure(f'{directory}, m={strToFloat(m)}, a={strToFloat(a)} induced potential', figsize=(10, 10))
+fig3 = plt.figure(f'{directory}, m={strToFloat(m)}, a={strToFloat(a)} mode energy', figsize=(10, 10))
+fig4 = plt.figure(f'{directory}, m={strToFloat(m)}, a={strToFloat(a)} L2 polarization', figsize=(10, 10))
+fig5 = plt.figure(f'{directory}, m={strToFloat(m)}, a={strToFloat(a)} L2 potential', figsize=(10, 10))
 
 axRho = fig1.subplots()
 ax_A0Induced = fig2.subplots()
