@@ -15,10 +15,14 @@ def saveSolutions(
 
     solutionFamily = {
             "eigenvalues":self.eigenvalues,
-            "eigenstates":self.eigenstates,
+            # "eigenstates":self.eigenstates,
             "A0Induced":self.A0Induced(self.z),
             "rho":self.rho,
             }
+
+    if self.saveEigenstates:
+        solutionFamily["eigenstates"] = self.eigenstates
+
 
     lambdaString = self.floatToStr(self.lambdaValue, sigDigs=sigDigs)
     aString = self.floatToStr(self.a, sigDigs=sigDigs)
@@ -29,6 +33,7 @@ def saveSolutions(
     if self.directory != "":
         directory = "/" + self.directory
 
+    
     rootDirectory = f"savedSolutions{directory}/{self.bcs}"
     print(f"Saving results under {rootDirectory}/.../{fileId}...")
     

@@ -64,7 +64,7 @@ def readSolutionsFromFile(
     lambdaString = floatToStr(lambdaValue, sigDigs)
     aString = floatToStr(a, sigDigs)
 
-    fileId = f"mass_{mString}A_{aString}Lambda_{lambdaString}.txt"
+    fileId = f"mass_{mString}_a_{aString}_lambda_{lambdaString}.txt"
 
     if directory != "": 
         directory = "/" + directory

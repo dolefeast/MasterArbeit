@@ -57,8 +57,6 @@ def calculateEigenstatesParallel(self):
     omegaLowerArray = self.bisectionMethodLowerBound(self.eigenvalues)
 
     eigenValuesEigenStates = p.map(_calculateSingleEigenstate, zip(omegaUpperArray, omegaLowerArray))
-    # with Pool() as pool:
-    #     eigenValuesEigenStates = pool.map(_calculateSingleEigenstate, zip(omegaLowerArray, omegaUpperArray))
 
     self.eigenvalues = [ element[0] for element in eigenValuesEigenStates ]
     self.eigenstates = [ element[1] for element in eigenValuesEigenStates ]
@@ -84,6 +82,16 @@ def calculateEigenstates(self):
     eigenvalueLowerBound = self.bisectionMethodLowerBound(self.eigenvalues)
     eigenvalueUpperBound = self.bisectionMethodUpperBound(self.eigenvalues)
 
+    if self.antisymmetric:
+        if self.bcs == "dirichlet":  
+            eigenvalueLowerBound  = eigenvalueLowerBound[self.maxN:]
+            eigenvalueUpperBound  = eigenvalueUpperBound[self.maxN:] 
+        elif self.bcs == "neumann":
+            # The number of modes does not coincide with the length of the array
+            # due to the zero mode
+            pass
+            
+
     parameterizedODE = lambda omega: solve_ivp(
             lambda z, y: self.KleinGordonEquation(z, y, omega), 
             t_span=(0, 1),
@@ -102,8 +110,14 @@ def calculateEigenstates(self):
             ]
 
     # the eigenvalues should be antisymmetric i.e. omegaN = -omega_{-n}
-    self.eigenvalues = [ (i-j) / 2 for i, j in zip(eigenvalues, eigenvalues[::-1]) ]
     self.eigenstates = [ parameterizedODE(omega).sol(self.z)[0] for omega in eigenvalues ]
+
+    if self.antisymmetric:
+        if self.bcs == "dirichlet":
+            self.eigenvalues = [-omega for omega in self.eigenvalues[::-1]] + self.eigenvalues
+            self.eigenstates = [-eigenstate[::-1] for eigenstate in self.eigenstates[::-1] ] + self.eigenstates
+    else:
+        self.eigenvalues = [ (i-j) / 2 for i, j in zip(eigenvalues, eigenvalues[::-1]) ]
 
 def normalizeEigenstates(self):
     """

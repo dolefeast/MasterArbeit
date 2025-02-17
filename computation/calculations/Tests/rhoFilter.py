@@ -40,9 +40,8 @@ def filteringComparisonPlot(compute, ax1):
 def antisymmetrize(arr:list):
     return [(xForward - xBackwards)/2 for xForward, xBackwards in zip(arr, arr[::-1])]
 
-for _ in range(3):
-    # filterRegex = "NoFi*lam"
-    filterRegex = "lambda10"
+for _ in range(4):
+    filterRegex = ""
 
     directory, solutionFamilyArray = openSolutionFamilyArray(filterRegex)
 

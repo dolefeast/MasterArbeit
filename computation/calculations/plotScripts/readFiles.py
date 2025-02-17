@@ -14,7 +14,10 @@ def getDirectoryMA(readMode='str', filterRegex=""):
 
     while True:
         try:
-            index = int(input("Choose the desired directory... "))
+            indexSTR = input("Choose the desired directory... ")
+            if indexSTR == "":
+                return 
+            index = int(indexSTR)
             directory = sorted(list(dirs.glob(filterRegex)))[index-1]
             break
         except ValueError:

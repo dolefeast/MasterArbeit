@@ -34,6 +34,8 @@ class Vacuum_Polarization:
             dynamicRelaxParameter=False,
             subtractMasslessPertVacuumPolarization=False,
             parallelization=True,
+            antisymmetric=False,
+            saveEigenstates=False,
             ):
 
         self.e = e
@@ -50,21 +52,22 @@ class Vacuum_Polarization:
         if bcs == "neumann":
             self.eigenvalues = self.eigenvalues[:self.maxN] + [-self.m, self.m] + self.eigenvalues[self.maxN:]
 
-
-
         self.colorCycle = cycle(
     "#C52E19FF, #AC9765FF, #54D8B1FF, #B67C3BFF, #175149FF, #AF4E24FF".split(", ")
         )
         self.color = next(self.colorCycle)
 
-         
-        self.plot = savePlots or showPlots
-        self.plotForEachLambda = plotForEachLambda
-        self.saveData = saveData
-        self.savePlots = savePlots
-        self.showPlots = showPlots
-        self.read = read
-        self.parallelization = parallelization
+        self.plot = savePlots or showPlots  # Controls whether matplotlib is initialized
+        self.plotForEachLambda = plotForEachLambda # Plot the value of A0(z) at each iteration
+        self.saveData = saveData # Saves the (converged) solutions to the KGM equations
+        self.saveEigenstates = saveEigenstates # Saves the (converged) eigenstates. Set to False as it is not usually needed and it is very memory intensive
+        self.savePlots = savePlots # Saves the generated plots
+        self.showPlots = showPlots # Shows the generated plots
+        self.read = read # Read from some solutions 
+        self.parallelization = parallelization # Parallelizes the calculation of the eigenstates
+        self.antisymmetric = antisymmetric # Only calculates the last n modes and assumes that 
+                                           # the solutions are going to be symmetric with 
+                                           # respect to the 0 energy mode to save some time
 
         if self.plot:
             import matplotlib.pyplot as plt
