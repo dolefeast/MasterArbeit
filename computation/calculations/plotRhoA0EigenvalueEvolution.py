@@ -1,17 +1,21 @@
-from plotScripts.readDataScripts import openSolutionFamilyArray
-
+from scipy.interpolate import CubicSpline
 import sys
-from itertools import cycle
+import os
+from itertools import cycle, count
 import matplotlib.pyplot as plt
 import numpy as np
+import time
 
-def getIndexForValueFromBelow(array, value):
-    """
-    Given an array, return the biggest index i for which array[i] <= value
-    """
-    for i, element in enumerate(array):
-        if element > value:
-            return i-1
+
+from plotScripts.readDataScripts import openSolutionFamilyArray
+
+plt.rcParams["figure.figsize"] = (3.5, 2.6)
+plt.rcParams["font.size"] = "5.4"
+plt.rcParams["axes.labelsize"] = "13"
+plt.rcParams["xtick.labelsize"] = "13"
+plt.rcParams["ytick.labelsize"] = "13"
+plt.rcParams["lines.linewidth"] = "0.9"
+
 
 try:
     filterRegex = sys.argv[1]
@@ -20,17 +24,37 @@ except IndexError:
 
 cmap = cycle(plt.rcParams['axes.prop_cycle'].by_key()['color'])
 
+def getIndexForValueFromBelow(array, value):
+    """
+    Given an array, return the biggest index i for which array[i] <= value
+    """
+    for i, element in enumerate(array):
+        if element > value:
+            return i-1
+    return -1
+
+def maxDerivative(y):
+    x = np.linspace(0, 1, len(y))
+    y = CubicSpline(x, y)
+
+    return -y.derivative()(1/2)
+
 def plotOneSolutionFamily(
+        lineStyle,
+        desiredLambdaValues,
         filterRegex, 
         axRho,
         ax_A0Induced,
         axOmega,
-        axL2NormsRho,
-        axL2NormsA0Induced,
+        axQInduced,
+        axQScreened,
+        axesDict,
             ):
-    directory, solutionFamilyArray = openSolutionFamilyArray(filterRegex)
 
-    L2NormsDict = {"rho":[], "A0Induced":[]}
+    colorCycle = cycle("#247ba0, #a40e4c, #28502e, #1a1b41, #8d0801".split(", "))
+    directory, m, a, solutionFamilyArray = openSolutionFamilyArray(filterRegex)
+
+    inducedQList = []
 
     maxN = len(solutionFamilyArray["eigenvalues"][0])//2
     if maxN == 1: 
@@ -52,95 +76,132 @@ def plotOneSolutionFamily(
 
     color = next(cmap)
 
-    for quantity in desiredQuantities:
-        for i, lambdaValue in enumerate(solutionFamilyArray["lambdaValue"][:brokenLambdaIndex]):
-            recoveredQuantity = solutionFamilyArray[quantity][i]
-            L2NormsDict[quantity].append(max(recoveredQuantity))
-        axesL2Dict[quantity].plot(lambdaValueArray[:brokenLambdaIndex], L2NormsDict[quantity], label=f"{str(directory.parent.name)}/{str(directory.name)}", color=color)
-        axesL2Dict[quantity].legend(loc="best")
-        axesL2Dict[quantity].set_xlabel(r"$\lambda$")
-
+    for i, lambdaValue in enumerate(solutionFamilyArray["lambdaValue"][:brokenLambdaIndex]):
+        recoveredQuantity = solutionFamilyArray["A0Induced"][i]
+        inducedQList.append(maxDerivative(recoveredQuantity))
+    
+    label = f"{str(directory.parent.name)}"
+    axQInduced.plot(lambdaValueArray[:brokenLambdaIndex], inducedQList, label=label, color=color)
+    axQScreened.plot(lambdaValueArray[:brokenLambdaIndex], [x+ y for x, y in zip(lambdaValueArray[:brokenLambdaIndex], inducedQList)], label=label, color=color)
     print("The maximum lambda value obtained is", lambdaValueArray[brokenLambdaIndex]) #, ", with a minimum lambda step of", lambdaValueArray[-1]-lambdaValueArray[-2])
 
-    axOmega.plot(lambdaValueArray[:brokenLambdaIndex], solutionFamilyArray["eigenvalues"][:brokenLambdaIndex], color=color, label = f"{str(directory.parent.name)}/{str(directory.name)}")
+    axOmega.plot(lambdaValueArray[:brokenLambdaIndex], solutionFamilyArray["eigenvalues"][:brokenLambdaIndex], color=color, label=label)
+
+    desiredLambdaIndex = [ getIndexForValueFromBelow(lambdaValueArray, value) for value in desiredLambdaValues ]
+
+    for i in desiredLambdaIndex:
+        lineColor = next(colorCycle)
+        for quantity in desiredQuantities:
+            axesDict[quantity].set_xlabel("z")
+            axesDict[quantity].set_xlabel(r"$\lambda$")
+            axesDict[quantity].set_xlabel(r"$\lambda$")
+            if i is None:
+                continue
+            recoveredQuantity = solutionFamilyArray[quantity][i]
+
+            nPoints = len(recoveredQuantity)
+            z = np.linspace(0, 1, nPoints) 
+
+            axesDict[quantity].plot(
+                    z,
+                    recoveredQuantity,
+                    lineStyle,
+                    # color=lineColor,
+                    label=label, #f"$\lambda={lambdaValueArray[i]}$", 
+                    )
+
+    axRho.set_xlabel(r"$z$")
+    ax_A0Induced.set_xlabel(r"$z$")
+
+    axQScreened.set_xlabel(r"$\lambda$")
+    axQInduced.set_xlabel(r"$\lambda$")
+
+    axRho.set_ylabel(r"$\rho$")
+    ax_A0Induced.set_ylabel(r"$A_0^\text{br}$")
+
+    axOmega.set_xlabel(r"$\lambda$")
+    axOmega.set_ylabel(r"$\omega_n$")
+
+    axQInduced.set_ylabel(r"$Q_I$")
+    axQScreened.set_ylabel(r"$\lambda + Q_I$")
+    
+    fig1.tight_layout()
+    fig2.tight_layout()
+    fig3.tight_layout()
+    fig4.tight_layout()
+    fig5.tight_layout()
 
     return solutionFamilyArray
 
+maxLambdaDensity = None  # There are more solutions for one region of lambda than there are for other, this approximately keeps the density of solutions per lambda value fixed for visualization purposes
 
 
-maxLambdaDensity = None
+fig1 = plt.figure(f'vacuum polarization',  dpi=600)
+fig2 = plt.figure(f'induced potential',  dpi=600)
+fig3 = plt.figure(f'mode energy',  dpi=600)
+fig4 = plt.figure(f'Screening charge',  dpi=600)
+fig5 = plt.figure(f'Screened charge',  dpi=600)
 
-# brokenLambdaIndex -= 2
-
-
-fig1 = plt.figure(f'vacuum polarization', figsize=(6, 4))
-fig2 = plt.figure(f'induced potential', figsize=(6, 4))
-fig3 = plt.figure(f'mode energy', figsize=(6, 4))
-fig4 = plt.figure(f'L2 polarization', figsize=(6, 4))
-fig5 = plt.figure(f'L2 potential', figsize=(6, 4))
 
 axRho = fig1.subplots()
 ax_A0Induced = fig2.subplots()
 axOmega = fig3.subplots()
-axL2NormsRho = fig4.subplots()
-axL2NormsA0Induced = fig5.subplots()
+axQInduced = fig4.subplots()
+axQScreened = fig5.subplots()
 
 desiredQuantities = ["rho", "A0Induced"]
 
 axesDict = {"rho":axRho, "A0Induced":ax_A0Induced}
-axesL2Dict = {"rho":axL2NormsRho, "A0Induced":axL2NormsA0Induced}
 
-while True:
+desiredLambdaValues = [100000000]
+# desiredLambdaValues = [1.5, 2.5, 3.5]
+
+
+formats = cycle(["-", "--", ":"])
+
+for n in count():
     try:
         solutionFamilyArray = plotOneSolutionFamily(
+            next(formats),
+            desiredLambdaValues,
             filterRegex, 
             axRho,
             ax_A0Induced,
             axOmega,
-            axL2NormsRho,
-            axL2NormsA0Induced)
+            axQInduced,
+            axQScreened,
+            axesDict,
+            )
        
-        for quantity in desiredQuantities:
-            axesDict[quantity].set_xlabel("z")
-            axesDict[quantity].set_xlabel(r"$\lambda$")
-            for i, lambdaValue in enumerate(solutionFamilyArray["lambdaValue"][-2:]):
-                recoveredQuantity = solutionFamilyArray[quantity][i]
-
-                nPoints = len(recoveredQuantity)
-                z = np.linspace(0, 1, nPoints) 
-
-                axesDict[quantity].plot(
-                        z,
-                        recoveredQuantity,
-                        label=f"$\lambda={lambdaValue}$", 
-                        )
 
     except TypeError as e:
+        print(e)
         break
 
 
+if n > 1:
+    axQScreened.legend(loc="best")
+    axQInduced.legend(loc="best")
+    axOmega.legend(loc="best")
+    handles, labels = plt.gca().get_legend_handles_labels()
+    by_label = dict(zip(labels, handles))
+    axOmega.legend(by_label.values(), by_label.keys())
+    ncol = 2
+else:
+    ncol = 1
 
+axRho.legend(loc="best", ncol=ncol, markerscale=0.3)
+ax_A0Induced.legend(loc="best", ncol=ncol, markerscale=0.3)
 
-axRho.set_xlabel(r"$z$", fontsize=17)
-ax_A0Induced.set_xlabel(r"$z$", fontsize=17)
+date = time.strftime("%Y%m%d-%H%M%S")
 
-axRho.set_ylabel(r"$\rho$", fontsize=17)
-ax_A0Induced.set_ylabel(r"$A_0$", fontsize=17)
-
-axOmega.set_xlabel(r"$\lambda$", fontsize=17)
-axOmega.set_ylabel(r"$\omega_N$", fontsize=17)
-axOmega.legend(loc="best")
-
-
-# fig1.tight_layout()
-# fig2.tight_layout()
-# fig3.tight_layout()
-# fig4.tight_layout()
-
-axL2NormsRho.set_ylabel(r"$L_2(\rho)$")
-
-handles, labels = plt.gca().get_legend_handles_labels()
-by_label = dict(zip(labels, handles))
-axOmega.legend(by_label.values(), by_label.keys())
+if not os.path.exists(date):
+    os.makedirs("figures/" + date)
 
 plt.show()
+# fig1.savefig(f"figures/{date}/vacuumPolarizationEvolution.pdf")
+# fig2.savefig(f"figures/{date}/A0InducedEvolution.pdf")
+# fig3.savefig(f"figures/{date}/eigenvalues.pdf")
+# fig4.savefig(f"figures/{date}/inducedCharge.pdf")
+# fig5.savefig(f"figures/{date}/electricFieldInduced.pdf")
+

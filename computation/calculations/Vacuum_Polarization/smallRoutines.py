@@ -31,10 +31,12 @@ def setConfigFromDict(self, configDict:dict):
     self.maxN = len(self.eigenvalues)//2
     if self.bcs == "neumann":
         self.maxN -= 1
-    self.eigenstates = configDict["eigenstates"]
+
     self.nPoints = len(configDict["A0Induced"])
     self.z = linspace(0, 1, self.nPoints)
 
     self.A0Induced = CubicSpline(self.z, configDict["A0Induced"])
     self.rho =  configDict["rho"]
     self.lambdaValue = configDict["lambdaValue"]
+
+    self.calculateEigenstatesParallel()

@@ -163,7 +163,7 @@ def openPosixDict(
                 and items with the path of each of the files.
     """
     
-    dictKeys = ['eigenvalues', 'eigenstates',  'rho', 'A0Induced']
+    dictKeys = ['eigenvalues', 'rho', 'A0Induced']
     # Not to fill the dictionary with crap that we don't need
     finalDesiredQuantities = [] # To be able to ignore queries that were miswriten
     if desiredQuantities is None:
@@ -200,7 +200,7 @@ def openSolutionFamilyArray(filterRegex) -> dict:
     posixDict = getPosixForQuantities(m, a, directory=directory)
     solutionFamilyArray = openPosixDict(posixDict)
 
-    return directory, solutionFamilyArray
+    return directory, m,a, solutionFamilyArray
 
 if __name__ == "__main__":
     m = 0

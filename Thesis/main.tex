@@ -1,0 +1,37 @@
+\documentclass{book}
+\usepackage{graphicx} % Required for inserting images
+
+\title{Vacuum Polarization in 1+1 dimensions}
+\author{ssanzwuhl }
+\date{February 2025}
+
+\usepackage{physics}
+\usepackage{natbib}
+\usepackage{amsmath}
+\usepackage{color}
+\usepackage{amssymb}
+\usepackage{subcaption}
+\usepackage{graphicx}
+\usepackage{mathtools}
+
+\newcommand{\note}[1]{\textbf{\textcolor{red}{{[ #1 ]}}}}
+\newcommand{\vacuum}[1]{\bra{0}#1\ket{0}}
+\newcommand{\defeq}{\vcentcolon=}
+\newcommand{\eqdef}{=\vcentcolon}
+\begin{document}
+
+\maketitle
+\input{Chapters/introduction.tex}
+\input{Chapters/aqft.tex}
+\input{Chapters/methodology.tex}
+\input{Chapters/results.tex}
+\input{Chapters/bibNotes}
+    \appendix
+    \input{Appendices/computation.tex}
+    \input{Appendices/vacuum-polarization-at-first-perturbative-order.tex}
+    \input{Appendices/vacuum-polarization-hadamard.tex}
+    \input{Appendices/basinOfConvergence}
+    \input{Appendices/sanity-checks}
+        \bibliographystyle{abbrvnat}
+    \bibliography{MyThesis}
+\end{document}

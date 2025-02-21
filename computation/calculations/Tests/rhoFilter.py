@@ -40,17 +40,22 @@ def filteringComparisonPlot(compute, ax1):
 def antisymmetrize(arr:list):
     return [(xForward - xBackwards)/2 for xForward, xBackwards in zip(arr, arr[::-1])]
 
-for _ in range(4):
-    filterRegex = ""
+while True:
+    try:
+        filterRegex = ""
 
-    directory, solutionFamilyArray = openSolutionFamilyArray(filterRegex)
+        directory, m, a, solutionFamilyArray = openSolutionFamilyArray(filterRegex)
 
-    solutionFamily = {key:value[-1] for key, value in solutionFamilyArray.items()}
+        solutionFamily = {key:value[-1] for key, value in solutionFamilyArray.items()}
 
-    compute = Vacuum_Polarization(bcs=directory.name, subtractMasslessPertVacuumPolarization=True)
-    compute.setConfigFromDict(solutionFamily)
+        compute = Vacuum_Polarization(bcs=directory.name, subtractMasslessPertVacuumPolarization=True)
+        compute.setConfigFromDict(solutionFamily)
 
-    filteringComparisonPlot(compute, ax1)
+        filteringComparisonPlot(compute, ax1)
+    except ValueError as e:
+        print(e)
+        break
+
 
 ax1.legend(loc="best")
 

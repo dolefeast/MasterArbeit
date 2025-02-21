@@ -4,8 +4,7 @@ import matplotlib.pyplot as plt
 import sys
 import numpy as np
 
-lambdaMin = 10
-lambdaMax = 26
+lambdaMax = 30
 parallelization = True
 lambdaStep = 1
 lambdaStepMin = 1e-8
@@ -16,12 +15,12 @@ plotForEachLambda = False
 savePlots = False
 saveData = True
 antisymmetric = False
+maxNIterations = 50
 a = 1
 
-bcsArray = ["dirichlet", "neumann"]
-massArray = [0, 1, 5, 10]
-maxNArray = [50]
-
+bcsArray = ["dirichlet"]
+massArray = [5, 10]
+maxNArray = [25, 50, 75, 100, 125]
 
 for bcs in bcsArray:
     for m in massArray:
@@ -30,13 +29,13 @@ for bcs in bcsArray:
             if bcs == "neumann": 
                 if m == 0:
                     continue
-                lambdaMin = 0.1
 
+            lambdaMin = 1
             computation = Vacuum_Polarization(
                     maxN=int(maxN),
                     m=m,
                     lambdaMin=lambdaMin,
-                    a=1,
+                    a=a,
                     lambdaMax=lambdaMax,
                     parallelization=parallelization,
                     lambdaStep=lambdaStep,
@@ -50,10 +49,11 @@ for bcs in bcsArray:
                     directory=directory,
                     bcs=bcs,
                     antisymmetric=antisymmetric,
+                    maxNIterations=maxNIterations,
                     )
 
             try:
                 computation.fullScript()
             except Exception as e:
-                raise (e)
+                print(e)
                 continue

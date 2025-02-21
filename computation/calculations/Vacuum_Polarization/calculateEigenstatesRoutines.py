@@ -48,7 +48,7 @@ def calculateSingleEigenstate(self, omegaUpperLower):
 def calculateEigenstatesParallel(self):
     from pathos.multiprocessing import ProcessingPool as Pool
 
-    p = Pool(4)
+    p = Pool()
 
     def _calculateSingleEigenstate(omegaUpperLower):
         return calculateSingleEigenstate(self, omegaUpperLower)

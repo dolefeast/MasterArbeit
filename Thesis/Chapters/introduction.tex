@@ -15,6 +15,13 @@ On another note, recent interests have arisen in the effects of considering boun
 	\item We study the semiclassical approach to quantum field theory. This approach treats the background as a completely 
 \end{enumerate}
 
+These results, appearing in the study of QFTCS, will still be useful to our case. There is some parallelism to be drawn between electromagnetism and gravitation. In General Relativity, the Levi-Civita connection gives rise to the Christoffel symbols that make the covariant derivative $\nabla_\mu = \partial_\mu + \Gamma^\nu_{\mu\rho}$ covariant. In QFTCS, one is interested in solving the Einstein Field equations 
+\begin{align}
+	R_{\mu\nu} + \frac{1}{2}g_{\mu\nu}R= 8\pi\left<T_{\mu\nu} \right>_\omega,
+\end{align} 
+where the field considered interacts with the spacetime through the expectation value of its stress-energy tensor. The solutions of the Einstein Field Equations are related to the curvature tensor of the connection $R^{\lambda}_{\alpha \beta \delta} = \left[ \nabla_\alpha, \nabla_\beta \right] $.
+Similarly, in the case of electrodynamics, the connection over the $U(1)$ fiber bundle gives rise to the covariant derivative $D_\mu = \partial_\mu+ ie A_\mu $, and the dynamical equation of interest is Maxwell's equations, $\partial_\mu F^{\mu\nu}=j^{\nu}$, with $F^{\mu\nu} = [D_\mu, D_\nu]$ the curvature of the connection. We therefore argue that the results from QFTCS can be used for our case, mainly by substituting the metric covariant derivative $\nabla_\mu$ by the gauge covariant derivative $D_\mu$.
+
 \newpage
 \section*{Notation and conventions}
 
@@ -33,3 +40,83 @@ Unless noted otherwise, Einstein's summation convention is assumed, i.e.
 	a_\mu b^{\mu}= \sum_{n=0}^{N} a_\mu b^{\mu}.
 \end{align}
 
+
+
+\chapter{Introduction 2: Attack of the modes}
+
+\paragraph{Physical intuition}
+Vacuum polarization is one of the first effects studied in the context of Quantum Field Theory (QFT)
+In popular science, one of the main results of Quantum Field Theory is the description of the vacuum, no longer as the absence of matter, but as a superposition state of particle and anti-particle solutions.
+This image leads to the understanding of the vacuum as a fuzzy cloud in which virtual pairs of particles and anti-particles are constantly being created and annihilated. The presence of external electromagnetic fields, causes the vacuum to polarize, changing the behavior of the electric field in that medium. The propagation of electromagnetic fields is affected by this polarization, causing the fields to behave in a similar fashion as they due when in contact with materials with dielectric constant $\varepsilon > 1$.
+
+\paragraph{History and physical consequences}
+This process is called vacuum polarization, and it was one of the first effects studied in the context of Quantum Field Theory (QFT)
+ by \cite{Eule1935, Heis1936, Uehl1935}. Strong enough electric charges polarize the vacuum, modifying Maxwells's equations, which are famously linear. The polarization of the vacuum induces a non-linearity in Maxwell's equation through which under high enough energies, light is deflected by Coulomb fields, split, or even have light-by-light scattering, at first-loop order. These behaviors were observed in \cite{Jarl1973} and \cite{ATLAS:2016pab}, respectively. Vacuum polarization also provides corrections to the Coulomb force as was first studied by \cite{Uehl1935}. These short distance interactions contribute to the Lamb shift of the Hydrogen atom at order of the Compton wavelength of the electron $\lambda_e = \frac{\hbar}{m_e c^2}$ .
+
+\paragraph{Schwinger effect}
+Furthermore, vacuum polarization also plays a crucial effect in the creation of real particle-antiparticle pairs via the Schwinger effect \cite{Schw51}. 
+
+\paragraph{Presence of boundaries in QFT}
+
+\paragraph{Renormalization problems}
+Quantum Field Theory is famously problematic due to the apparition of infinities in the prediction of observable quantities. The process of quantization of the fields transform their derived observables from functions defined over the spacetime into operator valued distributions over the spacetime. The treatment of distributions as functions is no longer allowed, and calculations involving non-linear observables on the fields such as the charge current density of the Klein-Gordon field
+\begin{align}
+    j_\mu = ie (\phi^* \partial_\mu \phi - \phi \partial_\mu \phi^*),
+\end{align}
+are therefore no longer well-defined. The point-wise product of fields leads to divergences even when studying the vacuum state.
+
+In the context of Quantum Field Theory in the absence of external electromagnetic fields, $j_\mu$ is usually defined through normal ordering. Normal ordering sets the vacuum expectation value of an observable $\mathcal{O}(\phi)$ to zero and defines the expectation value in a state $\Omega$ as 
+\begin{align}
+    \bra{\Omega} :\mathcal{O} (\phi):\ket{\Omega} = 
+    \bra{\Omega} \mathcal{O} (\phi)\ket{\Omega} -
+    \bra{0} \mathcal{O} (\phi)\ket{0} .
+\end{align}
+With $0$ the vacuum state of the Klein-Gordon field.
+The normal ordering prescription is however no longer valid in the presence of external electromagnetic field, non-zero vacuum expectation values of the charge density operator are to be expected. 
+
+\cite{Dirac1934} proceeded by assuming that the vacuum state $\ket{0}_A$ in the presence of an electromagnetic field $A$ has the same short-range behavior as the $\ket{0}$ state in the absence of background electromagnetic field, up to smooth functions. That the vacuum state of the field is of this form is called the Hadamard condition, and the class of Hadamard states (i.e. states which verify the Hadamard condition) are usually said to be the only physically relevant states.
+A state $\Omega$ is said to be Hadamard if its two-point function is of the form 
+\begin{align}
+   w^{\phi \phi^*}_\Omega (x, x') = \bra{\Omega} \phi(x) \phi^*(x') \ket{\Omega} =  H^{\phi \phi^*}(x, x') + R^{\phi \phi^*}_\Omega.
+\end{align}
+Here, the Hadamard parametrix $H^{\phi \phi^*}(x, x')$ is a state-independent diverging distribution as $x' \to x$, and $R^{\phi \phi^*}_\Omega$ is a smooth distribution, constructed from local geometric data.
+
+
+Hadamard states have recently gained relevance, in the context of Quantum Field Theory on Curved Spacetimes (QFTCS) \cite{Wald1977, Hollands_2015, Wald1994}. Indeed, even if the vacuum can be uniquely defined,  analogous difficulties appear in the construction of the two-point function of the quantum field, due to the lack of translational invariance in generic spacetimes \note{Need citation here}. These results can still be applied to our case, since the construction of renormalized local observables (such as the charge density $j_\mu$) should only depend on local geometric data. In QFTCS, the geometry of interest is that of the spacetime, where as in QFT (in flat spacetime) in the presence of background electromagnetic fields, we study the geometry of the $U(1)$ principal bundle defined over Minkowski spacetime.
+
+In modern terms, one assumes that the two-point function associated to the vacuum state of the Klein-Gordon field is of Hadamard form.
+
+This Hadamard condition can be more precisely described in terms of micro-local analysis
+\section{Gauge relevance}
+The (second) simplest approach to Quantum Field Theory is the free complex Klein-Gordon field (the first being the real Klein-Gordon field). This field is described by the lagrangian density \begin{align}
+    \mathcal{L}= - \eta^{\mu\nu}\partial_\mu \phi^* \partial_\nu \phi + m^2 \phi^* \phi.
+    \label{eq:free-complex-lagrangian}
+\end{align}
+
+Even though the field $\phi$ is itself complex, its measurements are to be real and thus the lagrangian to be invariant with respect to gauge transformations $$\phi \to \phi'= e^{i\alpha} \phi, \phi^*\to \phi^{* }'=e^{-i\alpha}\phi^*, \alpha \in \mathbb{R}.$$ Though this is the case for constant $\alpha$ (known as \textit{global} gauge transformations), the derivatives in \eqref{eq:free-complex-lagrangian} do not guarantee invariance under these transformation.
+
+That $\mathcal{L}$ is invariant under these specific transformation is called a $U(1)$ symmetry. $U(1)$ is the group of unitary transformations of dimension one, $$U(1) = \{ e^{i\alpha} \mid \alpha \in \mathbb{R}\}.$$ Its identity element is 1, and it is also abelian. Given a field $\phi$, the gauge-transformed $\phi'(x) = u(x) \phi(x) = e^{i\alpha(x)}\phi(x), u(x) \in U(1) $. One can also study 
+\begin{align}
+    \partial_\mu \phi' = \partial_\mu (e^{i\alpha(x)}\phi(x)) = e^{i\alpha(x)} \partial_\mu \phi(x) + i\partial_\mu\alpha(x) e^{i\alpha(x)}\phi(x)
+\end{align}
+and notice that the derivative of the field is not covariant under this gauge transformation. 
+We therefore define the gauge covariant derivative of the field $\phi$ as follows 
+\begin{align}
+D_\mu \phi = \partial_\mu \phi  + ie A_\mu \phi.
+\end{align}
+
+...
+
+\section{Noether symmetries}
+Noether's theorem states that for every continuous symmetry of the action of a physical system presents a correspondent conservation law. In this case, the $U(1)$ symmetry of the lagrangian implies the conserved current 
+\begin{align}
+    j_\mu(x) = ie (\phi(x) (D(x)_\mu  \phi(x))^* - \phi(x)^* D(x)_\mu \phi(x)).
+    \label{eq:charge-current-density}
+\end{align}
+Upon first quantization, $\phi$ is promoted to an operator-valued distribution over the spacetime\footnote{Discussing the value of the distribution at points on the spacetime is also not well-defined. One should instead discuss the distributions as averaged over the spacetime, weighted by some test function $f$, defining the field as the functional $$\phi(f) = \int \phi(x)f(x)dx.$$ In this sense, $\phi$ is said to obey the Klein-Gordon equation distributionaly, i.e. $$\phi((D_\mu D^\mu + m^2) f) = 0$$}. The distributional nature of the Klein-Gordon field prevents point-wise products of $\phi(x)$ to be a priori well-defined.
+
+In the absence of external electromagnetic fields, operators $\mathcal{O}$ are usually redefined through normal ordering, $\mathcal{O} \to :\mathcal{O}:$. One of the key properties of normal ordered operators is having a zero vacuum expectation value. This is no longer an expected behavior in the presence of external electromagnetic fields.
+
+With electromagnetic fields present, the expectation value of these operators should be defined by assuming that the state $\Omega$ (with respect to which the expectation value is taken), and particularly the two-point function $w(x, x')^{\phi \phi^*}_\Omega$ associated to the state is of Hadamard form. The details of this definition are discussed in following sections. 
+
+The Hadamard formalism, though it is being now revisited in the context of Quantum Field Theory in Curved Spacetimes, was also talked about in the definitions of operators such as \ref{eq:charge-current-density} in \cite{Dirac1934}. In this paper, they renormalize the charge operators as 

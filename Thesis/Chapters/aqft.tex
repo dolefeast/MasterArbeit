@@ -1,6 +1,5 @@
 \chapter{Preliminaries}
 
-
 %\paragraph{Why this chapter?}
 %This chapter appears because in the following chapter I calculate the expression of the expectation value of the charge density through Hadamard point-split renormalization
 %
@@ -263,126 +262,212 @@
 %	 \mathcal{F}(\mathcal{H}) = \oplus_{n=0}^\infty \mathcal{H}^{\otimes n}
 %\end{align}
 
-\section{Constructing the quantum field theory}
+\section{Quantization of the free complex scalar field}
 
 The free Klein-Gordon equation for a complex field $\phi$ in two spacetime dimensions is
 \begin{align}
-	(D_\mu D^{\mu} + m^2)\phi = 0,
+	(D(t, x)_\mu D(t, x)^{\mu} + m^2)\phi(t, x) = 0,
 	\label{eq:Klein-Gordon}
 	%\partial_\nu F^{\nu\mu} &= \left<j^{\mu} \right>.
 \end{align}
-with $D_\mu = \partial_\mu +i e A_\mu$ the gauge covariant derivative, and $D^\mu = \eta^{\mu\nu}D_\nu$, with $\eta$ the 2-dimensional Minkowski metric.
+with $D(t, x)_\mu = \partial_\mu +i e A(t, x)_\mu$ the gauge covariant derivative  and $D(t, x)^\mu = \eta^{\mu\nu}D(t, x)_\nu$, with $\eta$ the 2-dimensional Minkowski metric. We drop from now on the explicit dependence of the derivative with the spacetime coordinates.
 
 The general solution to equation \eqref{eq:Klein-Gordon} is 
 \begin{align}
 	\phi(t, x) = \sum_{n>0}^{} a_n \phi_n (x) e^{-i\Omega_n t}
 +\sum_{n<0}^{} b^*_n \phi_n (x) e^{-i\Omega_n t},
 \end{align}
-with $a_n, b_n$ complex coefficients depending on $n $, and $\phi_n$ solutions to
+with $a_n, b_n$ complex coefficients depending on $n $, and $\phi_n$ solutions to the time independent Klein-Gordon equation
 \begin{align}
-	\left[ \left( \Omega_n - eA_0 \right)^2 - \partial_1^2 + m^2  \right] \phi_n = 0,
+	\left[ \left( \Omega_n - eA_0 \right)^2 + \partial_1^2 - m^2  \right] \phi_n(x) = 0,
 \end{align}
-where the $\Omega_n$ are gauge dependent energy parameters that are calculated when applying the boundary conditions $\phi$ is subjected to.
+with $\Omega_n$ gauge dependent energy parameters that are calculated when applying the boundary conditions $\phi$ is subjected to. The $\phi_n$ are orthonormal with respect to the inner product 
+\begin{align}
+	(\phi_n, \phi_m) = \int_{\mathbb{R}}^{} \left( D_0\phi_n(x) \phi_m(x)^* - D_0^*\phi_n(x)^* \phi_m(x) \right) dx
+\end{align}
+and obey the completeness relation
+\begin{align}
+	i \sum_{n=-\infty}^{\infty} \phi_n(t, x') \partial_0 \phi_n(t, x) - \phi_n(t, x) \partial_0 \phi_n(t, x') = \delta ( x - x').
+\end{align}
 
-The associated canonical momentum is calculated as
+The canonical momentum $\pi$ associated to the field $\phi$ is calculated as
 \begin{align}
 	\pi(x) = D_0^*\phi^*= i\sum_{n>0}^{} a^*_n(\Omega_n - eA_0)\phi^*(x) e^{i\Omega_n t}
 + i\sum_{n<0}^{} b_n(\Omega_n - eA_0)\phi^*(x) e^{i\Omega_n t},
 \end{align}
-and the results are equivalent to the field $\phi^*$.
+and equivalently for the momentum $\pi^*$ associated to $\phi^*$ is  
+\begin{align}
+	\pi^*(x) = D_0\phi= -i\sum_{n>0}^{} a_n(\Omega_n - eA_0)\phi(x) e^{-i\Omega_n t}
+- i\sum_{n<0}^{} b_n^*(\Omega_n - eA_0)\phi(x) e^{-i\Omega_n t}.
+\end{align}
 
-We quantize the field $\phi(x)$ by imposing the same time commutation relation  
+Canonical quantization proceeds by promoting the classical fields $\phi, \pi$ to operators on the state Hilbert space obeying the same-time commutation relations 
 \begin{align}
 	[\phi(t, x), \pi(t, y)] = 
-	[\phi^*(t, x), \pi^*(t, y)] = i \delta(x-y)
+	[\phi^*(t, x), \pi^*(t, y)] = i \delta(x-y).
 \end{align}
-The quantization of the fields implies the promotion of the $a_n$, $b_n$ numbers into operators, and $a_n^*\to a_n^\dagger$. Due to the canonical commutation relations,
+The imposition of these commutation relations, together with the orthonormality and completeness condition, imply that the quantum operators corresponding to the classical coefficients $a_n$, $b_n$ are the ladder operators obeying the commutation relations
 \begin{align}
-	[a_n, a_m^\dagger] = [b_n, b_m^\dagger]= \delta_{nm},
+	[a_n, a_m^\dagger] &= [b_n, b_m^\dagger]= \delta_{nm}, \\
+	[a_n, a_m] = [b_n, b_m]&= 
+	[a_n, b_m] = [a_n, b^\dagger_m]=  0.
 \end{align}
-and the annihiliation operators $a_n$, $b_n$ can be written as 
+The ladder operators, in particular the annihilation operators $a_n, b_n $ define the vacuum state as that element of the Hilbert space of states which obeys 
 \begin{align}
-	a_n = e^{-i\Omega_n t}\sum_{n>0}^{} a_n z^n
+	a_n \ket{0} = b_n \ket{0} = 0.
 \end{align}
+%We proceed in the construction of quantum field theory as the quantization of a classical field theory. Therefore, consider the lagrangian of the complex free field
+%\begin{align}
+%	\mathcal{L} = \partial_\mu\phi^* \partial_\mu\phi + m^2\phi^*\phi.
+%\end{align}
+%From the lagrangian one can calculate the equations of movement of the field , namely the Klein-Gordon equation
+%\begin{align}
+%	\left( \partial_\mu\partial^\mu + m^2 \right) 	\phi = 0.
+%\end{align}
+%One also defines the canonical momentum associated to the scalar field $\pi = \frac{\partial \mathcal{L}}{\partial \partial_0\phi}  =  \left(\partial_0 \phi  \right) ^*$. One also calculates the Hamiltonian density of the Klein-Gordon field as the Legendre transform of the Lagrangian
+%\begin{align}
+%	H = \frac{1}{2}\pi^* \pi + \frac{1}{2} \left( \nabla  \phi\right) ^*\left(  \nabla \phi \right) + m^2\phi^*\phi.
+%\end{align}
+%
+%Linearity of the Klein-Gordon equation allows one to decompose it into a mode equation by assuming the ansatz 
+%\begin{align}
+%	\phi(t, x) = \sum_{}^{} a_n \phi_n e^{-i\omega_nt}
+%+	 \sum_{}^{} b^*_n \phi_n e^{+i\omega_nt}.
+%\end{align}
+%The expansion of $\phi$ presents the two sets of coefficients  $a_n$, $b_n$ which arise from the added degrees of freedom due to  $\phi$ being a  complex field.
+%
 
-
-When solved with compactly supported Cauchy data $\left(\left. \phi\right|_\Sigma, \left. n^{\mu}D_\mu\phi \right|_\Sigma\right)$, with $\Sigma$ a space-like hypersurface (typically a constant-$t$ surface) and $n$ a unit vector orthogonal to $\Sigma$, the global hyperbolicity of Minkowski spacetime ensures that this problem is well posed.
-		The collection of all possible smooth $\phi$ with compactly supported Cauchy data forms the configuration space $\mathcal{C}$. From $\mathcal{C}$ one constructs the phase space $\mathcal{P} = T^*\mathcal{C}$, as its cotangent space. The elements of $\mathcal{P}$ are the points $(\phi, \pi)$, with $\pi=D_0^*\phi^*$ the canonical conjugate of the field $\phi$. Points in the phase space correspond to initial conditions for the Klein-Gordon equation on the Cauchy surface $\Sigma.$
-		$\mathcal{P}$ can be endowed with symplectic structure with the symplectic\footnote{Bilinear, antisymmetric} form
-		\begin{align}
-			\sigma((\phi_1, \pi_1), (\phi_2, \pi_2)) = i \int_\Sigma \left( \pi_1^* \phi_2^*- \pi_2\phi_1 \right) d\Sigma.
-		\end{align}
-		It is not difficult to prove that $\sigma$ is a time evolution invariant if $\phi_1$, $\phi_2$ are solutions to the Klein-Gordon equation, as long as they are compactly supprted. \note{Prove this? In appendix?}
-	
-The solution space  $\mathcal{S}$ is the space of all smooth solutions to the Klein-Gordon equation. As the initial data fully determines a solution to the Klein-Gordon equation, each solution corresponds to a point in phase space and therefore $\mathcal{S}$ can be identified with $\mathcal{P}$.
-$\mathcal{S}$ can be given Hilbert space structure as follows: 
-\begin{enumerate}
-	\item Define the subspace $\mathcal{S}_+$ of positive frequency solutions. In this subspace the symplectic product can be made positive definite.
-	\item Define a Hermitian inner product in this subspace 
-	\begin{align}
-		(\phi_1, \phi_2) = i\sigma(\phi_1^*, \phi_2), \,\,\, \phi_1, \phi_2 \in S_{+}
-	\end{align}
-\item Complete $\mathcal{S}_+$ with respect to this norm. \note{How to go from this to the whole $\mathcal{S}$?}
-\end{enumerate}
-	
-
-In classical mechanics, observables are the compactly supported functions \linebreak $f: \mathcal{S}\rightarrow \mathbb{C}$. They can be equipped with an algebra structure via the Poisson brackets, 
+One also talks about the two two-point functions for a particular state $\chi$\footnote{The two point functions are also defined distributionally by 
 \begin{align}
-\{f, g\}  := \int_{\Sigma}^{}  \left( \frac{\delta f}{\delta \phi} \frac{\delta g}{\delta \pi} - \frac{\delta g}{\delta \phi} \frac{\delta f}{\delta \pi}  \right) d\Sigma.
-\end{align}
-
-First quantisation is done by the\, $\hat{}$\, operator, which elevates classical observables $f$ to operators $\hat{f}$ on the $\mathcal{S}$ obeying the algebraic rule 
+	w^{\phi \phi^*}(f, g) = \bra{\Omega} \phi(f)\phi^*(g) \ket{\Omega} = \int_{\mathbb{R}^2\times \mathbb{R}^2}^{}  w^{\phi\phi^*}_\Omega(x, x') f(x) g(x')dx dx'
+\end{align}}
 \begin{align}
-	[ \hat{f}, \hat{g} ] = i \hat{\{f, g\} },
+	w_\chi^{\phi \phi^*}(t, x; t', x') &= \bra{\chi} \phi(t, x) \phi^*(t', x') \ket{\chi}  \\
+	w_\chi^{\phi^* \phi}(t, x; t', x') &= \bra{\chi} \phi^*(t, x) \phi(t', x') \ket{\chi}.
 \end{align}
-with $ \hat{\{f, g\} }$ the quantized version of the Poisson bracket.
-
-The field observables are defined with respect to smooth compactly supported test functions $f$
+In particular for the vacuum state, they present the following form
 \begin{align}
-	\phi(f) = a(f)e^{-i\omega t} + a^\dagger(\overline{f}) e^{i\omega t},
+	w_0^{\phi_n \phi_n^*}(t, x; t', x') &= \sum_{n>0}^{}  \phi_n(x)\phi_n^*(x') e^{-i\Omega_n(t-t')} \\
+		w_0^{\phi_n^*\phi_n }(t, x; t', x') &= \sum_{n<0}^{}  \phi_n(x)\phi_n^*(x') e^{i\Omega_n(t-t')}.
 \end{align}
-where the $a$ and $a^\dagger$ operators are defined the same way the are constructed in the quantum harmonic oscillator problem. 
-
-The measured observables of the field in a state $\Omega \in \mathcal{F}(\mathcal{S)}$ are therefore the expectation value $ \bra{\Omega} \phi(f) \ket{\Omega}$.
-Through $\phi(f)$ one can define the field as the weighted average by the test function $f$ of the spacetime distribution $\phi(x)$ through 
+The two-point function is a bi-solution of the Klein-Gordon equation
 \begin{align}
-	\phi (f) = \int_{\mathbb{R}^{n}}^{} \phi(x) f(x) d^{n}x,
+	\mathcal{K}w_\chi^{\phi \phi^*}(t, x; t', x')  
+	= \mathcal{K'} w_\chi^{\phi \phi^*}(t, x; t', x')   = 0.
 \end{align}
-with $\phi(x)$ an operator valued distribution.
-This also formally defines the two-point function as the distributional kernel of
-\begin{align}
-	w^{\phi\phi^*}_\Omega(f, h) 
-	= \bra{\Omega} \phi(f)\phi^*(g) \ket{\Omega}  
-	= \int_{\mathcal{M}\times \mathcal{M}}  f(x) g(x') w^{\phi\phi^*}_\Omega(x, x') dx dx'.
-	\label{eq:two-point-function-formal-definition}
-\end{align}
+In the previous equation $\mathcal{K} = D_\mu D^{\mu} + m^2$ the Klein-Gordon operator, and $\mathcal{K'}$ the Klein-Gordon operator acting on the variables $(t', x')$.
 
+Finally, measurement of a linear observable $\mathcal{O}(\phi)$ $\phi$ is done by taking its expectation value with respect to some state 
+\begin{align}
+	\left< \mathcal{O}(\phi) \right>_\chi =\bra{\chi} \mathcal{O}\phi \ket{\chi} .
+\end{align}
+Observables $\mathcal{O}(\phi)$ non-linear on the fields involve taking the product of the distributions $\phi$. This operation is a priori ill-defined and its proper mathematical definition is dealt with in the next section.
+
+%\paragraph{Schrödinger vs. Heisenberg picture}
+%In non-relativistic quantum mechanics (this can also be done in QFT, but it is non-standard), the usual way of studying solutions to the Schrödinger equation is using the Schrödinger picture.
+%The Schrödinger picture means that solutions to the Schrödinger equation 
+%\begin{align}
+%	i\hbar \partial_t \psi(t, \textbf{x}) = H \psi(t, \textbf{x})
+%\end{align}
+%evolve in time as follows 
+%\begin{align}
+%	\psi(t, \textbf{x}) = e^{-iH (t-t_0)} \psi(t_0, \textbf{x}),
+%\end{align}
+%i.e. it focuses in the study of the time evolution of the wave function, where the operators remain "constant" in time. In this picture, the evaluation expectation values of some observable in the Schrödinger picture $\mathcal{O}_S$ and its evolution in time goes as 
+%\begin{align}
+%	\bra{\phi(t, \textbf{x})} \mathcal{O}_S \ket{\phi(t, \textbf{x})}  = 
+%	\bra{\phi(t_0, \textbf{x})} e^{iH(t-t_0)} \mathcal{O}_S e^{-iH(t-t_0)} \ket{\phi(t_0, \textbf{x})} .
+%	\label{eq:time-evolution-in-the-schrodinger-picture}
+%\end{align}
+%One might equivalently work in the Heisenberg picture, in which the study focuses on the time evolution of the operators, and the vectors are time-independent. By observing \eqref{eq:time-evolution-in-the-schrodinger-picture}, the operator $\mathcal{O}$ in the Heisenberg picture is defined as 
+%\begin{align}
+%	\mathcal{O}_H = e^{iH(t-t_0)} O_S e^{-iH(t-t_0)},
+%\end{align}
+%and differentiation of this expression with respect to time yields the equivalent time evolution equation for the operator $\mathcal{O}$ in the Heisenberg equation 
+%\begin{align}
+%		\frac{d\mathcal{O}_H}{dt} = i[H, \mathcal{O}_H].
+%\end{align}
+%
+
+%When solved with compactly supported Cauchy data $\left(\left. \phi\right|_\Sigma, \left. n^{\mu}D_\mu\phi \right|_\Sigma\right)$, with $\Sigma$ a space-like hypersurface (typically a constant-$t$ surface) and $n$ a unit vector orthogonal to $\Sigma$, the global hyperbolicity of Minkowski spacetime ensures that this problem is well posed.
+%		The collection of all possible smooth $\phi$ with compactly supported Cauchy data forms the configuration space $\mathcal{C}$. From $\mathcal{C}$ one constructs the phase space $\mathcal{P} = T^*\mathcal{C}$, as its cotangent space. The elements of $\mathcal{P}$ are the points $(\phi, \pi)$, with $\pi=D_0^*\phi^*$ the canonical conjugate of the field $\phi$. Points in the phase space correspond to initial conditions for the Klein-Gordon equation on the Cauchy surface $\Sigma.$
+%		$\mathcal{P}$ can be endowed with symplectic structure with the symplectic\footnote{Bilinear, antisymmetric} form
+%		\begin{align}
+%			\sigma((\phi_1, \pi_1), (\phi_2, \pi_2)) = i \int_\Sigma \left( \pi_1^* \phi_2^*- \pi_2\phi_1 \right) d\Sigma.
+%		\end{align}
+%		It is not difficult to prove that $\sigma$ is a time evolution invariant if $\phi_1$, $\phi_2$ are solutions to the Klein-Gordon equation, as long as they are compactly supprted. \note{Prove this? In appendix?}
+%	
+%The solution space  $\mathcal{S}$ is the space of all smooth solutions to the Klein-Gordon equation. As the initial data fully determines a solution to the Klein-Gordon equation, each solution corresponds to a point in phase space and therefore $\mathcal{S}$ can be identified with $\mathcal{P}$.
+%$\mathcal{S}$ can be given Hilbert space structure as follows: 
+%\begin{enumerate}
+%	\item Define the subspace $\mathcal{S}_+$ of positive frequency solutions. In this subspace the symplectic product can be made positive definite.
+%	\item Define a Hermitian inner product in this subspace 
+%	\begin{align}
+%		(\phi_1, \phi_2) = i\sigma(\phi_1^*, \phi_2), \,\,\, \phi_1, \phi_2 \in S_{+}
+%	\end{align}
+%\item Complete $\mathcal{S}_+$ with respect to this norm. \note{How to go from this to the whole $\mathcal{S}$?}
+%\end{enumerate}
+%	
+%
+%In classical mechanics, observables are the compactly supported functions \linebreak $f: \mathcal{S}\rightarrow \mathbb{C}$. They can be equipped with an algebra structure via the Poisson brackets, 
+%\begin{align}
+%\{f, g\}  := \int_{\Sigma}^{}  \left( \frac{\delta f}{\delta \phi} \frac{\delta g}{\delta \pi} - \frac{\delta g}{\delta \phi} \frac{\delta f}{\delta \pi}  \right) d\Sigma.
+%\end{align}
+%
+%First quantisation is done by the\, $\hat{}$\, operator, which elevates classical observables $f$ to operators $\hat{f}$ on the $\mathcal{S}$ obeying the algebraic rule 
+%\begin{align}
+%	[ \hat{f}, \hat{g} ] = i \hat{\{f, g\} },
+%\end{align}
+%with $ \hat{\{f, g\} }$ the quantized version of the Poisson bracket.
+%
+%The field observables are defined with respect to smooth compactly supported test functions $f$
+%\begin{align}
+%	\phi(f) = a(f)e^{-i\omega t} + a^\dagger(\overline{f}) e^{i\omega t},
+%\end{align}
+%where the $a$ and $a^\dagger$ operators are defined the same way the are constructed in the quantum harmonic oscillator problem. 
+%
+%The measured observables of the field in a state $\Omega \in \mathcal{F}(\mathcal{S)}$ are therefore the expectation value $ \bra{\Omega} \phi(f) \ket{\Omega}$.
+%Through $\phi(f)$ one can define the field as the weighted average by the test function $f$ of the spacetime distribution $\phi(x)$ through 
+%\begin{align}
+%	\phi (f) = \int_{\mathbb{R}^{n}}^{} \phi(x) f(x) d^{n}x,
+%\end{align}
+%with $\phi(x)$ an operator valued distribution.
+%This also formally defines the two-point function as the distributional kernel of
+%\begin{align}
+%	w^{\phi\phi^*}_\Omega(f, h) 
+%	= \bra{\Omega} \phi(f)\phi^*(g) \ket{\Omega}  
+%	= \int_{\mathcal{M}\times \mathcal{M}}  f(x) g(x') w^{\phi\phi^*}_\Omega(x, x') dx dx'.
+%	\label{eq:two-point-function-formal-definition}
+%\end{align}
 
 \section{Hadamard two point functions and point-split renormalization}
 \label{sec:Hadamard}
-The above mentioned construction of QFT is incomplete in the sense that it fails to describe the product of fields at same spacetime points. In particular, we are interested in calculating the following expression
+The approach to QFT described in the previous section is incomplete in the sense that it fails to describe the product of fields at coinciding spacetime points. In particular, we are interested in calculating the following expression
 \begin{align}
-	\rho(x) = \left<\hat{\rho}(x) \right>_\Omega= ie\bra{\Omega} \phi(x)^* D_0\phi(x) - \phi(x) D_0^* \phi(x)^* \ket{\Omega},
+	\rho(x) = \left<\hat{\rho}(x) \right>_\Omega= ie\bra{\Omega} \phi(x)^* D_0\phi(x) - \phi(x) D_0^* \phi(x)^* \ket{\Omega}.
 	\label{eq:rho-expectation-value}
 \end{align}
-wich is a priori ill-defined and needs to be renormalized.
+Under this approach, quantum fields are operator-valued distributions over Minkowski spacetime, and as distributions, their point-wise product is a priori ill-defined and calls for renormalization.
 
-The direct evaluation of \eqref{eq:rho-expectation-value} is divergent, even for the vacuum, due to the terms $a_n a^\dagger_n$, $b_n b_n^\dagger$ found in the mode expansion of the product of the fields \note{Mention the mode expansion here?}. The usual procedure in Relativistic Quantum Field Theory is to define $\left<\rho(x) \right>_\Omega$ through normal ordering,
+The direct evaluation of \eqref{eq:rho-expectation-value} is divergent, even for the vacuum, due to the terms $a_n a^\dagger_n$, $b_n b_n^\dagger$ found in the mode expansion of the product of the fields. In Minkowski spacetime, in the absence of background fields, the usual procedure is to define $\left<\rho \right>_\Omega$ using the normal ordering prescription
 \begin{align}
-	\left<:\hat{\rho}(x) :\right>_\Omega:= \bra{\Omega} \hat{\rho}(x) \ket{\Omega} - \bra{0} \hat{\rho}(x) \ket{0},
+	\left<:\hat{\rho}(x) :\right>_\Omega:= \bra{\Omega} \hat{\rho}(x) \ket{\Omega} - \bra{0} \hat{\rho}(x) \ket{0}.
 \end{align}
-which defines the expectation values with respect to the vacuum state, or the zero-point value.
+Under this prescription, the expectation value of operators is defined with respect to the zero-point value, i.e. the vacuum expectation value.
 
-The normal ordering of an observable $\mathcal{O}(\phi) \rightarrow :\mathcal{O}(\phi):$ is a crucial tool in Quantum Field Theory in the absence of background electromagnetic fields, when defining products of field operators at coinciding points. This prescription presents the key property $ \left< :\mathcal{O}(\phi): \right>_0 = 0$, which is not an expected behaviour for the vacuum in the pressence of background electric fields. This prescription also presents the flaw of defining the expectation values using the vacuum as a reference point. In the pressence of more general electromagnetic fields, the definition of a vacuum state lacks uniqueness, rendering the normal ordering prescription for more general backgrounds invalid. Using this prescription also fails at correctly describing the Casimir effect, as it appears purely due to the boundaries, which are not seen in the normal ordering.
+Normal ordering of an observable $\mathcal{O}(\phi) \rightarrow :\mathcal{O}(\phi):$ is a crucial tool in Quantum Field Theory in the absence of background electromagnetic fields, on flat spacetimes.  This prescription quickly presents shortcomings when considering different setups.
+Firstly, though not relevant to our case, in the pressence of general background electric fields, \textit{the} vacuum state for the field lacks a clear-cut distinct definition. 
+Secondly, in case the vacuum presents a distinct definition (such as the one we study in this work), in the pressence of background electric fields the vacuum is expected to be polarized, due to the quantum nature of the Klein-Gordon field. This is by definition not observed in the normal ordering prescription, as it is one of its key assumptions.
+Finally, the normal ordering prescription also fails to observe key properties of the vacuum, such as the Casimir force.
 
-In the context of Quantum Field Theory on Curved Spacetimes, these difficulties are circumvented by the following observations
+These difficulties are circumvented by the following observations
 \begin{enumerate}
 	\item Even though the expectation value $ \bra{\Omega} \phi(x)\phi^*(x) \ket{\Omega} $ is ill-defined, the two point function \eqref{eq:two-point-function-formal-definition} 
 	is a well defined bi-distribution, bi-solution to the field equation, divergent as $x' \to x$.
 	\item In the normal ordering prescription, the divergences that appear when evaluating expectation values are defined through difference of expectation values between different states. There exists a class of states for which their difference in the expectation values is also well-defined.
 \end{enumerate}
-
-These results, appearing in the study of QFTCS, will still be useful to our case. There is some parallelism to be drawn between electromagnetism and gravitation. In General Relativity, the Levi-Civita connection gives rise to the Christoffel symbols that make the covariant derivative $\nabla_\mu = \partial_\mu + \Gamma^\nu_{\mu\rho}$ covariant. The dynamical equation is an equation on the curvature of the connection, $R_{\mu\nu}$. Similarly, in the case of electrodynamics, the connection over the $U(1)$ fiber bundle gives rise to the covariant derivative $D_\mu + ie A_\mu $, and the dynamical question of interest is Maxwell's equations, $\partial_\mu F^{\mu\nu}=j^{\nu}$, with $F^{\mu\nu}$ the curvature of the connection. For our specific case, we are mostly interested in the parallelism in between $\nabla_\mu$ and $D_\mu$.
+The definition of the renormalized expectation values in the pressence of electromagnetic fields was first done by Dirac \cite{Dirac1934}, and the concept of Hadamard point-split renormalization was revisited decades later in the context of Quantum Field Theory on Curved Spacetimes \cite{Wald1994}. 
+The renormalized quantities built from local field observables are to be defined only from locally constructed data. In the case of Quantum Field Theory on Curved Spacetimes, this locality referes to the locality in a small neighbourhood of the 
 
 We are particularly interested in the class of Hadamard states, states which have the same divergence \note{Not actually the same divergence structure, since the parallel transport is what gives the very relevant gauge invariance} structure as the vacuum state of the Klein-Gordon field in the absence of background electromagnetic fields,
 \begin{align}
