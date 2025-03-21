@@ -1,4 +1,4 @@
-from numpy import sin, cos, tan, pi
+from numpy import sin, cos, tan, pi, concatenate
 
 def perturbativePhi(self, n, z):
     """
@@ -7,12 +7,15 @@ def perturbativePhi(self, n, z):
     omegaN = ( self.m ** 2 + (pi * n) ** 2) ** (1/2)
     if self.bcs == "dirichlet":
         return omegaN ** (-1/2) * (
-                sin(pi * n * z) + self.lambdaValue * omegaN / (2 * pi * abs(n)) * (
-                        1/(pi * n) * (1/2 - z) * sin(pi*n*z) - z * (1-z) * cos(pi * n * z)
+                sin(pi * n * z)
+                + self.lambdaValue * omegaN / 2 / pi / abs(n) * 
+                (
+                        1/ pi / n * (1/2 - z) * sin(pi*n*z) 
+                        - z * (1-z) * cos(pi * n * z)
                         )
                     )
     elif self.bcs == "neumann":
-        if self.m == 0:
+        if self.n == 0:
             return ( 2 * self.m ) ** (-1/2) - self.lambdaValue * (2 * m) ** (1/2) * (
                     1/24 - 1/4 * z ** 2 + 1/6 * z ** 3
                     )
@@ -30,7 +33,9 @@ def perturbativeModeRho(self, n, z):
     
     assert self.bcs == "dirichlet", "Only the Dirichlet boundary conditions have been contemplated"
 
-    return - 2 * self.lambdaValue * (
+    omegaN = ( self.m ** 2 + (pi * n) ** 2) ** (1/2)
+
+    return - 2 * self.e * self.lambdaValue * (
             (z - 1/2) * (abs(omegaN)/(pi*n)**2 - 1/abs(omegaN)) * sin(n * pi * z)**2
             + abs(omegaN) / pi / n * sin(pi * n * z) * cos(pi * n * z) * (1-z) * z
             )
@@ -41,17 +46,17 @@ def cotZ(z):
     The z = 0, 1 exist in the limit, which are calculated using L'Hôpital's rule
     """
 
-    if z == 0:
-        return -1/pi
-    elif z == 1:
-        return 1/pi
-    else:
-        return z * (z - 1) * tan(pi * z) ** -1
+    return z * (1 - z) * tan(pi * z) ** -1
 
-def perturbativeTotalVacuumPolarization(self, n, z):
+def perturbativeTotalVacuumPolarization(self, z):
     """
     Perturbative vacuum polarization of the Klein-Gordon field after doing the summation (for the massless case). Copied from https://arxiv.org/abs/2010.05499 
     """
     assert self.bcs == "dirichlet", "Only the Dirichlet boundary conditions have been contemplated"
 
-    return - self.e * self.lambdaValue * cotZ(z) / 2
+    cotArray = cotZ(z[1:-1])
+    cotArray = concatenate(([1/pi], cotArray, [-1/pi]))
+
+
+    return - self.e * self.lambdaValue * cotArray / 2 
+

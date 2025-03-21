@@ -1,3 +1,5 @@
+import numpy as np
+
 def KleinGordonEquation(self, z, y, omega): 
     """
     The time-independent Klein-Gordon equation. This is input into the ODE solver 

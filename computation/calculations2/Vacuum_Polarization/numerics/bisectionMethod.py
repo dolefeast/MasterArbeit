@@ -14,7 +14,7 @@ class MaxIterError(Exception):
         return f"Number of attempts in finding a root exceeded maxiter={self.maxiter}"
 
 
-def bisectionMethod(self, fun, x1, x2, tol=1e-15, maxiter=800):
+def bisectionMethod(self, fun, x1, x2, tol=1e-15, maxiter=1500):
     """Uses the bisection method to find the root of a function. Works recursively
     Parameters:
         fun: the callable of which to find the roots
@@ -31,7 +31,7 @@ def bisectionMethod(self, fun, x1, x2, tol=1e-15, maxiter=800):
         return x2
 
     if maxiter==0:
-        raise MaxIterError(maxiter)
+        raise MaxIterError(self.bisectionMaxiter)
     if fun(x1)*fun(x2) > 0:
         raise NoRootFoundError(x1, x2)
 
@@ -47,7 +47,7 @@ def eigenvaluesUpperBound(self, previousArray):
     returns an array of upper bound guesses
     """
 
-    if len(previousArray) == 1: return [1.9 * element for element in previousArray] 
+    if self.maxN == 1: return [1.9 * element for element in previousArray] 
     
     positiveSolutions = [element for element in previousArray if element > 0]
     upperBound = [0] * len(positiveSolutions)
@@ -61,7 +61,7 @@ def eigenvaluesUpperBound(self, previousArray):
     return upperBound
 
 def eigenvaluesLowerBound(self, previousArray):
-    if len(previousArray) == 1: return [0., 0.]
+    if self.maxN == 1: return [ 0.]
     
     positiveSolutions = [element for element in previousArray if element > 0]
     lowerBound = [0] * len(positiveSolutions)
