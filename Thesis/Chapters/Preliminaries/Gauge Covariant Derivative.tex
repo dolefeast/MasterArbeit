@@ -1,0 +1,130 @@
+\section{The gauge covariant derivative}
+
+
+The Lagrangian of the complex Klein-Gordon field is usually introduced in QFT texts (\cite{Peskin:1995ev, srednicki}) as 
+\begin{align}
+    L = \partial_\mu \phi^* \partial^\mu \phi - m\phi^* \phi.
+\end{align}
+One easily checks that this lagrangian is invariant under global $U(1) = \{ e^{i\alpha} : \alpha \in \mathbb{R}\}$ gauge transformations
+\begin{align}
+    \phi(x) \to e^{i\alpha} \phi(x), \hspace{1cm}
+    \phi^*(x) \to e^{-i\alpha} \phi^*(x),
+\end{align}
+but fails to be invariant under local $U(1)$ group actions, i.e. with non-constant $\alpha = \alpha(x)$, due to the kinetic term $\partial_\mu \phi^* \partial^\mu\phi$. Under local gauge transformations, this term picks up explicitly gauge dependent terms
+$$-\partial_\mu \phi^* ' \partial^\mu \phi ' = 
+\partial_\mu \alpha \partial^\mu \alpha\phi^* \phi
+-i \partial_\mu \alpha \phi^* \partial^\mu \phi
++i \partial_\mu \alpha \partial^\mu\phi^*  \phi
++ \partial_\mu \phi^*\partial^\mu \phi
+.$$
+
+In fact, taking the derivative of the field along the direction of any unit vector $n$ involves comparing the field at different points,
+\begin{align}
+   \frac{\partial \phi}{\partial n}  = n^\mu \partial_\mu \phi = \lim_{\varepsilon \to 0} \frac{\phi(x+n\varepsilon) - \phi(x)}{\varepsilon}.
+\end{align}
+This expression does not present geometrical interpretation as the fields at $\phi(x+n\varepsilon)$ and at $\phi(x)$ have different transformation laws.
+In order to compare the field at different points, the field at $x$, $\phi(x)$ should be parallely transported  to $y=x + \varepsilon n$ by the unitary transformation $U(y, x)$. The parallel transport condition equates to $U(y, x)$ having the following behavior under local gauge transformations
+\begin{align}
+U(y, x) \to e^{i\alpha(y)} U(y, x) e^{-i\alpha(x)},
+\end{align}
+together with the zero-distance condition $U(y, y)=1$.
+
+We can check that $U(y, x) \phi(x)$ transforms correctly under gauge transformations 
+\begin{align}
+   U(y, x)\phi(x) \to e^{i\alpha(y)} U(y, x) e^{-i\alpha(x)} e^{i\alpha(x)} \phi(x) = e^{i\alpha(y)} U(y, x) \phi(x).
+   \label{eq:gauge-transform-property}
+\end{align}
+$U(y, x)$ can be written as a pure phase $U(y, x) = e^{if(y, x)}$, and at first order in $\varepsilon$, where $\varepsilon$ is defined such that $\varepsilon n^\mu = (y-x)^\mu$, 
+$$f(y, x) =  \varepsilon n^\mu \partial^{(y)}_\mu f(y, x)\lvert_{y=x} + O(\varepsilon)^2,$$
+and therefore
+\begin{align}
+    U(y, x) = e^{if(y, x)} = 1 + i \varepsilon n^\mu \partial^{(y)}_\mu f(y, x)\lvert_{y=x} + O(\varepsilon^2).
+\end{align}
+Here, $\partial^{(y)}$ acts only on the $y$ variable.
+Now with a proper comparison between the field at different points, the covariant derivative is defined along the direction $n$ by
+\begin{align}
+    \begin{split}
+    n^\mu D_\mu \phi &= \lim_{\varepsilon \to 0} \frac{\phi(x+n\varepsilon) - U(x + n \varepsilon, x)\phi(x)}{\varepsilon} \\
+    &= n^\mu\partial_\mu \phi + ie  n^\mu A_\mu \phi.
+    \end{split}
+\end{align}
+This defines the gauge potential $A_\mu := - \frac{1}{e} \partial^{(y)}_\mu f(y, x)\lvert_{y=x},$ with the factor $e$ arbitrarily introduced.
+Thus,
+\begin{align}
+    D_\mu = \partial_\mu + i e A_\mu.
+\end{align}
+The transform action \eqref{eq:gauge-transform-property} of $U(y, x)$  defines the gauge transformed $f(y, x)'$
+\begin{align}
+    U(y, x)'=e^{i\alpha(y)} e^{i f(y, x)} e^{-i\alpha(x)} =  e^{i( \alpha(y) + f(y, x) - \alpha(x))} = e^{if(y, x)'},
+\end{align}
+leading to the transformed gauge potential
+\begin{align}
+    A_\mu' = -\frac{1}{e}\partial_\mu^{(y)} f(y, x)' =- 
+      \frac{1}{e}\partial_\mu^{(y)} (f(y, x) + \alpha(y))   = A_\mu - \frac{1}{e}\partial_\mu\alpha.
+\end{align}
+It is easy to check that $D_\mu$ is indeed covariant under $U(1)$ gauge transformations
+\begin{align}
+\begin{split}
+    D_\mu \phi \to D_\mu'\phi' &= (D_\mu - i\partial_\mu \alpha) e^{i\alpha(x)}\phi \\
+   &= (\partial_\mu + ie A_\mu - i\partial_\mu \alpha) e^{i\alpha(x)}\phi \\ 
+   &= e^{i\alpha(x)}(i\partial_\mu\alpha(x) + \partial_\mu + ie A_\mu - i\partial_\mu \alpha) \phi \\ 
+   &= e^{i\alpha(x)} D_\mu \phi(x).
+\end{split}\end{align}
+Equivalently, 
+\begin{align}
+    D_\mu' = e^{i\alpha(x)} D_\mu e^{-i\alpha(x)}.
+    \label{eq:covariance}
+\end{align}
+
+This allows us to construct the $U(1)$ gauge invariant Klein-Gordon lagrangian 
+\begin{align}
+    L_{KG} = (D_\mu \phi)^* D^\mu \phi - m^2 \phi^* \phi.
+\end{align}
+
+Finally, in order to describe the kinematics of the gauge field $A_\mu$, we look at the covariance property \eqref{eq:covariance} of $D_\mu$ and notice that (gauge covariant) derivatives of the fields also transform as the field. In particular, one can indeed look at the commutator
+\begin{align}
+\begin{split}
+   [D_\mu, D_\nu ] \phi &= [
+   \partial_\mu + i e A_\mu, 
+   \partial_\nu + i e A_\nu]\phi
+   = ie([\partial_\mu , A_\nu] + [A_\mu, \partial_\nu]) \phi \\
+   &= ie(
+   \partial_\mu A_\nu 
+    -  A_\nu \partial_\mu
+   +A_\mu \partial_\nu
+   -\partial_\nu A_\mu ) \phi \\
+   &= ie((\partial_\mu A_\nu) + A_\nu\partial_\mu - A_\nu \partial_\mu + A_\mu\partial_\nu - (\partial_\nu A_\mu) - A_\mu \partial_\nu)\phi \\
+   &=  ie(\partial_\mu A_\nu - \partial_\nu A_\mu ) \phi = ie F_{\mu\nu} \phi.
+\end{split}\end{align}
+Here we used $[\partial_\mu, \partial_\nu]\phi=[A_\mu, A_\nu]\phi=0$.
+
+We identify $F_{\mu\nu} = \frac{1}{ie}[D_\mu, D_\nu]$ with the Faraday tensor, and we remark its gauge invariance
+\begin{align}
+\begin{split}
+   F'_{\mu\nu}\phi' 
+   = \frac{1}{ie}[D'_\mu, D'_\nu]  
+   = \frac{1}{ie}
+    [e^{i\alpha(x)} D_\mu e^{-i\alpha(x)}, 
+    e^{i\alpha(x)} D_\nu e^{-i\alpha(x)}] e^{i\alpha(x)}\phi(x) \\
+   =e^{i\alpha(x)}F_{\mu\nu}\phi 
+   =F_{\mu\nu}\phi'.
+\end{split}\end{align}
+In the context of general gauge symmetries, $F_{\mu\nu}$ is the field strength tensor and is defined in the same fashion.
+
+The simplest lagrangian describing the interaction between the Klein-Gordon field $\phi$ and the gauge field $A_\mu$ is the Klein-Gordon-Maxwell lagrangian,
+\begin{align}
+    L_{KGM} =  (D_\mu \phi)^* D^\mu \phi - m^2 \phi^* \phi - \frac{1}{4}F_{\mu\nu}F^{\mu\nu}.
+\end{align}
+This leads via the Euler-Lagrange equations to the Klein-Gordon-Maxwell equations, i.e. the coupling between the Klein-Gordon field and the electromagnetic field
+\begin{subequations}
+\begin{align}
+    (D_\mu D^\mu + m^2)\phi &= (\eta^{\mu\nu}(\partial_\mu + ie A_\mu)(\partial_\nu + i e A_\nu) + m^2) \phi = 0 
+    \label{eq:KG-equation}\\
+    (D^*_\mu D^*^\mu + m^2)\phi^* &= (\eta^{\mu\nu}(\partial_\mu - ie A_\mu)(\partial_\nu - i e A_\nu) + m^2) \phi^* = 0 \\
+    \partial_\mu F^{\mu \nu} &= ie (\phi^* D^\nu \phi - \phi D^\nu^* \phi^*) = j^\nu.
+    \label{eq:maxwell-equation}
+\end{align}
+\end{subequations}
+Here, we directly see how the Klein-Gordon field acts as a source for the electromagnetic field through its Noether current $j^\nu$ defined in Equation \eqref{eq:maxwell-equation}.
+
+This construction of gauge invariant lagrangians can be more elegantly stated and generalized to Lie group actions to construct the Yang-Mills lagrangian, cf \cite{Hamilton:2017gbn}.

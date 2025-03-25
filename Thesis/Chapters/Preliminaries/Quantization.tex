@@ -1,0 +1,113 @@
+\section{Quantization of the free complex scalar field}
+\label{sec:quantization}
+
+We study the Klein-Gordon field subject to the equation of motion \eqref{eq:KG-equation}.
+When submitted to Dirichlet 
+\begin{align}
+    \phi(t, 0) = \phi(t, a) = 0,
+\end{align}
+or  Neumann 
+\begin{align}
+   \left. \partial_1 \phi(t, x)  \right|_{x=0}
+   =\left. \partial_1 \phi(t, x)  \right|_{x=a} = 0
+\end{align}
+boundary conditions,
+the general solution to equation \eqref{eq:KG-equation} can be expressed as a sum of energy modes
+\begin{align}
+	\phi(t, x) = \sum_{n>0}^{} a_n \phi_n (x) e^{-i\Omega_n t}
++\sum_{n<0}^{} b^*_n \phi_n (x) e^{-i\Omega_n t},
+\label{eq:field-expansion}
+\end{align}
+with $a_n, b_n$ complex coefficients depending on $n $, and $\phi_n$ solutions to the time independent Klein-Gordon equation
+\begin{align}
+	\left[ \left( \Omega_n - eA_0 \right)^2 + \partial_1^2 - m^2  \right] \phi_n(x) = 0.
+    \label{eq:TIKGE1}
+\end{align}
+Here, $\Omega_n$ are gauge dependent energy parameters that are calculated when applying the boundary conditions $\phi$ is subjected to. The $\phi_n$ are orthonormal with respect to the inner product 
+\begin{align}
+	(\phi_n, \phi_m) = i\int_{0}^{1} \left(  \phi_n(x)^*D_0\phi_m(x) -  \phi_m(x)D_0^*\phi_n(x)^* \right) dx,
+\end{align}
+and $n>0$ corresponds to modes of positive norm and $n<0$ corresponds to modes of negative norm.
+
+The canonical momentum $\pi$ associated to the field $\phi$ is calculated as
+\begin{align}
+	\pi(x) = D_0^*\phi^*= i\sum_{n>0}^{} a^*_n(\Omega_n - eA_0)\phi_n^*(x) e^{i\Omega_n t}
++ i\sum_{n<0}^{} b_n(\Omega_n - eA_0)\phi_n^*(x) e^{i\Omega_n t},
+\end{align}
+and equivalently for the momentum $\pi^*$ associated to $\phi^*$ is  
+\begin{align}
+	\pi^*(x) = D_0\phi= -i\sum_{n>0}^{} a_n(\Omega_n - eA_0)\phi_n(x) e^{-i\Omega_n t}
+- i\sum_{n<0}^{} b_n^*(\Omega_n - eA_0)\phi_n(x) e^{-i\Omega_n t}.
+\end{align}
+
+Canonical quantization proceeds by promoting the classical fields $\phi, \pi$ to operators on the state Hilbert space obeying the same-time commutation relations 
+\begin{align}
+	[\phi(t, x), \pi(t, y)] = 
+	[\phi^*(t, x), \pi^*(t, y)] = i \delta(x-y)\mathbf{1}.
+\end{align}
+The imposition of these commutation relations, together with the orthonormality and completeness condition, imply that the operators corresponding to the classical coefficients $a_n$, $b_n$ are the ladder operators obeying the commutation relations
+\begin{align}
+	[a_n, a_m^\dagger] &= [b_n, b_m^\dagger]= \delta_{nm}\mathbf{1}, \\
+	[a_n, a_m] = [b_n, b_m]&= 
+	[a_n, b_m] = [a_n, b^\dagger_m]=  0.
+\end{align}
+The ladder operators, in particular the annihilation operators $a_n, b_n $ define the vacuum state as that element of the Hilbert space of states which obeys 
+\begin{align}
+	a_n \ket{0} = b_n \ket{0} = 0.
+\end{align}
+
+One also talks about the two two-point functions for a particular state $\chi$\footnote{The two point functions are also defined distributionally by 
+\begin{align*}
+	w^{\phi \phi^*}(f, g) = \bra{\Omega} \phi(f)\phi^*(g) \ket{\Omega} = \int_{\mathbb{R}^2\times \mathbb{R}^2}^{}  w^{\phi\phi^*}_\Omega(x, x') f(x) g(x')dx dx'
+\end{align*}}
+\begin{align}
+	w_\chi^{\phi \phi^*}(t, x; t', x') &= \bra{\chi} \phi(t, x) \phi^*(t', x') \ket{\chi}  \\
+	w_\chi^{\phi^* \phi}(t, x; t', x') &= \bra{\chi} \phi^*(t, x) \phi(t', x') \ket{\chi}.
+\end{align}
+The two-point function is a bi-solution of the Klein-Gordon equation
+\begin{align}
+	\mathcal{K}w_\chi^{\phi \phi^*}(t, x; t', x')  
+	= \mathcal{K'} w_\chi^{\phi \phi^*}(t, x; t', x')   = 0.
+\end{align}
+In the previous equation $\mathcal{K} = D_\mu D^{\mu} + m^2$ the Klein-Gordon operator, and $\mathcal{K'}$ the Klein-Gordon operator acting on the variables $(t', x')$.
+
+In particular for the vacuum state, the two-point functions present the following form
+\begin{align}
+	w_0^{\phi \phi^*}(t, x; t', x') &= \sum_{n>0}^{}  \phi_n(x)\phi_n^*(x') e^{-i\Omega_n(t-t')} \\
+		w_0^{\phi^*\phi }(t, x; t', x') &= \sum_{n<0}^{}  \phi_n(x)\phi_n^*(x') e^{i\Omega_n(t-t')}.
+        \label{eq:two-point-function}
+\end{align}
+
+
+Finally, measurement of a linear observable $\mathcal{O}(\phi)$ is done by taking its expectation value with respect to some state $\Omega$
+\begin{align}
+	\left< \mathcal{O}(\phi) \right>_\Omega =\bra{\Omega} \mathcal{O}(\phi) \ket{\Omega} .
+\end{align}
+Observables $\mathcal{O}(\phi)$ non-linear on the fields involve taking the product of the distributions $\phi$. This operation is a priori ill-defined and its proper mathematical definition is dealt with in the next section.
+
+%\subsection{Short-distance behavior of $w$}
+%
+%In this work we will be particularly interested in studying the short distance behavior of the two-point function of the massless Klein-Gordon field in the absence of electromagnetic fields.
+%For Dirichlet boundary conditions, the mode solutions to Equation \eqref{eq:TIKGE1} are 
+%\begin{align}
+%    \omega_n = \frac{n\pi}{a}, \hspace{1cm} \phi_n(x) = \sqrt{\frac{1}{n \pi}}\sin \frac{n \pi x}{a}.
+%\end{align}
+%Substituting this into the two-point functions in the Equations \eqref{eq:two-point-function} yields 
+%\begin{align}
+%    	w_0^{\phi \phi^*}(t, x; t', x') &= \sum_{n>0}^{} \frac{1}{n\pi} \sin \frac{n \pi x}{a}\sin \frac{n \pi x'}{a}  e^{-in(t-t')}.
+%\end{align}
+%We focus on the splitting along the time direction, i.e. $x'=x, t'=t + \tau$, thus
+%\begin{align}
+%    	w_0^{\phi \phi^*}(\tau) := 
+%    	w_0^{\phi \phi^*}(x, t; x, t + \tau) 
+%        &= \sum_{n>0}^{} \frac{1}{n\pi} \sin^2 \frac{n \pi x}{a}  e^{in\pi\tau}.
+%\end{align}
+%If we look at the time derivative of $w(\tau)$, 
+%\begin{align}
+%    	\partial_\tau w_0^{\phi \phi^*}(\tau) := 2\sum_{n>0} e^{in\pi\tau} \sim  \frac{2}{1- e^{i\pi \tau}} = \frac{2}{i\pi \tau}.
+%\end{align}
+%Integrating,
+%\begin{align}
+%    	 w_0^{\phi \phi^*}(\tau) := \frac{2}{i\pi} \log \tau,
+%\end{align}
+%\note{which is nonsense but has to be looked into}

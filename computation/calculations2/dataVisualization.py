@@ -94,11 +94,10 @@ def plotOneSolutionFamily(
     inducedTotalChargeList = [x+ y for x, y in zip(lambdaValueArray[:brokenLambdaIndex], inducedQList)]
 
     label = f"{str(directory.parent.name)}"
-    print(label)
     axQInduced.plot(lambdaValueArray[:brokenLambdaIndex], inducedQList, label=label, color=color)
     axQScreened.plot(lambdaValueArray[:brokenLambdaIndex], inducedTotalChargeList, label=label, color=color)
 
-    print("The maximum lambda value obtained is", lambdaValueArray[brokenLambdaIndex]) #, ", with a minimum lambda step of", lambdaValueArray[-1]-lambdaValueArray[-2])
+    print("The maximum lambda value obtained is", max(lambdaValueArray[:brokenLambdaIndex])) #, ", with a minimum lambda step of", lambdaValueArray[-1]-lambdaValueArray[-2])
 
     axOmega.plot(lambdaValueArray[:brokenLambdaIndex], solutionFamilyArray["eigenvalues"][:brokenLambdaIndex], color=color, label=label)
 
@@ -216,12 +215,12 @@ date = time.strftime("%Y%m%d-%H%M%S")
 
 plt.show()
 
-# if not os.path.exists(date):
-#     os.makedirs("figures/" + date)
+if not os.path.exists(date):
+    os.makedirs("figures/" + date)
 
-# fig1.savefig(f"figures/{date}/vacuumPolarizationEvolution.pdf")
-# fig2.savefig(f"figures/{date}/A0InducedEvolution.pdf")
-# fig3.savefig(f"figures/{date}/eigenvalues.pdf")
-# fig4.savefig(f"figures/{date}/inducedCharge.pdf")
-# fig5.savefig(f"figures/{date}/electricFieldInduced.pdf")
+fig1.savefig(f"figures/{date}/vacuumPolarizationEvolution.pdf")
+fig2.savefig(f"figures/{date}/A0InducedEvolution.pdf")
+fig3.savefig(f"figures/{date}/eigenvalues.pdf")
+fig4.savefig(f"figures/{date}/inducedCharge.pdf")
+fig5.savefig(f"figures/{date}/electricFieldInduced.pdf")
 

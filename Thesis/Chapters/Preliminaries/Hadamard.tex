@@ -1,0 +1,64 @@
+\section{Hadamard two point functions. Point-split renormalization.}
+\label{sec:Hadamard}
+
+
+The construction described in the section above presents an observable algebra that is limited to linear combinations of products of fields at different points, but fails at describing monomials e.g.~$\phi^\dagger \phi(x)$. In particular, we are interested in calculating the vacuum polarization
+\begin{align}
+	\rho(x) = \left<\hat{\rho}(x) \right>_\Omega= ie\bra{\Omega} \phi^* D_0\phi(x) - \phi D_0^* \phi^*(x) \ket{\Omega}.
+	\label{eq:rho-expectation-value}
+\end{align}
+Due to the distributional nature of the field this expression is ill-defined.
+
+It might be illustrative to consider the mode expansion for $\phi$ in Equation \eqref{eq:field-expansion}, where one sees that the presence of  the $a_n a^\dagger_n$, $b_n b_n^\dagger$ terms lead to divergences.  A powerful tool in removing these divergences is normal ordering, which defines field operators using their zero-point value\textemdash the vacuum expectation value\textemdash as a reference point. The charge density at some point $x$ for a the field in a state $\Omega$ is therefore calculated as
+\begin{align}
+	\left<:\hat{\rho}(x) :\right>_\Omega:= \bra{\Omega} \hat{\rho}(x) \ket{\Omega} - \bra{0} \hat{\rho}(x) \ket{0}.
+\end{align}
+One immediately sees that under this prescription, the vacuum polarization is always 0, and therefore normal ordering ceases to be an appropriate prescription in the presence of electromagnetic fields.  Normal ordering also fails to account for effects such as the Casimir force. 
+
+
+A well-defined way of dealing with these point-wise products of fields is by point-split renormalization with respect to a Hadamard parametrix. Physically reasonably states  present a two-point function $w^{\phi \phi^*}(x, x')$ of Hadamard form \cite{Wroc2011}
+\begin{align}
+    w_\Omega^{\phi \phi^*}(x, x') = 
+    H^{\phi \phi^*}(x, x') + R_\Omega^{\phi \phi^*}(x, x')
+\end{align}
+with $H^{\phi \phi^*}$ the Hadamard parametrix, a divergent bi-distribution independent of the state $\Omega$, resembling the behavior of the vacuum two-point function in absence of external fields, up to smooth coefficients, and $R_\Omega^{\phi\phi^*}$ a smooth function which does depend on the state.
+
+The Hadamard parametrix is a state independent bi-distribution, which in general takes the form
+\begin{align}
+H^{\phi\phi^*}(x, x') = \sum_{k=0}^{} V_k(x, x') T_k(x, x')
+\label{eq:hadamard-expansion}
+\end{align}
+with $V_k(x, x')$ smooth coefficients to be found. In 1+1 spacetime dimensions\footnote{cf.  \cite{D_canini_2008} for treatments of the Hadamard parametrix in $n\neq 2$ spacetime dimensions.}, the $T_k$ take the form
+\begin{align}
+	T_k(x,x') = 
+	-\frac{1}{ 2^{2+2k}\pi k!} (x-x') ^{  -2k} \log \frac{-(x-x')_\epsilon^2}{\Lambda^2}  
+\end{align}
+with  
+\begin{align}
+	 (x-x')^2_\varepsilon = (x-x')^2 - i\varepsilon \text{sign} (x-x')^0
+\end{align}
+and $\Lambda>0$ an arbitrary scale. Changes in $\Lambda$ amount to smooth modifications in the parametrix, which get absorbed by the smooth function $R$.
+It is important to note that the Hadamard parametrix is constructed entirely by geometrical means and is independent of the state. 
+
+
+To find the $V_k( x, x')$  functions, one imposes that $w(x, x')$ is a bi-solution to the Klein-Gordon equation, i.e. 
+\begin{align}
+	(D_\mu D^\mu  + m^2)w^{\phi \phi^*}_\Omega(x, x') = ( D^*'_\mu D^*'^{\mu} + m^2)w(x, x') = 0,
+\end{align}
+with $D'^*_\mu = \partial'_\mu - ieA_\mu(x')$ acting on  $x'$.
+With this imposition, one finds the Hadamard recursion relations (\cite{dewitt1960radiation, Schl2015})
+\begin{align}
+    (x-x')^\mu D_\mu V_k(x, x') + k V_k(x, x') = -k \mathcal{K} V_{k-1}(x, x')
+    \label{eq:transport-equation}
+\end{align}
+which together with the initial conditions \newline $\lim_{x' \to x} V_0(x, x') = 1$ leads to the family $V_k$ of solutions. 
+
+In practice, the full expansion of the parametrix is not needed (in fact, it does not converge in general\footnote{The Hadamard expansion should rather be read in a way that when truncated after some $k\geq \frac{n}{2}$, $W(x, x') \in C^{k+1 -\frac{n}{2}}$.}) since the $T_j$ vanish increasingly fast as $x'\to x$. The charge density operator of the Klein-Gordon field only contains first order derivatives of the field, and thus we are only interested in the $k=0$ term of the expansion, containing the $V_0$ coefficient, higher order terms vanish in the coinciding points limit.
+
+Once $H^{\phi \phi^*}$ is known, one can define the expectation value of point-wise products of fields (and derivatives) through point-splitting with respect to the Hadamard parametrix, 
+\begin{align}
+	\left<D_\alpha \phi D^*_\beta \phi^*(x) \right>_\Omega = \lim_{x' \to x} D_\alpha D_\beta^* ' \left( w^{\phi\phi^*}_\Omega(x, x') - H^{\phi \phi^*}(x, x') \right),
+	\label{eq:point-splitting-wrt-a-Hadamard-parametrix}
+\end{align}
+with $\alpha, \beta$ symmetrized multiindices.
+Due to the Hadamard form of the two-point function, in the limit of coinciding points, the divergences cancel out, resulting in a well-defined expectation value.
