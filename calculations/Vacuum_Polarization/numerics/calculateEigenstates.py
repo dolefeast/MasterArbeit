@@ -1,6 +1,5 @@
 from scipy.integrate import solve_ivp
-from scipy.integrate import quad as spquad
-from mpmath import quad, quadsubdiv
+from mpmath import quad
 import mpmath
 import numpy as np
 
@@ -38,8 +37,8 @@ def calculateSingleEigenstate(self, eigenvalueRange: tuple, error=False, verbose
             t_span=(0, 1),
             y0=initialValues,
             dense_output=True,
-            rtol=1e-10,
-            atol=1e-10,
+            rtol=1e-8,
+            atol=1e-6,
             )
 
     eigenvalue = self.bisectionMethod(
@@ -57,7 +56,15 @@ def calculateEigenstatesParallel(self):
     if self.parallelization:
         from pathos.multiprocessing import ProcessingPool as Pool
 
-        p = Pool(12)
+        p = Pool(self.threads)
+
+
+    if self.saveData:
+        with open(f"convergenceLog/{self.directory}/eigenvalues_lambda_{self.lambdaValue}_{self.bcs}.txt", "a") as eigenvalueFile:
+            eigenvalueFile.write(", ".join([str(round(w, 4)) for w in self.eigenvalues]) + "\n")
+
+        with open(f"convergenceLog/{self.directory}/A0Induced_lambda_{self.lambdaValue}_{self.bcs}.txt", "a") as A0Induced:
+            A0Induced.write(", ".join([str(round(w, 4)) for w in self.A0Induced(self.z)]) + "\n")
 
     def _calculateSingleEigenstate(omegaUpperLower):
         return calculateSingleEigenstate(self, omegaUpperLower)

@@ -35,7 +35,7 @@ def perturbativeModeRho(self, n, z):
 
     omegaN = ( self.m ** 2 + (pi * n) ** 2) ** (1/2)
 
-    return - 2 * self.e * self.lambdaValue * (
+    return - 2 * self.e * self.a * self.lambdaValue * (
             (z - 1/2) * (abs(omegaN)/(pi*n)**2 - 1/abs(omegaN)) * sin(n * pi * z)**2
             + abs(omegaN) / pi / n * sin(pi * n * z) * cos(pi * n * z) * (1-z) * z
             )
@@ -58,5 +58,5 @@ def perturbativeTotalVacuumPolarization(self, z):
     cotArray = concatenate(([1/pi], cotArray, [-1/pi]))
 
 
-    return - self.e * self.lambdaValue * cotArray / 2 
+    return - self.e *self.a * self.lambdaValue * cotArray / 2 
 

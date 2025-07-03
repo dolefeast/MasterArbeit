@@ -18,7 +18,7 @@ fig, ax = plt.subplots()
 
 plt.plot(vp.z, vp.perturbativeTotalVacuumPolarization(vp.z) - vp.e**2 / np.pi * vp.lambdaValue *(vp.z-1/2), label="With parallel transport")
 plt.plot(vp.z, vp.perturbativeTotalVacuumPolarization(vp.z), label="Without parallel transport")
-# plt.plot(vp.z, vp.perturbativeModeRho(1,vp.z), label="Without parallel transport")
+plt.plot(vp.z, vp.perturbativeModeRho(1,vp.z), label=r"$\frac{1}{2}(\rho_1(z) + \rho_{-1}(z))$")
 
 
 ax.legend()
@@ -27,5 +27,6 @@ ax.set_xlabel(r"$z$")
 
 fig.tight_layout(rect=[0, 0.03, 1, 0.95])
 fig.suptitle(f"m = {vp.m}, $\lambda$ = {vp.lambdaValue}")
-# plt.show()
+
+ 
 fig.savefig("hambjorn.pdf")

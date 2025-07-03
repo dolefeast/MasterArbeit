@@ -5,6 +5,7 @@ from scipy.interpolate import CubicSpline
 from pathlib import Path
 from mpmath import quad
 import shutil
+import time
 
 class Vacuum_Polarization:
     def __init__(self,
@@ -36,6 +37,7 @@ class Vacuum_Polarization:
             sigDigs=9,
             parallelization=True,
             extrapolate=True,
+            threads=4,
             ):
 
         self.e = e
@@ -77,7 +79,7 @@ class Vacuum_Polarization:
         self.lambdaStepMin = lambdaStepMin # For safety
 
         self.rho = [0] * self.nPoints
-        self.A0Induced = lambda z: 0
+        self.A0Induced = lambda z: 0 * z
         self.A0 = lambda z: - self.lambdaValue * (z - 1/2) 
 
         # Avoids recursion errors
@@ -92,18 +94,20 @@ class Vacuum_Polarization:
 
         self.saveData = saveData # Stores results as txt
         if saveData and directory == "":
-            raise ValueError("If saveData==True, directory cannot be empty")
+            raise ValueError("If saveData==True, directory name cannot be empty string")
         self.directory = directory
 
         if saveData:
-            directoryExists = Path("data/"+directory+"/"+bcs).is_dir()
+            directoryExists = Path("data/"+directory+"/"+bcs).is_dir() and Path("convergenceLog/"+directory+"/"+bcs).is_dir() 
             if directoryExists:
                 print(f"Warning: data/{directory} already existed.")
             else:
                 Path("data/"+directory+"/"+bcs).mkdir(parents=True, exist_ok=True)
+                Path("convergenceLog/"+directory+"/"+bcs).mkdir(parents=True, exist_ok=True)
         self.sigDigs = sigDigs
 
         self.parallelization = parallelization # For the mode calculations
+        self.threads = threads # number of threads for the parallelizatoin
         self.extrapolate = extrapolate  # To predict the folowing A0 after a converged one
 
         self.colorCycle = cycle(

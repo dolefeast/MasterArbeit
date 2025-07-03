@@ -17,8 +17,8 @@ def calculateRho(self):
         # The charge density associated to the nth mode
         # eigenstate is np array. A0 is a callable. 
         # A0(z) is of the same shape as eigenstate
-        rhoN = ((omegaN - self.e*self.A0(self.z)) * phiN ** 2 
-                + (-omegaN - self.e*self.A0(self.z)) * phiN[::-1] ** 2)
+        rhoN = self.a*self.e*((omegaN - self.e*self.a*self.A0(self.z)) * phiN ** 2 
+                + (-omegaN - self.e*self.a*self.A0(self.z)) * phiN[::-1] ** 2)
 
 
         if self.subtractPertModes:
@@ -33,11 +33,10 @@ def calculateRho(self):
 
     if self.hadamard:
         print("Adding extra potential term")
-        self.rho += self.e**2 / np.pi * self.A0(self.z)
+        self.rho += self.e**2 * self.a**2 / np.pi * self.A0(self.z)
 
 def convolveRho(self, kernel = None):
     from scipy.interpolate import CubicSpline
-
 
     if kernel is None:
         window = self.nPoints // (self.maxN + 1) *2
@@ -49,17 +48,15 @@ def convolveRho(self, kernel = None):
 
     convolvedRho = np.convolve(self.rho, kernel, mode="same")
 
-
-    if self.bcs == "dirichlet" and False:
+    if self.bcs == "dirichlet" and True:
     # The indices outside of the boundary effects
         idx = np.where(np.logical_and(
             self.z>window/self.nPoints,
             self.z<1-window/self.nPoints)
             )
 
-        print(window/self.nPoints)
         zReduced = self.z[idx]
-        rhoReduced = self.rho[idx]
+        rhoReduced = convolvedRho[idx]
 
         zReduced = np.concatenate(([0], zReduced, [1]))
         rhoReduced = np.concatenate(([0], rhoReduced, [0]))

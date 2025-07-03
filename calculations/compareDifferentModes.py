@@ -5,16 +5,13 @@ import numpy as np
 from scipy.optimize import curve_fit
 import scienceplots
 
-import matplotlib.pyplot as plt
-import scienceplots
-
-# plt.style.use(["science", "high-contrast"])
-# plt.rcParams["figure.figsize"] = (3.5, 2.6)
-# plt.rcParams["font.size"] = "5.4"
-# plt.rcParams["axes.labelsize"] = "13"
-# plt.rcParams["xtick.labelsize"] = "13"
-# plt.rcParams["ytick.labelsize"] = "13"
-# plt.rcParams["lines.linewidth"] = "0.9"
+plt.style.use(["science", "high-contrast"])
+plt.rcParams["figure.figsize"] = (3.5, 2.6)
+plt.rcParams["font.size"] = "5.4"
+plt.rcParams["axes.labelsize"] = "13"
+plt.rcParams["xtick.labelsize"] = "13"
+plt.rcParams["ytick.labelsize"] = "13"
+plt.rcParams["lines.linewidth"] = "0.9"
 
 
 from Vacuum_Polarization import Vacuum_Polarization
@@ -43,17 +40,17 @@ lambdaValue = vp.lambdaValue
 
 while True:
     try:
-        vp.setConfigFromDict(index=0)
+        vp.setConfigFromDict(index=-1)
     except TypeError as e:
         print(e)
         break
     
     # arr = [10,0,10,0,6,0, 10,0,10]
     # vp.convolveRho(arr)
-    # vp.convolveRho(arr)
+    vp.rho = vp.rho - vp.e**2 / np.pi * vp.lambdaValue * (vp.z - 1/2)
+    vp.convolveRho()
     p, _ = curve_fit(linear, vp.z, [ float(x) for x in vp.rho])
 
-    vp.rho = vp.rho #- vp.e**2 / np.pi * vp.lambdaValue * (vp.z - 1/2)
 
     window = vp.nPoints // (vp.maxN + 1)  *2
     kernel = [ np.exp(-x**2/2/window**2) for x in range(-3*window , 3*window+1)]
@@ -107,7 +104,7 @@ date = time.strftime("%Y%m%d-%H%M%S")
 if not os.path.exists(date):
     os.makedirs("figures/" + date)
 
-plt.show()
-#fig1.savefig(f"figures/{date}/rhoModeComparison.pdf")
-#fig2.savefig(f"figures/{date}/A0InducedComparison.pdf")
-#fig3.savefig(f"figures/{date}/A0(1) mode comparison.pdf")
+# plt.show()
+fig1.savefig(f"figures/{date}/rhoModeComparison.pdf")
+fig2.savefig(f"figures/{date}/A0InducedComparison.pdf")
+fig3.savefig(f"figures/{date}/A0(1) mode comparison.pdf")
