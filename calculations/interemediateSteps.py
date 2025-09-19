@@ -1,8 +1,20 @@
 from pathlib import Path, PurePath
 import re
 import matplotlib.pyplot as plt
+<<<<<<< HEAD
 
 import matplotlib_format
+=======
+import scienceplots
+
+plt.style.use(["science", "high-contrast"])
+plt.rcParams["figure.figsize"] = (3.5, 2.6)
+plt.rcParams["font.size"] = "5.4"
+plt.rcParams["axes.labelsize"] = "13"
+plt.rcParams["xtick.labelsize"] = "13"
+plt.rcParams["ytick.labelsize"] = "13"
+plt.rcParams["lines.linewidth"] = "0.9"
+>>>>>>> 56f278ba38b8e6dca00bf7b5f466caed29774e7e
 
 thingsRe = re.compile(r"([a-zA-Z0]*)_lambda_([\d.]*)_([a-z]+)")
 

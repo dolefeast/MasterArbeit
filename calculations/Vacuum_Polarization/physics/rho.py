@@ -17,7 +17,12 @@ def calculateRho(self):
         # The charge density associated to the nth mode
         # eigenstate is np array. A0 is a callable. 
         # A0(z) is of the same shape as eigenstate
+<<<<<<< HEAD
         rhoN = self.e*((omegaN - self.e*self.A0(self.z)) * phiN ** 2 + (-omegaN - self.e*self.A0(self.z)) * phiN[::-1] ** 2)
+=======
+        rhoN = self.a*self.e*((omegaN - self.e*self.a*self.A0(self.z)) * phiN ** 2 
+                + (-omegaN - self.e*self.a*self.A0(self.z)) * phiN[::-1] ** 2)
+>>>>>>> 56f278ba38b8e6dca00bf7b5f466caed29774e7e
 
 
         if self.subtractPertModes:

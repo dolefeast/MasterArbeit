@@ -124,7 +124,11 @@ def plotOneSolutionFamily(
                     recoveredQuantity,
                     color=lineColor,
                     # label=f"$\lambda={lambdaValueArray[i]}$", 
+<<<<<<< HEAD
                     label=f"$\\lambda = {round(lambdaValue, 3)} $",
+=======
+                    label=f"$\lambda = {round(lambdaValue, 3)} $", 
+>>>>>>> 56f278ba38b8e6dca00bf7b5f466caed29774e7e
                     )
 
 
@@ -172,6 +176,7 @@ axQScreened = fig5.subplots()
 axeigenstate = fig6.subplots()
 axModeChargeDensity = fig7.subplots()
 
+<<<<<<< HEAD
 axQInduced.set_ylim((0, -10))
 axQScreened.set_ylim((0, 15))
 
@@ -181,6 +186,14 @@ axesDict = {"rho":axRho, "A0Induced":ax_A0Induced, "eigenstates":axeigenstate}
 
 desiredLambdaValues = [1, 5, 10]
 
+=======
+desiredQuantities = ["rho", "A0Induced", "eigenstates"]
+
+axesDict = {"rho":axRho, "A0Induced":ax_A0Induced, "eigenstates":axeigenstate}
+
+desiredLambdaValues = [1, 5, 10,  18.1, 20.1]
+
+>>>>>>> 56f278ba38b8e6dca00bf7b5f466caed29774e7e
 formats = cycle(["-", "--", ":", "-."])
 
 for n in count():
@@ -213,16 +226,30 @@ if n > 1:
 else:
     ncol = 1
 
+
 axRho.legend(loc="best", ncol=ncol, markerscale=0.3)
 ax_A0Induced.legend(loc="best", ncol=ncol, markerscale=0.3)
 axeigenstate.legend(loc="best", ncol=ncol, markerscale=0.3)
 
 date = time.strftime("%Y%m%d-%H%M%S")
 
+<<<<<<< HEAD
 base_dir = "/home/santi/Projects/Vacuum Polarization/MasterArbeit/MasterArbeit/calculations"
 
 if not os.path.exists(date):
     os.makedirs(f"{base_dir}/figures/{date}")
+=======
+if not os.path.exists(date):
+    os.makedirs("figures/" + date)
+
+fig1.savefig(f"figures/{date}/vacuumPolarizationEvolution.pdf")
+fig2.savefig(f"figures/{date}/A0InducedEvolution.pdf")
+fig3.savefig(f"figures/{date}/eigenvalues.pdf")
+fig4.savefig(f"figures/{date}/inducedCharge.pdf")
+fig5.savefig(f"figures/{date}/electricFieldInduced.pdf")
+fig6.savefig(f"figures/{date}/eigenstate.pdf")
+fig7.savefig(f"figures/{date}/modeChargeDensity.pdf")
+>>>>>>> 56f278ba38b8e6dca00bf7b5f466caed29774e7e
 
 fig1.savefig(f"{base_dir}/figures/{date}/rhoEvolution.pdf")
 fig2.savefig(f"{base_dir}/figures/{date}/A0InducedEvolution.pdf")

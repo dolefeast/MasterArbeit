@@ -1,8 +1,23 @@
 import matplotlib.pyplot as plt
+<<<<<<< HEAD
 import numpy as np
 
 from Vacuum_Polarization import Vacuum_Polarization
 import matplotlib_format
+=======
+import scienceplots
+import numpy as np
+
+from Vacuum_Polarization import Vacuum_Polarization
+
+plt.style.use(["science", "high-contrast"])
+plt.rcParams["figure.figsize"] = (3.5, 2.6)
+plt.rcParams["font.size"] = "5.4"
+plt.rcParams["axes.labelsize"] = "13"
+plt.rcParams["xtick.labelsize"] = "13"
+plt.rcParams["ytick.labelsize"] = "13"
+plt.rcParams["lines.linewidth"] = "0.9"
+>>>>>>> 56f278ba38b8e6dca00bf7b5f466caed29774e7e
 
 fig1, ax1 = plt.subplots()
 fig2, ax2 = plt.subplots()
@@ -14,6 +29,10 @@ while True:
         vp.setConfigFromDict()
 
         vp.hadamard = False
+<<<<<<< HEAD
+=======
+
+>>>>>>> 56f278ba38b8e6dca00bf7b5f466caed29774e7e
         vp.rho = vp.rho - vp.lambdaValue*(vp.z-1/2)/np.pi
 
         # vp.rho = np.concatenate((vp.rho, vp.rho, vp.rho ))

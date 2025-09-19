@@ -1,6 +1,12 @@
 from itertools import cycle
 from pathlib import Path
+<<<<<<< HEAD
 import numpy as np
+=======
+from mpmath import quad
+import shutil
+import time
+>>>>>>> 56f278ba38b8e6dca00bf7b5f466caed29774e7e
 
 class Vacuum_Polarization:
     def __init__(self,
