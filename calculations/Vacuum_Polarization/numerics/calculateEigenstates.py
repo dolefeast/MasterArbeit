@@ -11,7 +11,8 @@ def calculateNormSquared(self, omega: float, eigenstate: callable, error=False, 
     Calculates the squared norm of a calculated non-normalized eigenstate
     """
 
-    normSquared = quad(lambda z: 2 * ( omega - self.e * self.A0(z) ) * eigenstate.sol(z)[0] ** 2, [0, 1], error=error, verbose=verbose) 
+    normSquared = quad(lambda z: 2 * ( omega - self.e * self.A0(z) ) * eigenstate.sol(z
+                                                                                      )[0] ** 2, [0, 1], error=error, verbose=verbose) 
 
     if error:
         print(f"mpmath.quad calculates norm = {normSquared[0]} ± {100*normSquared[1]/2/normSquared[0]}%")
@@ -37,8 +38,8 @@ def calculateSingleEigenstate(self, eigenvalueRange: tuple, error=False, verbose
             t_span=(0, 1),
             y0=initialValues,
             dense_output=True,
-            rtol=1e-8,
-            atol=1e-6,
+            rtol=1e-10,
+            atol=1e-8,
             )
 
     eigenvalue = self.bisectionMethod(

@@ -16,7 +16,7 @@ def saveDataScript(self):
 
     fileId = f"mass_{mString}_a_{aString}_lambda_{lambdaString}.txt"
     
-    rootDirectory = f"data/{self.directory}/{self.bcs}"
+    rootDirectory = f"/home/santi/Projects/Vacuum Polarization/MasterArbeit/calculations/data/{self.directory}/{self.bcs}"
     try:
         for key, value in solutionFamily.items():
             np.savetxt(

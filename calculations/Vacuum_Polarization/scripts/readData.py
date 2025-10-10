@@ -6,7 +6,7 @@ floatRe = re.compile("\d+_\d+")
 
 def getDirectoryMA(readMode='str', filterRegex=""):
     
-    dirs = Path("/home/santi/Projects/Vacuum Polarization/MasterArbeit/MasterArbeit/calculations/data")
+    dirs = Path("/home/santi/Projects/Vacuum Polarization/MasterArbeit/calculations/data")
     #dirs = Path("data")
 
     if filterRegex != "":

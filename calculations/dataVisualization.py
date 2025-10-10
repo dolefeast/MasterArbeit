@@ -4,10 +4,9 @@ import os
 from itertools import cycle, count
 import matplotlib.pyplot as plt
 import numpy as np
-import time
+
 
 import matplotlib_format
-
 from Vacuum_Polarization import Vacuum_Polarization
 
 vp = Vacuum_Polarization()
@@ -17,7 +16,8 @@ try:
 except IndexError:
     filterRegex = ""
 
-cmap = cycle(plt.rcParams['axes.prop_cycle'].by_key()['color'])
+CMAP = cycle(plt.rcParams['axes.prop_cycle'].by_key()['color'])
+BASE_DIR = "/home/santi/Projects/Vacuum Polarization/MasterArbeit/calculations"
 
 def checkBrokenLambdaIndex(solutionFamilyArray):
     """
@@ -49,59 +49,13 @@ def maxDerivative(y):
 
     return -y.derivative()(1/2)
 
-
-def plotOneSolutionFamily(
-        lineStyle,
-        desiredLambdaValues,
-        filterRegex, 
-        axRho,
-        ax_A0Induced,
-        axOmega,
-        axQInduced,
-        axQScreened,
-        axesDict,
-            ):
-
+def plotDesiredLambda(solutionFamilyArray, axesDict, desiredLambdaValues, lineStyle):
     colorCycle = cycle("#247ba0, #a40e4c, #28502e, #1a1b41, #8d0801".split(", "))
-    color=next(cmap)
-    directory, m, a, solutionFamilyArray = vp.openSolutionFamilyArray(filterRegex)
 
-    label = directory.parent.name
-    inducedQList = []
-
-    try:
-        maxN = len(solutionFamilyArray["eigenvalues"][0])
-    except TypeError:
-        maxN = 1
-    if maxN == 1: 
-        omegaYlim = 1.05*solutionFamilyArray["eigenvalues"][0][:]
-        omegaYlim[0] = 0
-    else:
-        omegaYlim = (0, 1.05*solutionFamilyArray["eigenvalues"][0][2])
-
-    axOmega.set_ylim(omegaYlim)
     lambdaValueArray = solutionFamilyArray["lambdaValue"]
-        
-    brokenLambdaIndex = checkBrokenLambdaIndex(solutionFamilyArray)
+    desiredLambdaIndices = [ getIndexForValueFromBelow(lambdaValueArray, value) for value in desiredLambdaValues ]
 
-    for i, lambdaValue in enumerate(solutionFamilyArray["lambdaValue"][:brokenLambdaIndex]):
-        recoveredQuantity = solutionFamilyArray["A0Induced"][i]
-        inducedQList.append(maxDerivative(recoveredQuantity))
-    
-    inducedTotalChargeList = [x+ y for x, y in zip(lambdaValueArray[:brokenLambdaIndex], inducedQList)]
-
-    # label = f"{str(directory.parent.name)}"
-    axQInduced.plot(lambdaValueArray[:brokenLambdaIndex], inducedQList, label=label, color=color)
-    axQScreened.plot(lambdaValueArray[:brokenLambdaIndex], inducedTotalChargeList, label=label, color=color)
-
-    print("The maximum lambda value obtained is", max(lambdaValueArray[:brokenLambdaIndex])) #, ", with a minimum lambda step of", lambdaValueArray[-1]-lambdaValueArray[-2])
-
-    axOmega.plot(lambdaValueArray[:brokenLambdaIndex], solutionFamilyArray["eigenvalues"][:brokenLambdaIndex], color=color,)
-    axOmega.plot([], [],  label=label, color=color,)
-
-    desiredLambdaIndex = [ getIndexForValueFromBelow(lambdaValueArray, value) for value in desiredLambdaValues ]
-
-    for i in desiredLambdaIndex:
+    for i in desiredLambdaIndices:
         lineColor = next(colorCycle)
         for quantity in desiredQuantities:
             axesDict[quantity].set_xlabel("z")
@@ -110,28 +64,25 @@ def plotOneSolutionFamily(
             if i is None:
                 continue
             try:
-                recoveredQuantity = solutionFamilyArray[quantity][i]
+                A0Induced = solutionFamilyArray[quantity][i]
             except:
                 continue
 
             lambdaValue = lambdaValueArray[i]
 
-            nPoints = len(recoveredQuantity)
-            z = np.linspace(0, 1, nPoints) 
+            nPoints = len(A0Induced)
+            z = np.linspace(0, 1, nPoints)
 
             axesDict[quantity].plot(
                     z,
-                    recoveredQuantity,
+                    A0Induced,
                     color=lineColor,
-                    # label=f"$\lambda={lambdaValueArray[i]}$", 
-<<<<<<< HEAD
-                    label=f"$\\lambda = {round(lambdaValue, 3)} $",
-=======
-                    label=f"$\lambda = {round(lambdaValue, 3)} $", 
->>>>>>> 56f278ba38b8e6dca00bf7b5f466caed29774e7e
+                    linestyle=lineStyle,
+                    #label=f"$\lambda = {round(lambdaValue, 3)} $",
                     )
 
-
+def formatAxes(axRho, ax_A0Induced, axQScreened, axQInduced, axeigenstate, axOmega, solutionFamilyArray):
+    axRho, ax_A0Induced, axQScreened, axQInduced, axeigenstate, axOmega = axes
     axRho.set_xlabel(r"$z$")
     ax_A0Induced.set_xlabel(r"$z$")
 
@@ -148,6 +99,18 @@ def plotOneSolutionFamily(
     axQInduced.set_ylabel(r"$Q_I$")
     axQScreened.set_ylabel(r"$\lambda + Q_I$")
 
+    try:
+        maxN = len(solutionFamilyArray["eigenvalues"][0])
+    except TypeError:
+        maxN = 1
+    if maxN == 1:
+        omegaYlim = 1.05*solutionFamilyArray["eigenvalues"][0][:]
+        omegaYlim[0] = 0
+    else:
+        omegaYlim = (0, 1.05*solutionFamilyArray["eigenvalues"][0][2])
+
+    axOmega.set_ylim(omegaYlim)
+
     fig1.tight_layout()
     fig2.tight_layout()
     fig3.tight_layout()
@@ -155,6 +118,56 @@ def plotOneSolutionFamily(
     fig5.tight_layout()
     fig6.tight_layout()
     fig7.tight_layout()
+
+def plotInducedCharge(solutionFamilyArray, axQInduced, axQScreened):
+    brokenLambdaIndex = checkBrokenLambdaIndex(solutionFamilyArray)
+
+    lambdaValueArray = solutionFamilyArray["lambdaValue"]
+
+    inducedQList = []
+
+    for i, lambdaValue in enumerate(solutionFamilyArray["lambdaValue"][:brokenLambdaIndex]):
+        A0Induced = solutionFamilyArray["A0Induced"][i]
+        inducedQList.append(maxDerivative(A0Induced))
+    
+    inducedTotalChargeList = [x+y for x, y in zip(lambdaValueArray[:brokenLambdaIndex], inducedQList)]
+
+    label = directory.parent.name
+    if len(lambdaValueArray)==1:
+        marker = "x"
+    else:
+        marker = "-"
+
+    axQInduced.plot(lambdaValueArray[:brokenLambdaIndex], inducedQList, label=label, color=color, marker=marker)
+    axQScreened.plot(lambdaValueArray[:brokenLambdaIndex], inducedTotalChargeList, label=label, marker=marker, color=color)
+
+def main(
+        lineStyle,
+        desiredLambdaValues,
+        filterRegex, 
+        axRho,
+        ax_A0Induced,
+        axOmega,
+        axQInduced,
+        axQScreened,
+        axesDict,
+            ):
+    
+    color = next(CMAP)
+    directory, m, a, solutionFamilyArray = vp.openSolutionFamilyArray(filterRegex)
+
+    plotInducedCharge(solutionFamilyArray, axQInduced, axQScreened)
+
+    lambdaValueArray = solutionFamilyArray["lambdaValue"]
+        
+    print("The maximum lambda value obtained is", max(lambdaValueArray[:brokenLambdaIndex])) #, ", with a minimum lambda step of", lambdaValueArray[-1]-lambdaValueArray[-2])
+
+    axOmega.plot(lambdaValueArray[:brokenLambdaIndex], solutionFamilyArray["eigenvalues"][:brokenLambdaIndex], color=color,)
+    axOmega.plot([], [],  label=label, color=color,)
+
+    plotDesiredLambda(solutionFamilyArray, axesDict, desiredLambdaValues, lineStyle)
+    
+    formatAxes(axRho, ax_A0Induced, axQScreened, axQInduced, axeigenstate, axOmega, solutionFamilyArray)
 
     return solutionFamilyArray
 
@@ -176,32 +189,20 @@ axQScreened = fig5.subplots()
 axeigenstate = fig6.subplots()
 axModeChargeDensity = fig7.subplots()
 
-<<<<<<< HEAD
-axQInduced.set_ylim((0, -10))
-axQScreened.set_ylim((0, 15))
-
 desiredQuantities = ["rho", "A0Induced", "eigenstates"]
 
 axesDict = {"rho":axRho, "A0Induced":ax_A0Induced, "eigenstates":axeigenstate}
 
-desiredLambdaValues = [1, 5, 10]
+desiredLambdaValues = [1,]
 
-=======
-desiredQuantities = ["rho", "A0Induced", "eigenstates"]
-
-axesDict = {"rho":axRho, "A0Induced":ax_A0Induced, "eigenstates":axeigenstate}
-
-desiredLambdaValues = [1, 5, 10,  18.1, 20.1]
-
->>>>>>> 56f278ba38b8e6dca00bf7b5f466caed29774e7e
 formats = cycle(["-", "--", ":", "-."])
 
-for n in count():
+for nCurves in count():
     try:
-        solutionFamilyArray = plotOneSolutionFamily(
+        solutionFamilyArray = main(
             next(formats),
             desiredLambdaValues,
-            filterRegex, 
+            filterRegex,
             axRho,
             ax_A0Induced,
             axOmega,
@@ -210,22 +211,17 @@ for n in count():
             axesDict,
             )
        
-
     except TypeError as e:
         print(e)
         break
 
-if n > 1:
+if nCurves > 1:
     axQScreened.legend(loc="best")
     axQInduced.legend(loc="best")
     axOmega.legend(loc="best")
-    # handles, labels = plt.gca().get_legend_handles_labels()
-    # by_label = dict(zip(labels, handles))
-    # axOmega.legend(by_label.values(), by_label.keys(), loc="best")
     ncol = 2
 else:
     ncol = 1
-
 
 axRho.legend(loc="best", ncol=ncol, markerscale=0.3)
 ax_A0Induced.legend(loc="best", ncol=ncol, markerscale=0.3)
@@ -233,28 +229,13 @@ axeigenstate.legend(loc="best", ncol=ncol, markerscale=0.3)
 
 date = time.strftime("%Y%m%d-%H%M%S")
 
-<<<<<<< HEAD
-base_dir = "/home/santi/Projects/Vacuum Polarization/MasterArbeit/MasterArbeit/calculations"
-
 if not os.path.exists(date):
-    os.makedirs(f"{base_dir}/figures/{date}")
-=======
-if not os.path.exists(date):
-    os.makedirs("figures/" + date)
+    os.makedirs(f"{BASE_DIR}/figures/{date}")
 
-fig1.savefig(f"figures/{date}/vacuumPolarizationEvolution.pdf")
-fig2.savefig(f"figures/{date}/A0InducedEvolution.pdf")
-fig3.savefig(f"figures/{date}/eigenvalues.pdf")
-fig4.savefig(f"figures/{date}/inducedCharge.pdf")
-fig5.savefig(f"figures/{date}/electricFieldInduced.pdf")
-fig6.savefig(f"figures/{date}/eigenstate.pdf")
-fig7.savefig(f"figures/{date}/modeChargeDensity.pdf")
->>>>>>> 56f278ba38b8e6dca00bf7b5f466caed29774e7e
-
-fig1.savefig(f"{base_dir}/figures/{date}/rhoEvolution.pdf")
-fig2.savefig(f"{base_dir}/figures/{date}/A0InducedEvolution.pdf")
-fig3.savefig(f"{base_dir}/figures/{date}/eigenvalues.pdf")
-fig4.savefig(f"{base_dir}/figures/{date}/inducedCharge.pdf")
-fig5.savefig(f"{base_dir}/figures/{date}/electricFieldInduced.pdf")
-fig6.savefig(f"{base_dir}/figures/{date}/eigenstate.pdf")
-fig7.savefig(f"{base_dir}/figures/{date}/modeChargeDensity.pdf")
+fig1.savefig(f"{BASE_DIR}/figures/{date}/rhoEvolution.pdf")
+fig2.savefig(f"{BASE_DIR}/figures/{date}/A0InducedEvolution.pdf")
+fig3.savefig(f"{BASE_DIR}/figures/{date}/eigenvalues.pdf")
+fig4.savefig(f"{BASE_DIR}/figures/{date}/inducedCharge.pdf")
+fig5.savefig(f"{BASE_DIR}/figures/{date}/electricFieldInduced.pdf")
+fig6.savefig(f"{BASE_DIR}/figures/{date}/eigenstate.pdf")
+fig7.savefig(f"{BASE_DIR}/figures/{date}/modeChargeDensity.pdf")
